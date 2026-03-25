@@ -1,38 +1,51 @@
 import React, { useState } from "react";
-import { execMD, invalidFields } from "../../dummyData";
-import DisabledByDefaultIcon from '@mui/icons-material/DisabledByDefault';
-import CheckBoxIcon from '@mui/icons-material/CheckBox';
-import { Autocomplete, Box, Card, CardContent, Typography, TextField, Button, Divider, Stack, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
+import {
+    Autocomplete,
+    Box,
+    Card,
+    CardContent,
+    Typography,
+    TextField,
+    Button,
+    Divider,
+    Stack,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle
+} from "@mui/material";
 
-const RecordCard = ({record}) => {
-    const [option, setOption] = useState(invalidFields[0]) //invalid field from record
-    const [showMD, setShowMD] = useState(false)
+const RecordCard = ({ record }) => {
+
+    const invalidFields = record["Invalid Records"]
+
+    const [option, setOption] = useState(invalidFields[0] || null);
+    const [showMD, setShowMD] = useState(false);
 
     const handleChange = (e, val) => {
-        setOption(val)
-    }
+        setOption(val);
+    };
 
     return (
         <Stack justifyContent="center" alignItems="center">
-            <Card sx={{ width: "60vw" , backgroundColor: "#f9f9f9"}}>
+            <Card sx={{ width: "60vw", backgroundColor: "#f9f9f9" }}>
                 <CardContent>
+
                     <Stack direction="row" justifyContent="space-between" alignItems="center">
                         <Box>
                             <Typography fontWeight={600}>
-                                {execMD[0].name} {/*executionid*/}
+                                ExecutionID
                             </Typography>
                             <Typography variant="body2">
-                                {execMD[0].value} {/*executionid value*/}
+                                {record.ExecutionId}
                             </Typography>
                         </Box>
 
                         <Autocomplete
-                            options={invalidFields}  
-                            // all invalidFields
+                            options={invalidFields}
                             value={option}
                             onChange={handleChange}
-                            getOptionLabel={(option) => option?.name || ""} 
-                            //invalid field name
+                            getOptionLabel={(option) => option?.field || ""}
                             renderInput={(params) => (
                                 <TextField {...params} label="Invalid Field" />
                             )}
@@ -40,40 +53,56 @@ const RecordCard = ({record}) => {
                         />
                     </Stack>
 
-                    {option && <>
-                        <Divider sx={{ my: 2 }} />
-                        <Stack direction="row" spacing={4}>
-                            <Stack direction="row" spacing={1} alignItems="center">
-                                <Typography fontWeight={600}>Existing Value:</Typography>
-                                <Typography variant="body2" color="red">
-                                    {option?.previousValue}
-                                </Typography>
-                            </Stack>
+                    {option && (
+                        <>
+                            <Divider sx={{ my: 2 }} />
 
-                            <Button onClick={() => setShowMD(true) }>Metadata</Button>
-                        </Stack>
-                    </>}
+                            <Stack direction="row" spacing={4}>
+                                <Stack direction="row" spacing={1} alignItems="center">
+                                    <Typography fontWeight={600}>
+                                        Existing Value:
+                                    </Typography>
+                                    <Typography variant="body2" color="red">
+                                        {option.value}
+                                    </Typography>
+                                </Stack>
+
+                                <Button onClick={() => setShowMD(true)}>
+                                    Metadata
+                                </Button>
+                            </Stack>
+                        </>
+                    )}
 
                     <Dialog
                         open={showMD}
-                        onClose={() => setShowMD(false)} 
+                        onClose={() => setShowMD(false)}
                         disableRestoreFocus
                     >
                         <DialogTitle>Metadata</DialogTitle>
 
                         <DialogContent dividers>
-                           {invalidFields.map((e)=>{
-                            return <Stack direction="row" gap={1} alignItems="center" key={e.name}>
-                                <Typography fontWeight={600}>{`${e.name}:`}</Typography> {/*metadata fieldname */}
-                                <Typography variant="body2">
-                                    {e.previousValue}  {/*metadata fieldname value */}
-                                </Typography>
-                            </Stack>
-                           })}     
+                            {option?.metadata?.map((item, i) => (
+                                <Stack
+                                    direction="row"
+                                    gap={1}
+                                    alignItems="center"
+                                    key={i}
+                                >
+                                    <Typography fontWeight={600}>
+                                        {item.name}:
+                                    </Typography>
+                                    <Typography variant="body2">
+                                        {item.value}
+                                    </Typography>
+                                </Stack>
+                            ))}
                         </DialogContent>
 
                         <DialogActions>
-                            <Button onClick={() => setShowMD(false)}>Close</Button>
+                            <Button onClick={() => setShowMD(false)}>
+                                Close
+                            </Button>
                         </DialogActions>
                     </Dialog>
 
@@ -81,6 +110,6 @@ const RecordCard = ({record}) => {
             </Card>
         </Stack>
     );
-}
+};
 
 export default RecordCard;

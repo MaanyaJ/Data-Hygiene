@@ -1,19 +1,22 @@
 import React, { useEffect, useState } from 'react'
 import './App.css'
 import RecordCard from './components/RecordCard'
-import { Box, Pagination } from '@mui/material'
+import { Box, Pagination, TextField, Stack } from '@mui/material'
 
 const App = () => {
 
   const [page, setPage] = useState(1)
   const [records, setRecords] = useState([])
+  const [totalPages, setTotalPages] = useState(0)
+  const pageSize = 50
 
-
-  const fetchRecords = async(page) => {
+  const fetchRecords = async (page) => {
     try {
-      const res = await fetch(`http://127.0.0.1:8000/invalid-records?page=${page}&size=50`)
-      
+      const res = await fetch(`http://192.168.0.182:8000/invalid-records?page=${page}&size=${pageSize}`)
       const data = await res.json()
+
+      
+      setTotalPages(Math.ceil(data.total_invalid_records / pageSize)) 
       setRecords(data.data)
     } catch (error) {
       console.log(error)
@@ -22,7 +25,6 @@ const App = () => {
 
   useEffect(() => {
     fetchRecords(page)
-    console.log(records)
   }, [page])
 
   return (
@@ -34,19 +36,15 @@ const App = () => {
         margin: 2,
         alignItems: "center"
       }}>
-        
+
         {
-          records.map((e)=>{
-            return <RecordCard record = {e}></RecordCard>
+          records.map((e) => {
+            return <RecordCard record={e} key={e.ExecutionId}></RecordCard>
           })
         }
-        <RecordCard/>
-        <RecordCard/>
-        <RecordCard/>
-        <RecordCard/>
 
         <Pagination
-          count={50}
+          count={totalPages}
           variant='outlined'
           color='primary'
           page={page}
@@ -55,7 +53,11 @@ const App = () => {
               border: "none"
             }
           }}
-          onChange={(e,val)=>{setPage(val)}}
+          onChange={(e, val) => { setPage(val) }}
+          siblingCount={1}
+          boundaryCount={1}
+          showFirstButton
+          showLastButton
         />
       </Box>
 
