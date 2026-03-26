@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import './App.css'
 import RecordCard from './components/RecordCard'
-import { Box, Pagination, TextField, Stack } from '@mui/material'
+import { Box, Pagination, Typography } from '@mui/material'
 
 const App = () => {
 
@@ -15,9 +15,9 @@ const App = () => {
       const res = await fetch(`http://192.168.0.182:8000/invalid-records?page=${page}&size=${pageSize}`)
       const data = await res.json()
 
-      
-      setTotalPages(Math.ceil(data.total_invalid_records / pageSize)) 
+      setTotalPages(Math.ceil(data.total_invalid_records / pageSize))
       setRecords(data.data)
+
     } catch (error) {
       console.log(error)
     }
@@ -59,6 +59,9 @@ const App = () => {
           showFirstButton
           showLastButton
         />
+        <Typography>
+          Page {page} of {totalPages}
+        </Typography>
       </Box>
 
     </>
