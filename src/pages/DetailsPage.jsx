@@ -7,6 +7,7 @@ const DetailsPage = () => {
 
     const { id } = useParams()
     const [error, setError] = useState(null)
+    const [data, setData] = useState(null)
     const [loading, setLoading] = useState(false)
 
     const fetchInvalidFields = async () => {
@@ -14,7 +15,9 @@ const DetailsPage = () => {
         try {
             const res = await fetch(`http://192.168.0.182:8000/snapshot-records/${id}`)
             const data = await res.json()
+            setData(data.data)
             console.log(data)
+            
         } catch (error) {
             console.log(error)
             setError(error)
