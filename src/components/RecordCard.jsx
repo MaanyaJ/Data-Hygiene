@@ -1,110 +1,53 @@
 import React, { useState } from "react";
+import { grey } from "@mui/material/colors";
+import Errors from "./Errors";
+import { useNavigate } from "react-router-dom";
 import {
-    Autocomplete,
-    Box,
     Card,
+    Chip,
     CardContent,
     Typography,
-    TextField,
-    Button,
     Divider,
     Stack,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle
 } from "@mui/material";
 
 const RecordCard = ({ record }) => {
 
-    const invalidFields = record["Invalid Records"]
-
-    const [option, setOption] = useState(invalidFields[0] || null);
-    const [showMD, setShowMD] = useState(false);
-
-    const handleChange = (e, val) => {
-        setOption(val);
-    };
+    const invalidFields = record["InvalidFields"]
+    const navigate = useNavigate()
 
     return (
         <Stack justifyContent="center" alignItems="center">
-            <Card sx={{ width: "60vw", backgroundColor: "#f9f9f9" }}>
+            <Card 
+            onClick={() => navigate(`/record/${record.ExecutionId}`)}
+            sx={{
+                width: "50vw",
+                backgroundColor: "#f9f9f9",
+
+                boxShadow: "0px 2px 8px rgba(0,0,0,0.08)",
+
+                transition: "all 0.25s ease",
+
+                "&:hover": {
+                    transform: "scale(1.02)",
+                    boxShadow: "0px 6px 20px rgba(0,0,0,0.12)",
+                    cursor: "pointer"
+                },
+            }}>
                 <CardContent>
 
-                    <Stack direction="row" justifyContent="space-between" alignItems="center">
-                        <Box>
-                            <Typography fontWeight={600}>
-                                ExecutionID
-                            </Typography>
-                            <Typography variant="body2">
-                                {record.ExecutionId}
-                            </Typography>
-                        </Box>
-
-                        <Autocomplete
-                            options={invalidFields}
-                            value={option}
-                            onChange={handleChange}
-                            getOptionLabel={(option) => option?.field || ""}
-                            renderInput={(params) => (
-                                <TextField {...params} label="Invalid Field" />
-                            )}
-                            sx={{ width: 200 }}
-                        />
+                    <Stack direction="row" alignItems="center" gap={1} >
+                        <Typography fontWeight={600}>
+                            ExecutionID:
+                        </Typography>
+                        <Typography variant="body2" color="primary" fontWeight="bold">
+                            {record.ExecutionId}
+                        </Typography>
                     </Stack>
 
-                    {option && (
-                        <>
-                            <Divider sx={{ my: 2 }} />
+                    <Divider sx={{ my: 1 }} />
 
-                            <Stack direction="row" spacing={4}>
-                                <Stack direction="row" spacing={1} alignItems="center">
-                                    <Typography fontWeight={600}>
-                                        Existing Value:
-                                    </Typography>
-                                    <Typography variant="body2" color="red">
-                                        {option.value}
-                                    </Typography>
-                                </Stack>
-
-                                <Button onClick={() => setShowMD(true)}>
-                                    Metadata
-                                </Button>
-                            </Stack>
-                        </>
-                    )}
-
-                    <Dialog
-                        open={showMD}
-                        onClose={() => setShowMD(false)}
-                        disableRestoreFocus
-                    >
-                        <DialogTitle>Metadata</DialogTitle>
-
-                        <DialogContent dividers>
-                            {option?.metadata?.map((item, i) => (
-                                <Stack
-                                    direction="row"
-                                    gap={1}
-                                    alignItems="center"
-                                    key={i}
-                                >
-                                    <Typography fontWeight={600}>
-                                        {item.name}:
-                                    </Typography>
-                                    <Typography variant="body2">
-                                        {item.value}
-                                    </Typography>
-                                </Stack>
-                            ))}
-                        </DialogContent>
-
-                        <DialogActions>
-                            <Button onClick={() => setShowMD(false)}>
-                                Close
-                            </Button>
-                        </DialogActions>
-                    </Dialog>
+                    <Errors invalidFields={invalidFields} />
 
                 </CardContent>
             </Card>
