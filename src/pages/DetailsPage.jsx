@@ -1,18 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Box, Container, Paper } from "@mui/material";
-import mockData from "../mock/details.json";
 import ErrorPage from "../components/ErrorPage";
 import Loader from "../components/Loader";
 import ExecutionInfoBox from "../components/ExecutionInfoBox";
 import CorrectionsTable from "../components/CorrectionsTable";
- 
-const USE_MOCK = false;
- 
+  
 const DetailsPage = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
- 
+   
   const [error, setError] = useState(null);
   const [executionData, setExecutionData] = useState(null);
   const [data, setData] = useState(null)
@@ -23,16 +19,6 @@ const DetailsPage = () => {
     setError(null);
  
     try {
-      if (USE_MOCK) {
-        console.log("Using MOCK data");
- 
-        setTimeout(() => {
-          setData(mockData);
-          setLoading(false);
-        }, 500);
- 
-        return;
-      }
  
       const res = await fetch(`http://192.168.0.182:8000/snapshot-records/${id}`);
  
@@ -41,6 +27,7 @@ const DetailsPage = () => {
       }
  
       const data = await res.json();
+
       console.log("API response:", data);
  
       setExecutionData(data.Execution_data);
@@ -49,11 +36,9 @@ const DetailsPage = () => {
     } catch (err) {
       console.log(err);
       setError(err);
-      setLoading(false);
+
     } finally {
-      if (!USE_MOCK) {
         setLoading(false);
-      }
     }
   };
  
