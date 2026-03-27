@@ -1,44 +1,11 @@
 import React from "react";
 import { Box, Paper, Typography } from "@mui/material";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
- 
-const InfoItem = ({ label, value, borderRight = false, borderBottom = false }) => {
-  return (
-    <Box
-      sx={{
-        p: 2,
-        borderRight: { md: borderRight ? "1px solid #e5eaf2" : "none" },
-        borderBottom: {
-          xs: borderBottom ? "1px solid #e5eaf2" : "none",
-          md: "none",
-        },
-      }}
-    >
-      <Typography
-        sx={{
-          fontSize: 13,
-          color: "#5b6b82",
-          fontWeight: 600,
-          mb: 0.5,
-        }}
-      >
-        {label}
-      </Typography>
- 
-      <Typography
-        sx={{
-          fontSize: 16,
-          color: "#17233a",
-          fontWeight: 600,
-        }}
-      >
-        {value}
-      </Typography>
-    </Box>
-  );
-};
- 
+
+const COLUMNS = 3;
+
 const ExecutionInfoBox = ({ executionInfo }) => {
+  const entries = Object.entries(executionInfo);
+
   return (
     <Box
       sx={{
@@ -48,19 +15,10 @@ const ExecutionInfoBox = ({ executionInfo }) => {
         mb: 5,
       }}
     >
-      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-       
-        <Typography
-          variant="h6"
-          sx={{
-            fontWeight: 700,
-            color: "#17233a",
-          }}
-        >
-          Execution Information
-        </Typography>
-      </Box>
- 
+      <Typography variant="h6" sx={{ fontWeight: 700, color: "#17233a", mb: 2 }}>
+        Execution Information
+      </Typography>
+
       <Paper
         elevation={0}
         sx={{
@@ -73,52 +31,35 @@ const ExecutionInfoBox = ({ executionInfo }) => {
         <Box
           sx={{
             display: "grid",
-            gridTemplateColumns: { xs: "1fr", md: "repeat(3, 1fr)" },
-            borderBottom: { md: "1px solid #e5eaf2" },
+            gridTemplateColumns: { xs: "1fr", md: `repeat(${COLUMNS}, 1fr)` },
           }}
         >
-          <InfoItem
-            label="Benchmark Type"
-            value={executionInfo.benchmarkType}
-            borderRight
-            borderBottom
-          />
-          <InfoItem
-            label="SUT Type"
-            value={executionInfo.sutType}
-            borderRight
-            borderBottom
-          />
-          <InfoItem
-            label="Run Category"
-            value={executionInfo.runCategory}
-            borderBottom
-          />
-        </Box>
- 
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: { xs: "1fr", md: "repeat(3, 1fr)" },
-          }}
-        >
-          <InfoItem
-            label="Created On"
-            value={executionInfo.createdOn}
-            borderRight
-            borderBottom
-          />
-          <InfoItem
-            label="Tester"
-            value={executionInfo.tester}
-            borderRight
-            borderBottom
-          />
-          <InfoItem label="Result Type" value={executionInfo.resultType} />
+          {entries.map(([key, value], index) => {
+            const isLastInRow = (index + 1) % COLUMNS === 0;
+            const isLastRow = index >= entries.length - (entries.length % COLUMNS || COLUMNS);
+
+            return (
+              <Box
+                key={key}
+                sx={{
+                  p: 2,
+                  borderRight: { md: isLastInRow ? "none" : "1px solid #e5eaf2" },
+                  borderBottom: isLastRow ? "none" : "1px solid #e5eaf2",
+                }}
+              >
+                <Typography sx={{ fontSize: 13, color: "#5b6b82", fontWeight: 600, mb: 0.5 }}>
+                  {key}
+                </Typography>
+                <Typography sx={{ fontSize: 16, color: "#17233a", fontWeight: 600 }}>
+                  {value ? value : "-"}
+                </Typography>
+              </Box>
+            );
+          })}
         </Box>
       </Paper>
     </Box>
   );
 };
- 
+
 export default ExecutionInfoBox;

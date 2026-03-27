@@ -4,7 +4,6 @@ import { Box, Container, Paper } from "@mui/material";
 import mockData from "../mock/details.json";
 import ErrorPage from "../components/ErrorPage";
 import Loader from "../components/Loader";
-import DetailsPageHeader from "../components/DetailsPageHeader";
 import ExecutionInfoBox from "../components/ExecutionInfoBox";
 import CorrectionsTable from "../components/CorrectionsTable";
  
@@ -15,7 +14,8 @@ const DetailsPage = () => {
   const navigate = useNavigate();
  
   const [error, setError] = useState(null);
-  const [data, setData] = useState(null);
+  const [executionData, setExecutionData] = useState(null);
+  const [data, setData] = useState(null)
   const [loading, setLoading] = useState(false);
  
   const fetchInvalidFields = async () => {
@@ -40,10 +40,12 @@ const DetailsPage = () => {
         throw new Error("Failed to fetch record details");
       }
  
-      const result = await res.json();
-      console.log("API response:", result);
+      const data = await res.json();
+      console.log("API response:", data);
  
-      setData(result.Execution_data);
+      setExecutionData(data.Execution_data);
+      setData(data.Data)
+
     } catch (err) {
       console.log(err);
       setError(err);
@@ -61,21 +63,10 @@ const DetailsPage = () => {
  
   if (loading) return <Loader />;
   if (error) return <ErrorPage />;
-  if (!data) return null;
+  if (!data) return "No data to show";
  
-  const executionInfo = {
-    executionId: data?.execution_id || "-",
-    benchmarkType: data?.benchmarkType || "-",
-    sutType: data?.sutType || "-",
-    runCategory: data?.runCategory || "-",
-    createdOn: data?.createdOn || "-",
-    tester: data?.tester || "-",
-    resultType: data?.resultType || "-",
-    invalidFields: data?.invalidFields || [],
-  };
- 
-  const tableRows = Array.isArray(data?.Data)
-    ? data.Data.map((item, index) => ({
+  const tableRows = Array.isArray(data)
+    ? data.map((item, index) => ({
         id: index,
         fieldName: item?.field || "---",
         currentValue: item?.value || "---",
@@ -88,32 +79,16 @@ const DetailsPage = () => {
     : [];
  
   return (
-    // <Box
-    //   sx={{
-    //     minHeight: "100vh",
-    //     bgcolor: "#f5f7fb",
-    //     py: 4,
-    //   }}
-    // >
       <Container maxWidth="xl">
         <Paper
           elevation={0}
-         
         >
-          <DetailsPageHeader
-            navigate={navigate}
-            executionId={executionInfo.executionId}
-            invalidCount={executionInfo.invalidFields.length}
-            resultType={executionInfo.resultType}
-          />
- 
           <Box sx={{ px: 4, pt: 4, pb: 4 }}>
-            <ExecutionInfoBox executionInfo={executionInfo} />
+            <ExecutionInfoBox executionInfo={executionData} />
             <CorrectionsTable tableRows={tableRows} />
           </Box>
         </Paper>
       </Container>
-    // </Box>
   );
 };
  
