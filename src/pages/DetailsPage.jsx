@@ -48,7 +48,8 @@ const DetailsPage = () => {
  
   if (loading) return <Loader />;
   if (error) return <ErrorPage />;
-  if (!data) return "No data to show";
+  if (!data) return "No invalid data in the response to show";
+  if (!executionData) return "No execution data to show";
  
   const tableRows = Array.isArray(data)
     ? data.map((item, index) => ({
