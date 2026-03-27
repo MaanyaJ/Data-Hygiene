@@ -51,6 +51,7 @@ const LandingPage = () => {
                     <ErrorPage message={error} onRetry={() => fetchRecords(page)} />
                 ) : (
                     <>
+                    <Typography variant='h3'>Data Hygiene</Typography>
                         <Typography>
                             Page {page} of {totalPages}
                         </Typography>
