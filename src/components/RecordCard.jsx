@@ -4,7 +4,6 @@ import Errors from "./Errors";
 import { useNavigate } from "react-router-dom";
 import {
     Card,
-    Chip,
     CardContent,
     Typography,
     Divider,
@@ -18,31 +17,62 @@ const RecordCard = ({ record }) => {
 
     return (
         <Stack justifyContent="center" alignItems="center">
-            <Card 
-            onClick={() => navigate(`/record/${record.ExecutionId}`)}
-            sx={{
-                width: "50vw",
-                backgroundColor: "#f9f9f9",
+            <Card
+                onClick={() => navigate(`/record/${record.ExecutionId}`)}
+                sx={{
+                    width: "60vw",
+                    backgroundColor: "#f9f9f9",
 
-                boxShadow: "0px 2px 8px rgba(0,0,0,0.08)",
+                    boxShadow: "0px 2px 8px rgba(0,0,0,0.08)",
 
-                transition: "all 0.25s ease",
+                    transition: "all 0.25s ease",
 
-                "&:hover": {
-                    transform: "scale(1.02)",
-                    boxShadow: "0px 6px 20px rgba(0,0,0,0.12)",
-                    cursor: "pointer"
-                },
-            }}>
+                    "&:hover": {
+                        transform: "scale(1.02)",
+                        boxShadow: "0px 6px 20px rgba(0,0,0,0.12)",
+                        cursor: "pointer"
+                    },
+                }}>
                 <CardContent>
 
-                    <Stack direction="row" alignItems="center" gap={1} >
-                        <Typography fontWeight={600}>
-                            ExecutionID:
-                        </Typography>
-                        <Typography variant="body2" color="primary" fontWeight="bold">
-                            {record.ExecutionId}
-                        </Typography>
+                    <Stack direction="row" gap={8}>
+
+                        <Stack>
+                            <Typography fontWeight={600}>
+                                ExecutionID:
+                            </Typography>
+                            <Typography variant="body2" color="primary" fontWeight="bold">
+                                {record.ExecutionId}
+                            </Typography>
+                        </Stack>
+
+                        <Stack>
+                            <Typography fontWeight={600}>
+                                Benchmark Category:
+                            </Typography>
+                            <Typography variant="body2" color="primary" fontWeight="bold">
+                                {record.BenchmarkCategory}
+                            </Typography>
+                        </Stack>
+
+                        <Stack >
+                            <Typography fontWeight={600}>
+                                Benchmark Type:
+                            </Typography>
+                            <Typography variant="body2" color="primary" fontWeight="bold">
+                                {record.BenchmarkType}
+                            </Typography>
+                        </Stack>
+
+                        <Stack >
+                            <Typography fontWeight={600}>
+                                Status:
+                            </Typography>
+                            <Typography variant="body2" color="primary" fontWeight="bold">
+                                {record.Status}
+                            </Typography>
+                        </Stack>
+
                     </Stack>
 
                     <Divider sx={{ my: 1 }} />
