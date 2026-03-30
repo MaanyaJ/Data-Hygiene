@@ -22,11 +22,11 @@ const ErrorPage = ({ message, onRetry }) => {
         {message}
       </Typography>
 
-      {onRetry && (
+      {/* {onRetry && (
         <Button variant="contained" onClick={onRetry}>
           Retry
         </Button>
-      )}
+      )} */}
     </Box>
   );
 };

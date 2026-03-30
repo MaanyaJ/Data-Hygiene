@@ -1,7 +1,7 @@
 import React from 'react'
 import { Stack, Typography, Chip } from "@mui/material";
 
-const Errors = ({ invalidFields }) => {
+const Errors = ({ invalidFields = []}) => {
     const errors = invalidFields
 
     const MAX_VISIBLE = 7;

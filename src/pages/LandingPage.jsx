@@ -33,19 +33,20 @@ const LandingPage = () => {
     setLoading(true);
     try {
       const queryParams = new URLSearchParams({
+        status: filter,
         page: pageNum,
         size: pageSize,
         search: search || "",
-        status: filter,
       });
 
       const res = await fetch(
-        `http://192.168.0.182:8000/invalid-summary?${queryParams}`
+        `http://192.168.0.141:8001/invalid-summary?${queryParams}`
       );
 
       if (!res.ok) throw new Error("Failed to fetch data");
 
       const data = await res.json();
+      console.log(data)
 
       setTotalPages(Math.ceil(data.total_invalid_records / pageSize));
       setRecords((prev) => (isNew ? data.data : [...prev, ...data.data]));
@@ -73,7 +74,7 @@ const LandingPage = () => {
     return (
       <ErrorPage
         message={error?.message || "Something went wrong"}
-        onRetry={() => fetchRecords(page)}
+        onRetry={() => fetchRecords(queryParams)}
       />
     );
   }
