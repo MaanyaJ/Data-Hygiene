@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 const NAV_LINKS = [
     { label: "All", path: "/" },
@@ -40,33 +41,30 @@ const Navbar = () => {
           sx={{ cursor: "pointer", letterSpacing: 1 }}
           onClick={() => navigate("/")}
         >
-          BrandName
+          Logo
         </Typography>
 
         {/* Dropdown */}
-        <Box>
-          <Button
-            color="inherit"
-            onClick={handleOpen}
-            endIcon={<KeyboardArrowDownIcon />}
-            sx={{ fontWeight: 600, textTransform: "none", fontSize: "1rem" }}
-          >
-            Navigate
-          </Button>
-          <Menu
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleClose}
-            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-            transformOrigin={{ vertical: "top", horizontal: "right" }}
-          >
-            {NAV_LINKS.map(({ label, path }) => (
-              <MenuItem key={path} onClick={() => handleNavigate(path)}>
-                {label}
-              </MenuItem>
-            ))}
-          </Menu>
-        </Box>
+        <Box sx={{ display: "flex", gap: 4 }}>
+  {NAV_LINKS.map(({ label, path }) => (
+    <NavLink
+      key={label}
+      to={path}
+      style={({ isActive }) => ({
+        textDecoration: "none",
+        color: "#fff",
+        fontWeight: 600,
+        fontSize: "0.95rem",
+        opacity: isActive ? 1 : 0.7,
+        borderBottom: isActive ? "2px solid #fff" : "2px solid transparent",
+        paddingBottom: "4px",
+        transition: "all 0.2s ease",
+      })}
+    >
+      {label}
+    </NavLink>
+  ))}
+</Box>
       </Toolbar>
     </AppBar>
   );

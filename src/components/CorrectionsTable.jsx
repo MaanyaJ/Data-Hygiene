@@ -15,6 +15,7 @@ import {
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import ChooseValueCell from "./ChooseValueCell";
+import RejectDialog from "./RejectDialog";
 
 const getMaxSuggestions = (tableRows) =>
   Math.max(...tableRows.map((row) => row.suggestions?.length ?? 0), 0);
@@ -33,28 +34,25 @@ const stickyHeadCell = {
   backgroundColor: "#eef3f8",
 };
 
-
 // Score 0→1 maps to red→yellow→green
 const scoreToColor = (score) => {
   if (score === null || score === undefined) return "#9e9e9e";
   const s = Math.max(0, Math.min(1, score));
   if (s <= 0.5) {
-    // red → yellow
     const r = 220;
     const g = Math.round(s * 2 * 200);
     return `rgb(${r}, ${g}, 0)`;
   } else {
-    // yellow → green
     const r = Math.round((1 - (s - 0.5) * 2) * 200);
     const g = 160;
     return `rgb(${r}, ${g}, 0)`;
   }
 };
 
-
 const CorrectionsTable = ({ tableRows, onAccept, onRejectAll }) => {
   const [selectedSuggestions, setSelectedSuggestions] = useState({});
   const [chosenValues, setChosenValues] = useState({});
+  const [rejectDialogRow, setRejectDialogRow] = useState(null);
 
   const maxSuggestions = getMaxSuggestions(tableRows);
 
@@ -87,10 +85,25 @@ const CorrectionsTable = ({ tableRows, onAccept, onRejectAll }) => {
     onAccept?.(row, value);
   };
 
+  // Opens the dialog — actual clearing happens after user picks an option
   const handleRejectAll = (row) => {
+    setRejectDialogRow(row);
+  };
+
+  const handleRejectDialogClose = () => setRejectDialogRow(null);
+
+  // L0 Data chosen — clear row state and propagate
+  const handleL0Data = (row) => {
     setSelectedSuggestions((prev) => { const n = { ...prev }; delete n[row.id]; return n; });
     setChosenValues((prev) => ({ ...prev, [row.id]: null }));
-    onRejectAll?.(row);
+    onRejectAll?.(row, "l0_data");
+  };
+
+  // Draft submitted — clear row state and propagate with form values
+  const handleDraftSubmit = (row, formValues) => {
+    setSelectedSuggestions((prev) => { const n = { ...prev }; delete n[row.id]; return n; });
+    setChosenValues((prev) => ({ ...prev, [row.id]: null }));
+    onRejectAll?.(row, "draft", formValues);
   };
 
   return (
@@ -224,6 +237,14 @@ const CorrectionsTable = ({ tableRows, onAccept, onRejectAll }) => {
           </TableBody>
         </Table>
       </TableContainer>
+
+      <RejectDialog
+        open={!!rejectDialogRow}
+        onClose={handleRejectDialogClose}
+        row={rejectDialogRow}
+        onL0Data={handleL0Data}
+        onDraftSubmit={handleDraftSubmit}
+      />
     </>
   );
 };
