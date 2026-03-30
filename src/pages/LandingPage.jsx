@@ -4,12 +4,12 @@ import LandingPageHeader from "../components/LandingPageHeader";
 import RecordList from "../components/RecordList";
 import ErrorPage from "../components/ErrorPage";
 
-const STATUS_MAP = {
-  filter1: "",
-  InProgress: "pending",
-  Success: "success",
-  Failed: "failed",
-};
+export const FILTERS = [
+  { label: "All", value: "" },
+  { label: "Pending", value: "pending" },
+  { label: "Approved", value: "approved" },
+  { label: "Rejected", value: "rejected" },
+];
 
 const pageSize = 50;
 
@@ -22,10 +22,10 @@ const LandingPage = () => {
   const [error, setError] = useState(null);
 
   const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState([]);
+  const [filter, setFilter] = useState(""); // "" = All
 
   const handleFilterChange = (value) => {
-    setFilter((prev) => (prev.includes(value) ? [] : [value]));
+    setFilter((prev) => (prev === value ? "" : value));
   };
 
   const fetchRecords = async (pageNum, isNew = false) => {
@@ -35,7 +35,7 @@ const LandingPage = () => {
         page: pageNum,
         size: pageSize,
         search: search || "",
-        status: STATUS_MAP[filter[0]] || "",
+        status: filter,
       });
 
       const res = await fetch(
@@ -56,14 +56,12 @@ const LandingPage = () => {
     }
   };
 
-  // Reset and refetch on search/filter change
   useEffect(() => {
     setRecords([]);
     setPage(1);
     fetchRecords(1, true);
   }, [search, filter]);
 
-  // Fetch next pages
   useEffect(() => {
     if (page !== 1) {
       fetchRecords(page);
@@ -87,7 +85,6 @@ const LandingPage = () => {
         filter={filter}
         onFilterChange={handleFilterChange}
       />
-
       <RecordList
         records={records}
         totalRecords={totalRecords}

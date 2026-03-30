@@ -6,27 +6,17 @@ import Loader from "../components/Loader";
 import ExecutionInfoBox from "../components/ExecutionInfoBox";
 import CorrectionsTable from "../components/CorrectionsTable";
 
-// Transforms comparingData: [{ suggestion1, score1 }, ...]
-// into a flat array: [{ value, score }, ...]
+// comparing_data: [{ suggestion1, score1 }, { suggestion2, score2 }, ...]
+// each object in the array holds one suggestion at its own index
 const parseSuggestions = (comparingData = []) => {
-  if (!Array.isArray(comparingData) || comparingData.length === 0) return [];
+  if (!Array.isArray(comparingData)) return [];
 
-  // Each object in comparingData has suggestion1/score1, suggestion2/score2, etc.
-  // Flatten all of them into a single ordered array
-  const suggestions = [];
-
-  for (const entry of comparingData) {
-    let i = 1;
-    while (entry[`suggestion${i}`] !== undefined) {
-      suggestions.push({
-        value: entry[`suggestion${i}`],
-        score: entry[`score${i}`] ?? null,
-      });
-      i++;
-    }
-  }
-
-  return suggestions;
+  return comparingData
+    .map((entry, i) => ({
+      value: entry[`suggestion${i + 1}`] ?? null,
+      score: entry[`score${i + 1}`] ?? null,
+    }))
+    .filter((s) => s.value !== null);
 };
 
 const DetailsPage = () => {
@@ -52,6 +42,7 @@ const DetailsPage = () => {
 
       setExecutionData(json.execution_details);
       setData(json.Data);
+      console.log(json)
     } catch (err) {
       setError(err);
     } finally {
@@ -74,12 +65,12 @@ const DetailsPage = () => {
         fieldName: item?.field || "---",
         currentValue: item?.value || "---",
         mapping: item?.mapping || "---",
-        suggestions: parseSuggestions(item?.comparingData),
+        suggestions: parseSuggestions(item?.comparing_data),
       }))
     : [];
 
   const handleAccept = (row, acceptedSuggestion) => {
-    console.log("Accepted:", row.fieldName, "→", acceptedSuggestion);
+    console.log("Accepted:", row.fieldName, "->", acceptedSuggestion);
     // TODO: call your API to persist the accepted value
   };
 

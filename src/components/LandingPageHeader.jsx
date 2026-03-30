@@ -8,8 +8,7 @@ import {
   FormGroup,
   Stack,
 } from "@mui/material";
-
-const FILTER_LABELS = ["filter1", "Pending", "Success", "Failed"];
+import { FILTERS } from "../pages/LandingPage";
 
 const LandingPageHeader = ({ search, onSearchChange, filter, onFilterChange }) => {
   return (
@@ -33,16 +32,16 @@ const LandingPageHeader = ({ search, onSearchChange, filter, onFilterChange }) =
         />
 
         <FormGroup row>
-          {FILTER_LABELS.map((item) => (
+          {FILTERS.map(({ label, value }) => (
             <FormControlLabel
-              key={item}
+              key={value}
               control={
                 <Checkbox
-                  checked={filter.includes(item)}
-                  onChange={() => onFilterChange(item)}
+                  checked={filter === value}
+                  onChange={() => onFilterChange(value)}
                 />
               }
-              label={item === "filter1" ? "All" : item}
+              label={label}
             />
           ))}
         </FormGroup>
