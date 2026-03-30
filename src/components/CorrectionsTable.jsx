@@ -11,12 +11,10 @@ import {
   Button,
   Chip,
   Box,
-  Autocomplete,
-  TextField,
-  CircularProgress,
 } from "@mui/material";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
+import ChooseValueCell from "./ChooseValueCell";
 
 const getMaxSuggestions = (tableRows) =>
   Math.max(...tableRows.map((row) => row.suggestions?.length ?? 0), 0);
@@ -35,86 +33,31 @@ const stickyHeadCell = {
   backgroundColor: "#eef3f8",
 };
 
-const isCpuField = (fieldName) => fieldName === "CPUs";
 
-// Per-row Choose Value input — kept separate so fetch state is isolated per row
-const ChooseValueCell = ({ fieldName, value, onChange }) => {
-  const [options, setOptions] = useState([]);
-  const [loadingOptions, setLoadingOptions] = useState(false);
-  const [open, setOpen] = useState(false);
-
-  const handleOpen = async () => {
-    setOpen(true);
-    if (options.length > 0) return;
-    setLoadingOptions(true);
-    try {
-      const res = await fetch(
-        `http://192.168.0.182:8000/unique-values?parameterName=${encodeURIComponent(fieldName)}`
-      );
-      const data = await res.json();
-      setOptions(data?.data ?? []);
-    } catch {
-      setOptions([]);
-    } finally {
-      setLoadingOptions(false);
-    }
-  };
-
-  if (isCpuField(fieldName)) {
-    return (
-      <TextField
-        size="small"
-        placeholder="Enter whole number"
-        value={value ?? ""}
-        onChange={(e) => {
-          const val = e.target.value;
-          if (val === "" || /^\d+$/.test(val)) onChange(val || null);
-        }}
-        inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
-        sx={{ minWidth: 160 }}
-      />
-    );
+// Score 0→1 maps to red→yellow→green
+const scoreToColor = (score) => {
+  if (score === null || score === undefined) return "#9e9e9e";
+  const s = Math.max(0, Math.min(1, score));
+  if (s <= 0.5) {
+    // red → yellow
+    const r = 220;
+    const g = Math.round(s * 2 * 200);
+    return `rgb(${r}, ${g}, 0)`;
+  } else {
+    // yellow → green
+    const r = Math.round((1 - (s - 0.5) * 2) * 200);
+    const g = 160;
+    return `rgb(${r}, ${g}, 0)`;
   }
-
-  return (
-    <Autocomplete
-      size="small"
-      open={open}
-      onOpen={handleOpen}
-      onClose={() => setOpen(false)}
-      options={options}
-      loading={loadingOptions}
-      value={value ?? null}
-      onChange={(_, newVal) => onChange(newVal)}
-      sx={{ minWidth: 200 }}
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          placeholder="Choose value"
-          InputProps={{
-            ...params.InputProps,
-            endAdornment: (
-              <>
-                {loadingOptions ? <CircularProgress color="inherit" size={16} /> : null}
-                {params.InputProps.endAdornment}
-              </>
-            ),
-          }}
-        />
-      )}
-    />
-  );
 };
 
+
 const CorrectionsTable = ({ tableRows, onAccept, onRejectAll }) => {
-  // { [rowId]: number } — which suggestion chip is selected
   const [selectedSuggestions, setSelectedSuggestions] = useState({});
-  // { [rowId]: string | null } — value in the Choose Value input
   const [chosenValues, setChosenValues] = useState({});
 
   const maxSuggestions = getMaxSuggestions(tableRows);
 
-  // Clicking a suggestion chip toggles selection and always clears the Choose Value input
   const handleSelectSuggestion = (rowId, suggIndex) => {
     setChosenValues((prev) => ({ ...prev, [rowId]: null }));
     setSelectedSuggestions((prev) => {
@@ -127,8 +70,6 @@ const CorrectionsTable = ({ tableRows, onAccept, onRejectAll }) => {
     });
   };
 
-  // Typing/selecting in Choose Value input:
-  // - clears any selected suggestion chip (they're mutually exclusive)
   const handleChosenValueChange = (rowId, val) => {
     setChosenValues((prev) => ({ ...prev, [rowId]: val }));
     setSelectedSuggestions((prev) => {
@@ -154,10 +95,6 @@ const CorrectionsTable = ({ tableRows, onAccept, onRejectAll }) => {
 
   return (
     <>
-      <Typography variant="h6" sx={{ fontWeight: 700, color: "#17233a", mb: 2 }}>
-        Fields to be Corrected
-      </Typography>
-
       <TableContainer sx={{ mt: 2, overflowX: "auto" }}>
         <Table sx={{ minWidth: 900 }}>
           <TableHead>
@@ -172,7 +109,7 @@ const CorrectionsTable = ({ tableRows, onAccept, onRejectAll }) => {
                 </TableCell>
               ))}
               <TableCell sx={{ fontWeight: 700, minWidth: 220 }}>Choose Value</TableCell>
-              <TableCell sx={{ fontWeight: 700, minWidth: 200 }}>Actions</TableCell>
+              <TableCell sx={{ fontWeight: 700, minWidth: 250 }}>Actions</TableCell>
             </TableRow>
           </TableHead>
 
@@ -181,7 +118,6 @@ const CorrectionsTable = ({ tableRows, onAccept, onRejectAll }) => {
               tableRows.map((row) => {
                 const selectedIdx = selectedSuggestions[row.id];
                 const chosenValue = chosenValues[row.id];
-                // Accept enabled if either a suggestion chip or a choose value is set
                 const canAccept = selectedIdx !== undefined || !!chosenValue;
 
                 return (
@@ -206,17 +142,32 @@ const CorrectionsTable = ({ tableRows, onAccept, onRejectAll }) => {
                     {Array.from({ length: maxSuggestions }, (_, i) => {
                       const sugg = row.suggestions?.[i];
                       const isSelected = selectedIdx === i;
+                      const chipColor = sugg ? scoreToColor(sugg.score) : null;
+
                       return (
                         <TableCell key={i}>
                           {sugg ? (
-                            <Tooltip title={`Score: ${sugg.score}`} arrow placement="top">
+                            <Tooltip
+                              title={`Confidence: ${Math.round(sugg.score * 100)}%`}
+                              arrow
+                              placement="top"
+                            >
                               <Chip
                                 label={sugg.value}
                                 clickable
                                 onClick={() => handleSelectSuggestion(row.id, i)}
-                                color={isSelected ? "primary" : "default"}
                                 variant={isSelected ? "filled" : "outlined"}
-                                sx={{ maxWidth: 160 }}
+                                sx={{
+                                  maxWidth: 160,
+                                  borderColor: chipColor,
+                                  color: isSelected ? "#fff" : chipColor,
+                                  backgroundColor: isSelected ? chipColor : "transparent",
+                                  fontWeight: 600,
+                                  "& .MuiChip-label": { fontWeight: 600 },
+                                  "&:hover": {
+                                    backgroundColor: isSelected ? chipColor : `${chipColor}22`,
+                                  },
+                                }}
                               />
                             </Tooltip>
                           ) : (
@@ -226,7 +177,7 @@ const CorrectionsTable = ({ tableRows, onAccept, onRejectAll }) => {
                       );
                     })}
 
-                    {/* key changes when a chip is selected, forcing Autocomplete to fully remount and clear */}
+                    {/* Choose Value */}
                     <TableCell>
                       <ChooseValueCell
                         key={`${row.id}-${selectedIdx ?? "none"}`}
@@ -251,7 +202,7 @@ const CorrectionsTable = ({ tableRows, onAccept, onRejectAll }) => {
                         </Button>
                         <Button
                           size="small"
-                          variant="outlined"
+                          variant="contained"
                           color="error"
                           startIcon={<CancelOutlinedIcon />}
                           onClick={() => handleRejectAll(row)}

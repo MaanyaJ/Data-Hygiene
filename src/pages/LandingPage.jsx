@@ -3,6 +3,7 @@ import { Box } from "@mui/material";
 import LandingPageHeader from "../components/LandingPageHeader";
 import RecordList from "../components/RecordList";
 import ErrorPage from "../components/ErrorPage";
+import Navbar from "../components/Navbar";
 
 export const FILTERS = [
   { label: "All", value: "" },
@@ -79,6 +80,7 @@ const LandingPage = () => {
 
   return (
     <Box>
+        <Navbar/>
       <LandingPageHeader
         search={search}
         onSearchChange={setSearch}
