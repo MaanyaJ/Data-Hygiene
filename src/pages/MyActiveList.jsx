@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { Box, Typography } from "@mui/material";
 import MyActiveListHeader from "../components/MyActiveListHeader";
 import RecordList from "../components/RecordList";
@@ -12,9 +12,7 @@ const MyActiveList = () => {
   const [totalRecords, setTotalRecords] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
  
-  const [counts, setCounts] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [countsLoading, setCountsLoading] = useState(false);
   const [error, setError] = useState(null);
  
   const [search, setSearch] = useState("");
@@ -28,35 +26,11 @@ const MyActiveList = () => {
     setFilter((prev) => (prev === value ? "" : value));
   };
  
-  const fetchCounts = async () => {
-    setCountsLoading(true);
-    try {
-      const res = await fetch(
-        "http://192.168.0.182:8001/invalid-summary/counts"
-      );
- 
-      if (!res.ok) {
-        throw new Error("Failed to fetch counts");
-      }
- 
-      const data = await res.json();
-      console.log("Counts API response:", data);
- 
-      setCounts(data);
- 
-      setRed(data?.red ?? 0);
-      setYellow(data?.yellow ?? 0);
-      setGreen(data?.green ?? 0);
-    } catch (error) {
-      console.error("Counts API error:", error);
-      setError(error);
-    } finally {
-      setCountsLoading(false);
-    }
-  };
- 
-  const fetchRecords = async (pageNum, isNew = false) => {
+  // Use useCallback to memoize fetchRecords
+  const fetchRecords = useCallback(async (pageNum, isNew = false) => {
     setLoading(true);
+    setError(null);
+    
     try {
       const queryParams = new URLSearchParams({
         page: pageNum,
@@ -64,51 +38,49 @@ const MyActiveList = () => {
         search: search || "",
       });
  
+      console.log(`Fetching page ${pageNum} with search: ${search}`); // Debug log
+ 
       const res = await fetch(
-        `http://192.168.0.141:8001/invalid-summary?${queryParams}`
+        `http://192.168.0.182:8002/invalid-summary?${queryParams}`
       );
  
       if (!res.ok) {
-        throw new Error("Failed to fetch data");
+        throw new Error(`Failed to fetch data: ${res.status}`);
       }
  
       const data = await res.json();
- 
-      console.log("Records API response:", data);
-      console.log("Records API data.data:", data?.data);
-      console.log(
-        "Records API total_invalid_records:",
-        data?.total_invalid_records
-      );
+      console.log("API Response:", data);
  
       setTotalPages(Math.ceil((data?.total_invalid_records || 0) / pageSize));
       setRecords((prev) =>
-        isNew ? data?.Data || [] : [...prev, ...(data?.Data || [])]
+        isNew ? data?.data || [] : [...prev, ...(data?.data || [])]
       );
       setTotalRecords(data?.total_invalid_records || 0);
+      setRed(data.red || 0);
+      setGreen(data.green || 0);
+      setYellow(data.yellow || 0);
     } catch (error) {
       console.error("Records API error:", error);
       setError(error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [search]); // search is the only dependency that should trigger a new fetchRecords
  
+  // Initial load and search changes
   useEffect(() => {
-    fetchCounts();
-  }, []);
- 
-  useEffect(() => {
+    // Reset state when search changes
     setRecords([]);
     setPage(1);
     fetchRecords(1, true);
-  }, [search]);
+  }, [search, fetchRecords]); // Now fetchRecords is stable due to useCallback
  
+  // Handle page changes (but not on initial load)
   useEffect(() => {
-    if (page !== 1) {
+    if (page > 1) {
       fetchRecords(page);
     }
-  }, [page]);
+  }, [page, fetchRecords]);
  
   const filteredRecords = useMemo(() => {
     if (!filter) return records;
@@ -134,21 +106,16 @@ const MyActiveList = () => {
     });
   }, [records, filter]);
  
-  console.log("Current counts state:", counts);
-  console.log("Current red:", red);
-  console.log("Current yellow:", yellow);
-  console.log("Current green:", green);
-  console.log("Current records state:", records);
-  console.log("Current filteredRecords:", filteredRecords);
+  // Fix the onRetry function in error handler
+  const handleRetry = useCallback(() => {
+    fetchRecords(page, page === 1);
+  }, [fetchRecords, page]);
  
   if (error) {
     return (
       <ErrorPage
         message={error?.message || "Something went wrong"}
-        onRetry={() => {
-          fetchCounts();
-          fetchRecords(page, page === 1);
-        }}
+        onRetry={handleRetry}
       />
     );
   }
@@ -163,7 +130,7 @@ const MyActiveList = () => {
         red={red}
         green={green}
         yellow={yellow}
-        countsLoading={countsLoading}
+        countsLoading={loading} // Pass loading state instead of missing countsLoading
       />
  
       <RecordList
@@ -178,12 +145,18 @@ const MyActiveList = () => {
  
       {filter &&
         !loading &&
-        filteredRecords.length < 1 &&
-        page < totalPages && (
+        filteredRecords.length === 0 &&
+        records.length > 0 && ( // Only show if there are records but none match filter
           <Box sx={{ textAlign: "center", mt: 2, mb: 4 }}>
-            <Typography>No Records Found</Typography>
+            <Typography>No records match the selected filter</Typography>
           </Box>
         )}
+      
+      {!loading && records.length === 0 && !error && (
+        <Box sx={{ textAlign: "center", mt: 2, mb: 4 }}>
+          <Typography>No records found</Typography>
+        </Box>
+      )}
     </Box>
   );
 };

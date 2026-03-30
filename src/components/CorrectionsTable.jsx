@@ -121,7 +121,7 @@ const CorrectionsTable = ({ tableRows, onAccept, onRejectAll }) => {
                   Suggestion {i + 1}
                 </TableCell>
               ))}
-              <TableCell sx={{ fontWeight: 700, minWidth: 220 }}>Choose Value</TableCell>
+              <TableCell sx={{ fontWeight: 700, minWidth: 220 }}>Choose Other Value</TableCell>
               <TableCell sx={{ fontWeight: 700, minWidth: 250 }}>Actions</TableCell>
             </TableRow>
           </TableHead>

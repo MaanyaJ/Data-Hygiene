@@ -1,5 +1,6 @@
 import React from "react";
 import { Box, Typography, TextField, Stack, Tooltip } from "@mui/material";
+import Navbar from "./Navbar";
  
 const MyActiveListHeader = ({
   search,
@@ -9,11 +10,10 @@ const MyActiveListHeader = ({
   red,
   green,
   yellow,
-  countsLoading,
 }) => {
   const PATCH_FILTERS = [
     {
-      label: countsLoading ? "..." : `${green}`,
+      label: `${green}`,
       hoverLabel: "< 3 Days Old",
       value: "<3",
       color: "#2e7d32",
@@ -23,7 +23,7 @@ const MyActiveListHeader = ({
       dot: "#66bb6a",
     },
     {
-      label: countsLoading ? "..." : `${yellow}`,
+      label:  `${yellow}`,
       hoverLabel: "3 - 6 Days Old",
       value: "3-6",
       color: "#f57f17",
@@ -33,7 +33,7 @@ const MyActiveListHeader = ({
       dot: "#ffd54f",
     },
     {
-      label: countsLoading ? "..." : `${red}`,
+      label: `${red}`,
       hoverLabel: "> 6 Days Old",
       value: ">6",
       color: "#b71c1c",
@@ -46,6 +46,7 @@ const MyActiveListHeader = ({
  
   return (
     <Box>
+        <Navbar/>
       <Typography variant="h3" align="center" sx={{ my: 3 }}>
         My Active List
       </Typography>

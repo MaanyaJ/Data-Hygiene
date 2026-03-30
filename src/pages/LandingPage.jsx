@@ -40,7 +40,7 @@ const LandingPage = () => {
       });
 
       const res = await fetch(
-        `http://192.168.0.141:8001/invalid-summary?${queryParams}`
+        `http://192.168.0.182:8002/invalid-summary?${queryParams}`
       );
 
       if (!res.ok) throw new Error("Failed to fetch data");

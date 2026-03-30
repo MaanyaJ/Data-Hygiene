@@ -79,7 +79,7 @@ const RejectDialog = ({ open, onClose, row, onL0Data, onDraftSubmit }) => {
     try {
       // TODO: call your API with row.fieldName to get the detail fields
       // e.g. GET /draft-fields?fieldName=CPUModel
-      // const res = await fetch(`http://192.168.0.182:8001/draft-fields?fieldName=${encodeURIComponent(row.fieldName)}`);
+      // const res = await fetch(`http://192.168.0.182:8002/draft-fields?fieldName=${encodeURIComponent(row.fieldName)}`);
       // const data = await res.json();
       // setDetailFields(data.fields); // expected: [{ name: string, label: string, type?: string }]
 
@@ -104,7 +104,7 @@ const RejectDialog = ({ open, onClose, row, onL0Data, onDraftSubmit }) => {
     try {
       // TODO: call your submit API with formValues + row details
       // e.g. POST /submit-draft
-      // await fetch("http://192.168.0.182:8001/submit-draft", {
+      // await fetch("http://192.168.0.182:8002/submit-draft", {
       //   method: "POST",
       //   headers: { "Content-Type": "application/json" },
       //   body: JSON.stringify({ fieldName: row.fieldName, ...formValues }),

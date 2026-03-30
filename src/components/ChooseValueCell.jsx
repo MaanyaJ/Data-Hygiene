@@ -21,7 +21,7 @@ const ChooseValueCell = ({ fieldName, value, onChange }) => {
     setLoadingOptions(true);
     try {
       const res = await fetch(
-        `http://192.168.0.182:8001/unique-values?parameterName=${encodeURIComponent(fieldName)}`
+        `http://192.168.0.182:8002/unique-values?parameterName=${encodeURIComponent(fieldName)}`
       );
       const data = await res.json();
       setOptions(data?.data ?? []);
@@ -78,7 +78,7 @@ const ChooseValueCell = ({ fieldName, value, onChange }) => {
       renderInput={(params) => (
         <TextField
           {...params}
-          placeholder="Choose value"
+          placeholder="Choose other value"
           InputProps={{
             ...params.InputProps,
             endAdornment: (
