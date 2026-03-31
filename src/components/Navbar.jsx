@@ -9,9 +9,9 @@ import { useNavigate } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 
 const NAV_LINKS = [
-    { label: "All", path: "/all" },
+    { label: "All", path: "/" },
     { label: "Active List", path: "/active" },
-    { label: "Completed List", path: "/completed" },
+    { label: "Completed List", path: "/" },
 ];
 
 const Navbar = () => {

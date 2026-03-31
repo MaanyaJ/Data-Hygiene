@@ -119,6 +119,7 @@ const LandingPage = () => {
         page={page}
         loading={loading}
         onLoadMore={() => setPage((prev) => prev + 1)}
+        showCount={true}
       />
     </Box>
   );
