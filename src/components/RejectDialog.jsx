@@ -79,15 +79,15 @@ const RejectDialog = ({ open, onClose, row, onL0Data, onDraftSubmit }) => {
     try {
       // TODO: call your API with row.fieldName to get the detail fields
       // e.g. GET /draft-fields?fieldName=CPUModel
-      // const res = await fetch(`http://192.168.0.182:8002/draft-fields?fieldName=${encodeURIComponent(row.fieldName)}`);
+      // const res = await fetch(`http://192.168.0.182:8000/draft-fields?fieldName=${encodeURIComponent(row.fieldName)}`);
       // const data = await res.json();
       // setDetailFields(data.fields); // expected: [{ name: string, label: string, type?: string }]
 
       // ---- placeholder until API is ready ----
       await new Promise((r) => setTimeout(r, 800)); // fake delay
       setDetailFields([
-        { name: "reason", label: "Reason for Rejection" },
-        { name: "notes", label: "Additional Notes" },
+        { name: "field1", label: "Fieldname1" },
+        { name: "field2", label: "fieldname2" },
       ]);
       // ----------------------------------------
     } catch {
@@ -104,7 +104,7 @@ const RejectDialog = ({ open, onClose, row, onL0Data, onDraftSubmit }) => {
     try {
       // TODO: call your submit API with formValues + row details
       // e.g. POST /submit-draft
-      // await fetch("http://192.168.0.182:8002/submit-draft", {
+      // await fetch("http://192.168.0.182:8000/submit-draft", {
       //   method: "POST",
       //   headers: { "Content-Type": "application/json" },
       //   body: JSON.stringify({ fieldName: row.fieldName, ...formValues }),
@@ -172,13 +172,13 @@ const RejectDialog = ({ open, onClose, row, onL0Data, onDraftSubmit }) => {
             <OptionCard
               icon={<StorageIcon />}
               title="L0 Data"
-              description="Mark this field as L0 data and skip correction"
+              description="Send this data to L0 dataset without applying any corrections"
               onClick={handleL0Data}
             />
             <OptionCard
               icon={<EditNoteIcon />}
               title="Submit Draft Record"
-              description="Fill in additional details and submit as a draft"
+              description="Fill in all required fields to create a new master list value"
               onClick={handleDraftOptionClick}
             />
           </Stack>

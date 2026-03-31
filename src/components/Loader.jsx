@@ -5,7 +5,7 @@ const Loader = () => {
   return (
     <Box
       sx={{
-        height: "50vh",
+        height: "60vh",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",

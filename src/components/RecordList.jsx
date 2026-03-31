@@ -45,7 +45,7 @@ const RecordList = ({
     return (
       <div key={key} style={style}>
         <Box sx={{ px: 2, py: 1 }}>
-          <RecordCard record={record} />
+          <RecordCard record={record}/>
         </Box>
       </div>
     );
@@ -62,7 +62,9 @@ const RecordList = ({
   return (
     <Box>
       <Typography align="center" sx={{ mb: 2 }}>
-       Total number of records : {totalRecords}
+
+        Total records: {totalRecords}
+
       </Typography>
 
       <InfiniteLoader
