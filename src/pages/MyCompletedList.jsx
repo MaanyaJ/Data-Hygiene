@@ -4,7 +4,7 @@ import MyCompletedListHeader from "../components/MyCompletedListHeader";
 import RecordList from "../components/RecordList";
 import ErrorPage from "../components/ErrorPage";
 import Navbar from "../components/Navbar";
-import { usePaginatedRecords } from "../hooks/usePaginatedRecords";
+import { usePaginatedRecords } from "../hooks/UsePaginatedRecords";
 
 const MyCompletedList = () => {
   const {

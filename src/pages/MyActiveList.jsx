@@ -3,7 +3,7 @@ import { Box, Typography } from "@mui/material";
 import MyActiveListHeader from "../components/MyActiveListHeader";
 import RecordList from "../components/RecordList";
 import ErrorPage from "../components/ErrorPage";
-import { usePaginatedRecords } from "../hooks/usePaginatedRecords";
+import { usePaginatedRecords } from "../hooks/UsePaginatedRecords";
 
 const MyActiveList = () => {
   const [filter, setFilter] = useState("");

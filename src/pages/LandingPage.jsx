@@ -4,7 +4,7 @@ import LandingPageHeader from "../components/LandingPageHeader";
 import RecordList from "../components/RecordList";
 import ErrorPage from "../components/ErrorPage";
 import Navbar from "../components/Navbar";
-import { usePaginatedRecords } from "../hooks/usePaginatedRecords";
+import { usePaginatedRecords } from "../hooks/UsePaginatedRecords";
 
 export const FILTERS = [
   { label: "All",      value: "" },
