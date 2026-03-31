@@ -41,7 +41,7 @@ const MyActiveList = () => {
       console.log(`Fetching page ${pageNum} with search: ${search}`); // Debug log
  
       const res = await fetch(
-        `http://192.168.0.182:8002/invalid-summary?${queryParams}`
+        `http://192.168.0.182:8000/invalid-summary?${queryParams}`
       );
  
       if (!res.ok) {
