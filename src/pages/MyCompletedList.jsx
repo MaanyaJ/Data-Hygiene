@@ -101,6 +101,7 @@ const MyCompletedList = () => {
         page={page}
         loading={loading}
         onLoadMore={() => setPage((prev) => prev + 1)}
+        showCount={true}
       />
 
       {!loading && records.length === 0 && !error && (
