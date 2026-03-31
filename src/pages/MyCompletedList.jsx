@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 import React, { useEffect, useState, useCallback } from "react";
 import { Box, Typography } from "@mui/material";
 import MyCompletedListHeader from "../components/MyCompletedListHeader";
@@ -113,18 +113,4 @@ const MyCompletedList = () => {
 };
 
 export default MyCompletedList;
-=======
-import React from 'react'
-import Navbar from '../components/Navbar'
 
-const Completed = () => {
-  return (
-    <>
-    <Navbar/>
-    Completed page
-    </>
-  )
-}
-
-export default Completed
->>>>>>> 7f85a1402d70434da4ccc80c6f3fdad1f200f436
