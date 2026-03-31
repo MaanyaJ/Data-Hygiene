@@ -58,7 +58,7 @@ const RecordList = ({
   return (
     <Box>
       <Typography align="center" sx={{ mb: 2 }}>
-        Loaded {records.length} records out of {totalRecords}
+        Total records: {totalRecords}
       </Typography>
 
       <InfiniteLoader
