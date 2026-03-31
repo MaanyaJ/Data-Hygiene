@@ -15,7 +15,7 @@ const STATUS_COLOR = {
   rejected: "#d32f2f",
 };
 
-const RecordCard = ({ record }) => {
+const RecordCard = ({ record, ageColor }) => {
   const invalidFields = record["InvalidFields"];
   const navigate = useNavigate();
 
@@ -28,12 +28,17 @@ const RecordCard = ({ record }) => {
         onClick={() => navigate(`/record/${record.ExecutionId}`)}
         sx={{
           width: "60vw",
-          backgroundColor: "#f9f9f9",
-          boxShadow: "0px 2px 8px rgba(0,0,0,0.08)",
+          backgroundColor: ageColor ? ageColor.bg : "#f9f9f9",
+          borderLeft: ageColor ? `5px solid ${ageColor.border}` : "5px solid transparent",
+          boxShadow: ageColor
+            ? `0px 2px 8px ${ageColor.border}33`
+            : "0px 2px 8px rgba(0,0,0,0.08)",
           transition: "all 0.25s ease",
           "&:hover": {
             transform: "scale(1.02)",
-            boxShadow: "0px 6px 20px rgba(0,0,0,0.12)",
+            boxShadow: ageColor
+              ? `0px 6px 20px ${ageColor.border}55`
+              : "0px 6px 20px rgba(0,0,0,0.12)",
             cursor: "pointer",
           },
         }}

@@ -2,6 +2,8 @@ import React from "react";
 import { Box, Typography } from "@mui/material";
 import RecordCard from "./RecordCard";
 import Loader from "./Loader";
+
+
 import {
   List,
   InfiniteLoader,
@@ -9,6 +11,8 @@ import {
   AutoSizer,
 } from "react-virtualized";
 import "react-virtualized/styles.css";
+
+
 
 const RecordList = ({
   records,
@@ -58,7 +62,7 @@ const RecordList = ({
   return (
     <Box>
       <Typography align="center" sx={{ mb: 2 }}>
-        Loaded {records.length} records out of {totalRecords}
+       Total number of records : {totalRecords}
       </Typography>
 
       <InfiniteLoader

@@ -22,7 +22,7 @@ const Details = () => {
     const fetchInvalidFields = async () => {
         setLoading(true)
         try {
-            const res = await fetch(`http://192.168.0.182:8002/snapshot-records/${id}`)
+            const res = await fetch(`http://192.168.0.182:8000/snapshot-records/${id}`)
             const data = await res.json()
             setData(data.data)
             console.log(data)
