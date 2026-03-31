@@ -86,8 +86,8 @@ const RejectDialog = ({ open, onClose, row, onL0Data, onDraftSubmit }) => {
       // ---- placeholder until API is ready ----
       await new Promise((r) => setTimeout(r, 800)); // fake delay
       setDetailFields([
-        { name: "reason", label: "Reason for Rejection" },
-        { name: "notes", label: "Additional Notes" },
+        { name: "field1", label: "Fieldname1" },
+        { name: "field2", label: "fieldname2" },
       ]);
       // ----------------------------------------
     } catch {
