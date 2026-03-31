@@ -21,6 +21,7 @@ const RecordList = ({
   page,
   loading,
   onLoadMore,
+  showCount
 }) => {
   const isRowLoaded = ({ index }) => !!records[index];
 
@@ -61,11 +62,11 @@ const RecordList = ({
 
   return (
     <Box>
-      <Typography align="center" sx={{ mb: 2 }}>
 
+     {showCount ? <Typography align="center" sx={{ mb: 2 }}>
         Total records: {totalRecords}
+      </Typography> : "" }
 
-      </Typography>
 
       <InfiniteLoader
         isRowLoaded={isRowLoaded}

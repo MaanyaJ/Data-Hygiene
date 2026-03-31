@@ -141,6 +141,7 @@ const MyActiveList = () => {
         loading={loading}
         onLoadMore={() => setPage((prev) => prev + 1)}
         showAgeColors
+        showCount = {false}
       />
  
       {filter &&
