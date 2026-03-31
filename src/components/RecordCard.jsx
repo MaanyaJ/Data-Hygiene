@@ -25,7 +25,7 @@ const RecordCard = ({ record }) => {
   return (
     <Stack justifyContent="center" alignItems="center">
       <Card
-        onClick={() => navigate(`/record/${record.ExecutionId}`)}
+        onClick={() => navigate(`/${record.ExecutionId}`)}
         sx={{
           width: "60vw",
           backgroundColor: "#f9f9f9",
@@ -69,9 +69,11 @@ const RecordCard = ({ record }) => {
             </Stack>
           </Stack>
 
-          <Divider sx={{ my: 1 }} />
+          {/* {status !== "approved" && <Divider sx={{ my: 1 }} />}
+          {status !== "approved" && <Errors invalidFields={invalidFields} /> } */}
 
-          <Errors invalidFields={invalidFields} />
+          <Divider sx={{ my: 1 }} />
+          <Errors invalidFields={invalidFields} /> 
         </CardContent>
       </Card>
     </Stack>

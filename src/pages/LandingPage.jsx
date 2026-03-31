@@ -13,7 +13,7 @@ export const FILTERS = [
 ];
 
 const pageSize = 50;
-const DEBOUNCE_MS = 400;
+const DEBOUNCE_MS = 500;
 
 const LandingPage = () => {
   const [page, setPage] = useState(1);
