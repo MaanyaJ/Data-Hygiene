@@ -5,7 +5,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 
-const isCpuField = (fieldName) => fieldName === "CPUs";
+const isCpuField = (fieldName) => fieldName === "coreCount";
 
 const ChooseValueCell = ({ fieldName, value, onChange }) => {
   const [options, setOptions] = useState([]);
