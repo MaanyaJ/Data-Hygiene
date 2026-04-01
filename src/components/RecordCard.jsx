@@ -22,10 +22,18 @@ const RecordCard = ({ record, ageColor }) => {
   const status = record.Status?.toLowerCase();
   const statusColor = STATUS_COLOR[status] ?? "text.primary";
 
+  const handleClick = () => {
+    if (status === "approved" || status === "rejected") {
+      navigate(`/completed/${record.ExecutionId}`);
+    } else {
+      navigate(`/${record.ExecutionId}`);
+    }
+  };
+
   return (
     <Stack justifyContent="center" alignItems="center">
       <Card
-        onClick={() => navigate(`/${record.ExecutionId}`)}
+        onClick={handleClick}
         sx={{
           width: "60vw",
           backgroundColor: ageColor ? ageColor.bg : "#f9f9f9",
