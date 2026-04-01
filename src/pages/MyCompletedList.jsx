@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useCallback } from "react";
 import { Box, Typography } from "@mui/material";
 import MyCompletedListHeader from "../components/MyCompletedListHeader";
@@ -23,33 +22,51 @@ const MyCompletedList = () => {
       setError(null);
 
       try {
-        const queryParams = new URLSearchParams({
+        const approvedParams = new URLSearchParams({
           status: "APPROVED",
           page: pageNum,
           size: pageSize,
           search: search || "",
         });
 
-        const res = await fetch(
-          `http://192.168.0.182:8000/invalid-summary?${queryParams.toString()}`
-        );
+        const rejectedParams = new URLSearchParams({
+          status: "REJECTED",
+          page: pageNum,
+          size: pageSize,
+          search: search || "",
+        });
 
-        if (!res.ok) {
+        const [approvedRes, rejectedRes] = await Promise.all([
+          fetch(`http://192.168.0.182:8000/invalid-summary?${approvedParams.toString()}`),
+          fetch(`http://192.168.0.182:8000/invalid-summary?${rejectedParams.toString()}`),
+        ]);
+
+        if (!approvedRes.ok || !rejectedRes.ok) {
           throw new Error("Failed to fetch data");
         }
 
-        const data = await res.json();
-        console.log("Completed list response:", data);
+        const approvedData = await approvedRes.json();
+        const rejectedData = await rejectedRes.json();
 
-        const approvedRecords = (data?.data || []).filter(
-          (record) => (record?.Status || "").toUpperCase() === "APPROVED"
+        const approvedRecords = approvedData?.data || [];
+        const rejectedRecords = rejectedData?.data || [];
+
+        const mergedRecords = [...approvedRecords, ...rejectedRecords];
+
+        mergedRecords.sort(
+          (a, b) => new Date(b.updatedOn || 0) - new Date(a.updatedOn || 0)
         );
 
-        setTotalPages(Math.ceil((data?.total_invalid_records || 0) / pageSize));
         setRecords((prev) =>
-          isNew ? approvedRecords : [...prev, ...approvedRecords]
+          isNew ? mergedRecords : [...prev, ...mergedRecords]
         );
-        setTotalRecords(data?.total_invalid_records || 0);
+
+        const approvedTotal = approvedData?.total_invalid_records || 0;
+        const rejectedTotal = rejectedData?.total_invalid_records || 0;
+        const total = approvedTotal + rejectedTotal;
+
+        setTotalRecords(total);
+        setTotalPages(Math.ceil(total / pageSize));
       } catch (error) {
         console.error("Completed list API error:", error);
         setError(error);
@@ -68,7 +85,7 @@ const MyCompletedList = () => {
 
   useEffect(() => {
     if (page > 1) {
-      fetchRecords(page);
+      fetchRecords(page, false);
     }
   }, [page, fetchRecords]);
 
@@ -106,7 +123,7 @@ const MyCompletedList = () => {
 
       {!loading && records.length === 0 && !error && (
         <Box sx={{ textAlign: "center", mt: 2, mb: 4 }}>
-          <Typography>No approved records found</Typography>
+          <Typography>No completed records found</Typography>
         </Box>
       )}
     </Box>
@@ -114,4 +131,3 @@ const MyCompletedList = () => {
 };
 
 export default MyCompletedList;
-
