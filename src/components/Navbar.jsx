@@ -11,6 +11,7 @@ import { NavLink } from "react-router-dom";
 const NAV_LINKS = [
     { label: "All", path: "/all" },
     { label: "Active List", path: "/active" },
+    { label: "On Hold", path: "/onhold" },
     { label: "Completed List", path: "/completed" },
 ];
 
