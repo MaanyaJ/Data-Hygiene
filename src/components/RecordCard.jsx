@@ -25,6 +25,8 @@ const RecordCard = ({ record, ageColor }) => {
   const handleClick = () => {
     if (status === "approved" || status === "rejected") {
       navigate(`/completed/${record.ExecutionId}`);
+    } else if (status === "onhold") {
+      navigate(`/onhold/${record.ExecutionId}`);
     } else {
       navigate(`/${record.ExecutionId}`);
     }
@@ -37,7 +39,7 @@ const RecordCard = ({ record, ageColor }) => {
         sx={{
           width: "60vw",
           backgroundColor: ageColor ? ageColor.bg : "#f9f9f9",
-          borderLeft: ageColor ? `5px solid ${ageColor.border}` : "5px solid transparent",
+          // borderLeft: ageColor ? `5px solid ${ageColor.border}` : "5px solid transparent",
           boxShadow: ageColor
             ? `0px 2px 8px ${ageColor.border}33`
             : "0px 2px 8px rgba(0,0,0,0.08)",

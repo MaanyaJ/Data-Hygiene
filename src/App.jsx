@@ -3,6 +3,7 @@ import LandingPage from './pages/LandingPage'
 import { Routes, Route } from 'react-router-dom'
 import DetailsPage from './pages/DetailsPage'
 import CompletedDetailsPage from './pages/CompletedDetailsPage'
+import OnHoldDetailsPage from './pages/OnHoldDetailsPage'
 import MyActiveList from './pages/MyActiveList'
 import All from './pages/All'
 import MyCompletedList from './pages/MyCompletedList'
@@ -18,6 +19,7 @@ const App = () => {
       <Route path="/" element={<LandingPage/>} />
       <Route path="/:id" element={<DetailsPage/>} />
       <Route path="/completed/:id" element={<CompletedDetailsPage/>} />
+      <Route path="/onhold/:id" element={<OnHoldDetailsPage/>} />
       <Route path="/active" element={<MyActiveList/>}/>
       <Route path='/all' element={<All/>}/>
       <Route path="/completed" element={<MyCompletedList/>}/>

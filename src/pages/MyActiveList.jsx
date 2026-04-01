@@ -5,12 +5,26 @@ import RecordList from "../components/RecordList";
 import ErrorPage from "../components/ErrorPage";
 import { usePaginatedRecords } from "../hooks/usePaginatedRecords";
 
-// ── Age helper ────────────────────────────────────────────────────────────────
+// ── Age helpers ───────────────────────────────────────────────────────────────
 const getDiffDays = (record) => {
   const date =
     record?.updatedOn || record?.history?.updatedOn || record?.createdOn;
   if (!date) return null;
   return (Date.now() - new Date(date).getTime()) / (1000 * 60 * 60 * 24);
+};
+
+const AGE_COLORS = {
+  green:  { bg: "#e8f5e9", border: "#43a047" },
+  yellow: { bg: "#fff8e1", border: "#ffa000" },
+  red:    { bg: "#ffebee", border: "#e53935" },
+};
+
+const getAgeColor = (record) => {
+  const days = getDiffDays(record);
+  if (days === null) return null;
+  if (days < 3)               return AGE_COLORS.green;
+  if (days >= 3 && days <= 6) return AGE_COLORS.yellow;
+  return AGE_COLORS.red;
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -80,6 +94,7 @@ const MyActiveList = () => {
         loading={loading}
         onLoadMore={loadMore}
         showAgeColors
+        ageColorFn={getAgeColor}
         showCount={false}
       />
 
@@ -100,4 +115,4 @@ const MyActiveList = () => {
   );
 };
 
-export default MyActiveList;
+export default MyActiveList;
