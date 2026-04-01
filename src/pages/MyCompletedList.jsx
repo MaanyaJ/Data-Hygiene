@@ -19,7 +19,7 @@ const MyCompletedList = () => {
     loadMore,
     retry,
   } = usePaginatedRecords({
-    extraParams: { status: "APPROVED" },
+    extraParams: { status: "APPROVED" || "REJECTED" },
     // Passes ?status=APPROVED to the API on every request.
     // The client-side guard below is an extra safety net in case
     // the API returns mixed statuses despite the param.
@@ -27,7 +27,7 @@ const MyCompletedList = () => {
 
   // Client-side guard: keep only APPROVED records
   const approvedRecords = records.filter(
-    (record) => (record?.Status || "").toUpperCase() === "APPROVED"
+    (record) => (record?.Status || "").toUpperCase() === "APPROVED" || "REJECTED"
   );
 
   // ── Error state ───────────────────────────────────────────────────────────

@@ -1,0 +1,2479 @@
+{
+  "exec-1": {
+    "status": "success",
+    "snapshot_id": "3324d7eb-dc82-4241-9c1c-472da6d8b39b",
+    "execution_details": {
+      "execution_id": "exec-1",
+      "benchmarkType": "FFMPEG",
+      "benchmarkCategory": "Storage",
+      "sutType": "vm",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user1@amd.com",
+      "resultType": "AUTO"
+    },
+    "invalidFields": [
+      "CPUModel"
+    ],
+    "Data": [
+      {
+        "field": "CPUModel",
+        "value": "AMD EPYC",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "ACCEPTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "APPROVED",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.692687+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "APPROVED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-2": {
+    "status": "success",
+    "snapshot_id": "3a96f940-c429-43b1-93ff-0dc5abad2470",
+    "execution_details": {
+      "execution_id": "exec-2",
+      "benchmarkType": "Redis",
+      "benchmarkCategory": "Database",
+      "sutType": "baremetal",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user2@amd.com",
+      "resultType": "MANUAL"
+    },
+    "invalidFields": [
+      "CPUModel"
+    ],
+    "Data": [
+      {
+        "field": "CPUModel",
+        "value": "AMD EPYC",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "ACCEPTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "APPROVED",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.692832+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "APPROVED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-3": {
+    "status": "success",
+    "snapshot_id": "5fc2ed27-0140-4845-8329-46a2745752fb",
+    "execution_details": {
+      "execution_id": "exec-3",
+      "benchmarkType": "ACES DGEMM",
+      "benchmarkCategory": "Web",
+      "sutType": "baremetal",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user3@amd.com",
+      "resultType": "AUTO"
+    },
+    "invalidFields": [
+      "CPUModel"
+    ],
+    "Data": [
+      {
+        "field": "CPUModel",
+        "value": "AMD EPYC",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "REJECTED",
+    "reason": "L0 data",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.693045+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "REJECTED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-4": {
+    "status": "success",
+    "snapshot_id": "065edff8-9cfb-4d0c-9adc-295fb87973a6",
+    "execution_details": {
+      "execution_id": "exec-4",
+      "benchmarkType": "Nginx",
+      "benchmarkCategory": "Database",
+      "sutType": "cloud",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user4@amd.com",
+      "resultType": "AUTO"
+    },
+    "invalidFields": [
+      "CPUModel"
+    ],
+    "Data": [
+      {
+        "field": "CPUModel",
+        "value": "AMD EPYC",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "REJECTED",
+    "reason": "L0 data",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.693184+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "REJECTED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-5": {
+    "status": "success",
+    "snapshot_id": "f91b01ea-972e-47df-b4f1-fc9b0ceaf2d6",
+    "execution_details": {
+      "execution_id": "exec-5",
+      "benchmarkType": "Redis",
+      "benchmarkCategory": "Web",
+      "sutType": "cloud",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user5@amd.com",
+      "resultType": "MANUAL"
+    },
+    "invalidFields": [
+      "instanceType"
+    ],
+    "Data": [
+      {
+        "field": "instanceType",
+        "value": "g8a.4xlarge",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "ACCEPTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "APPROVED",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.693421+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "APPROVED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-6": {
+    "status": "success",
+    "snapshot_id": "f0d60bff-57aa-471d-8b5a-0e38884873bd",
+    "execution_details": {
+      "execution_id": "exec-6",
+      "benchmarkType": "ACES DGEMM",
+      "benchmarkCategory": "Others",
+      "sutType": "baremetal",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user6@amd.com",
+      "resultType": "AUTO"
+    },
+    "invalidFields": [
+      "instanceType"
+    ],
+    "Data": [
+      {
+        "field": "instanceType",
+        "value": "g8a.4xlarge",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "REJECTED",
+    "reason": "L0 data",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.693566+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "REJECTED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-7": {
+    "status": "success",
+    "snapshot_id": "bc3e4641-d2fc-4e1d-acc7-0642979f25aa",
+    "execution_details": {
+      "execution_id": "exec-7",
+      "benchmarkType": "Redis",
+      "benchmarkCategory": "Others",
+      "sutType": "baremetal",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user7@amd.com",
+      "resultType": "AUTO"
+    },
+    "invalidFields": [
+      "instanceType"
+    ],
+    "Data": [
+      {
+        "field": "instanceType",
+        "value": "g8a.4xlarge",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "REJECTED",
+    "reason": "L0 data",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.693843+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "REJECTED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-8": {
+    "status": "success",
+    "snapshot_id": "9e1b462e-d9c8-4551-abef-50650cae3312",
+    "execution_details": {
+      "execution_id": "exec-8",
+      "benchmarkType": "ACES DGEMM",
+      "benchmarkCategory": "Video",
+      "sutType": "cloud",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user8@amd.com",
+      "resultType": "AUTO"
+    },
+    "invalidFields": [
+      "CPUModel"
+    ],
+    "Data": [
+      {
+        "field": "CPUModel",
+        "value": "AMD EPYC",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "REJECTED",
+    "reason": "L0 data",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.693994+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "REJECTED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-9": {
+    "status": "success",
+    "snapshot_id": "f2fb61f2-77f4-421f-8fa3-fcee47d26372",
+    "execution_details": {
+      "execution_id": "exec-9",
+      "benchmarkType": "FIO",
+      "benchmarkCategory": "Database",
+      "sutType": "cloud",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user9@amd.com",
+      "resultType": "MANUAL"
+    },
+    "invalidFields": [
+      "instanceType"
+    ],
+    "Data": [
+      {
+        "field": "instanceType",
+        "value": "g8a.4xlarge",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "ACCEPTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "APPROVED",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.694375+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "APPROVED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-10": {
+    "status": "success",
+    "snapshot_id": "09ac0539-c507-4974-b54f-4199e225d6d7",
+    "execution_details": {
+      "execution_id": "exec-10",
+      "benchmarkType": "FIO",
+      "benchmarkCategory": "Storage",
+      "sutType": "vm",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user10@amd.com",
+      "resultType": "AUTO"
+    },
+    "invalidFields": [
+      "instanceType"
+    ],
+    "Data": [
+      {
+        "field": "instanceType",
+        "value": "g8a.4xlarge",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "REJECTED",
+    "reason": "L0 data",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.694502+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "REJECTED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-11": {
+    "status": "success",
+    "snapshot_id": "747efe09-de4f-4b9e-9594-418c8f2985b2",
+    "execution_details": {
+      "execution_id": "exec-11",
+      "benchmarkType": "Nginx",
+      "benchmarkCategory": "Database",
+      "sutType": "vm",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user11@amd.com",
+      "resultType": "AUTO"
+    },
+    "invalidFields": [
+      "CPUModel"
+    ],
+    "Data": [
+      {
+        "field": "CPUModel",
+        "value": "AMD EPYC",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "REJECTED",
+    "reason": "L0 data",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.694603+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "REJECTED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-12": {
+    "status": "success",
+    "snapshot_id": "4c50d1fd-502a-461d-8e68-87dc99f12fb4",
+    "execution_details": {
+      "execution_id": "exec-12",
+      "benchmarkType": "ACES DGEMM",
+      "benchmarkCategory": "Others",
+      "sutType": "cloud",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user12@amd.com",
+      "resultType": "MANUAL"
+    },
+    "invalidFields": [
+      "CPUModel"
+    ],
+    "Data": [
+      {
+        "field": "CPUModel",
+        "value": "AMD EPYC",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "ACCEPTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "APPROVED",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.694678+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "APPROVED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-13": {
+    "status": "success",
+    "snapshot_id": "a600e0a6-8c36-464c-bf15-60f4f76a9e6e",
+    "execution_details": {
+      "execution_id": "exec-13",
+      "benchmarkType": "Nginx",
+      "benchmarkCategory": "Storage",
+      "sutType": "baremetal",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user13@amd.com",
+      "resultType": "AUTO"
+    },
+    "invalidFields": [
+      "instanceType"
+    ],
+    "Data": [
+      {
+        "field": "instanceType",
+        "value": "g8a.4xlarge",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "REJECTED",
+    "reason": "L0 data",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.694738+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "REJECTED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-14": {
+    "status": "success",
+    "snapshot_id": "1334ff7c-c950-48a4-87cd-93c5c667bff4",
+    "execution_details": {
+      "execution_id": "exec-14",
+      "benchmarkType": "FFMPEG",
+      "benchmarkCategory": "Database",
+      "sutType": "vm",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user14@amd.com",
+      "resultType": "MANUAL"
+    },
+    "invalidFields": [
+      "CPUModel"
+    ],
+    "Data": [
+      {
+        "field": "CPUModel",
+        "value": "AMD EPYC",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "REJECTED",
+    "reason": "L0 data",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.694783+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "REJECTED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-15": {
+    "status": "success",
+    "snapshot_id": "410bdb75-ecde-469d-b285-873a616a50fe",
+    "execution_details": {
+      "execution_id": "exec-15",
+      "benchmarkType": "Nginx",
+      "benchmarkCategory": "Storage",
+      "sutType": "baremetal",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user15@amd.com",
+      "resultType": "MANUAL"
+    },
+    "invalidFields": [
+      "instanceType"
+    ],
+    "Data": [
+      {
+        "field": "instanceType",
+        "value": "g8a.4xlarge",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "REJECTED",
+    "reason": "L0 data",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.694897+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "REJECTED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-16": {
+    "status": "success",
+    "snapshot_id": "b4efd7ea-ea40-4445-9447-850ac78348e1",
+    "execution_details": {
+      "execution_id": "exec-16",
+      "benchmarkType": "ACES DGEMM",
+      "benchmarkCategory": "Storage",
+      "sutType": "vm",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user16@amd.com",
+      "resultType": "AUTO"
+    },
+    "invalidFields": [
+      "CPUModel"
+    ],
+    "Data": [
+      {
+        "field": "CPUModel",
+        "value": "AMD EPYC",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "ACCEPTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "APPROVED",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.694944+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "APPROVED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-17": {
+    "status": "success",
+    "snapshot_id": "a4e7f28f-3a2d-4dd0-afc3-ef7bae94ccc5",
+    "execution_details": {
+      "execution_id": "exec-17",
+      "benchmarkType": "FIO",
+      "benchmarkCategory": "Storage",
+      "sutType": "vm",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user17@amd.com",
+      "resultType": "MANUAL"
+    },
+    "invalidFields": [
+      "instanceType"
+    ],
+    "Data": [
+      {
+        "field": "instanceType",
+        "value": "g8a.4xlarge",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "ACCEPTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "APPROVED",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.694982+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "APPROVED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-18": {
+    "status": "success",
+    "snapshot_id": "2016cc93-d344-4b66-812c-a754d9ab6954",
+    "execution_details": {
+      "execution_id": "exec-18",
+      "benchmarkType": "Nginx",
+      "benchmarkCategory": "Video",
+      "sutType": "baremetal",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user18@amd.com",
+      "resultType": "MANUAL"
+    },
+    "invalidFields": [
+      "instanceType"
+    ],
+    "Data": [
+      {
+        "field": "instanceType",
+        "value": "g8a.4xlarge",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "ACCEPTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "APPROVED",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.695020+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "APPROVED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-19": {
+    "status": "success",
+    "snapshot_id": "0f2ce853-a6e8-4f1b-90c5-088c38799ec5",
+    "execution_details": {
+      "execution_id": "exec-19",
+      "benchmarkType": "Redis",
+      "benchmarkCategory": "Database",
+      "sutType": "cloud",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user19@amd.com",
+      "resultType": "AUTO"
+    },
+    "invalidFields": [
+      "CPUModel"
+    ],
+    "Data": [
+      {
+        "field": "CPUModel",
+        "value": "AMD EPYC",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "REJECTED",
+    "reason": "L0 data",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.695057+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "REJECTED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-20": {
+    "status": "success",
+    "snapshot_id": "fbfc92b4-5a94-4d30-9fa5-c3d70bdc5c54",
+    "execution_details": {
+      "execution_id": "exec-20",
+      "benchmarkType": "FIO",
+      "benchmarkCategory": "Others",
+      "sutType": "baremetal",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user20@amd.com",
+      "resultType": "MANUAL"
+    },
+    "invalidFields": [
+      "instanceType"
+    ],
+    "Data": [
+      {
+        "field": "instanceType",
+        "value": "g8a.4xlarge",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "REJECTED",
+    "reason": "L0 data",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.695094+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "REJECTED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-21": {
+    "status": "success",
+    "snapshot_id": "4927c0ca-c061-4012-ae8e-837f8be897f0",
+    "execution_details": {
+      "execution_id": "exec-21",
+      "benchmarkType": "FFMPEG",
+      "benchmarkCategory": "Others",
+      "sutType": "baremetal",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user21@amd.com",
+      "resultType": "MANUAL"
+    },
+    "invalidFields": [
+      "CPUModel"
+    ],
+    "Data": [
+      {
+        "field": "CPUModel",
+        "value": "AMD EPYC",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "ACCEPTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "APPROVED",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.695131+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "APPROVED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-22": {
+    "status": "success",
+    "snapshot_id": "b5bbf944-2ed7-4271-a9cc-3be38c2526e2",
+    "execution_details": {
+      "execution_id": "exec-22",
+      "benchmarkType": "Redis",
+      "benchmarkCategory": "Others",
+      "sutType": "cloud",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user22@amd.com",
+      "resultType": "AUTO"
+    },
+    "invalidFields": [
+      "instanceType"
+    ],
+    "Data": [
+      {
+        "field": "instanceType",
+        "value": "g8a.4xlarge",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "REJECTED",
+    "reason": "L0 data",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.695169+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "REJECTED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-23": {
+    "status": "success",
+    "snapshot_id": "1bd5fbbd-3577-4f25-88cf-eb7f67311808",
+    "execution_details": {
+      "execution_id": "exec-23",
+      "benchmarkType": "FIO",
+      "benchmarkCategory": "Database",
+      "sutType": "vm",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user23@amd.com",
+      "resultType": "AUTO"
+    },
+    "invalidFields": [
+      "CPUModel"
+    ],
+    "Data": [
+      {
+        "field": "CPUModel",
+        "value": "AMD EPYC",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "REJECTED",
+    "reason": "L0 data",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.695207+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "REJECTED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-24": {
+    "status": "success",
+    "snapshot_id": "86d54fa0-23e6-40e8-813d-ddb8b0cf3d70",
+    "execution_details": {
+      "execution_id": "exec-24",
+      "benchmarkType": "ACES DGEMM",
+      "benchmarkCategory": "Storage",
+      "sutType": "vm",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user24@amd.com",
+      "resultType": "AUTO"
+    },
+    "invalidFields": [
+      "instanceType"
+    ],
+    "Data": [
+      {
+        "field": "instanceType",
+        "value": "g8a.4xlarge",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "ACCEPTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "APPROVED",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.695248+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "APPROVED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-25": {
+    "status": "success",
+    "snapshot_id": "cfc458b5-9370-484d-88e6-54f9823f8772",
+    "execution_details": {
+      "execution_id": "exec-25",
+      "benchmarkType": "Nginx",
+      "benchmarkCategory": "Video",
+      "sutType": "vm",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user25@amd.com",
+      "resultType": "MANUAL"
+    },
+    "invalidFields": [
+      "CPUModel"
+    ],
+    "Data": [
+      {
+        "field": "CPUModel",
+        "value": "AMD EPYC",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "ACCEPTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "APPROVED",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.695284+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "APPROVED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-26": {
+    "status": "success",
+    "snapshot_id": "8c0f58aa-a999-491c-8c9f-286cda93b331",
+    "execution_details": {
+      "execution_id": "exec-26",
+      "benchmarkType": "FIO",
+      "benchmarkCategory": "Web",
+      "sutType": "cloud",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user26@amd.com",
+      "resultType": "AUTO"
+    },
+    "invalidFields": [
+      "instanceType"
+    ],
+    "Data": [
+      {
+        "field": "instanceType",
+        "value": "g8a.4xlarge",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "ACCEPTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "APPROVED",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.695321+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "APPROVED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-27": {
+    "status": "success",
+    "snapshot_id": "d369aa37-ed1d-420a-af3b-07522f25238a",
+    "execution_details": {
+      "execution_id": "exec-27",
+      "benchmarkType": "ACES DGEMM",
+      "benchmarkCategory": "Video",
+      "sutType": "baremetal",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user27@amd.com",
+      "resultType": "AUTO"
+    },
+    "invalidFields": [
+      "instanceType"
+    ],
+    "Data": [
+      {
+        "field": "instanceType",
+        "value": "g8a.4xlarge",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "REJECTED",
+    "reason": "L0 data",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.695358+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "REJECTED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-28": {
+    "status": "success",
+    "snapshot_id": "8949ee33-7b33-4e5e-9fc9-4af999acf82f",
+    "execution_details": {
+      "execution_id": "exec-28",
+      "benchmarkType": "Redis",
+      "benchmarkCategory": "Web",
+      "sutType": "cloud",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user28@amd.com",
+      "resultType": "MANUAL"
+    },
+    "invalidFields": [
+      "CPUModel"
+    ],
+    "Data": [
+      {
+        "field": "CPUModel",
+        "value": "AMD EPYC",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "REJECTED",
+    "reason": "L0 data",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.695397+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "REJECTED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-29": {
+    "status": "success",
+    "snapshot_id": "46a2bbf7-e08f-41cb-93c2-a087d28b3005",
+    "execution_details": {
+      "execution_id": "exec-29",
+      "benchmarkType": "ACES DGEMM",
+      "benchmarkCategory": "Database",
+      "sutType": "baremetal",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user29@amd.com",
+      "resultType": "AUTO"
+    },
+    "invalidFields": [
+      "instanceType"
+    ],
+    "Data": [
+      {
+        "field": "instanceType",
+        "value": "g8a.4xlarge",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "ACCEPTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "APPROVED",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.695434+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "APPROVED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-30": {
+    "status": "success",
+    "snapshot_id": "650bb4dc-2f9c-412b-bb72-dfbd7b46010a",
+    "execution_details": {
+      "execution_id": "exec-30",
+      "benchmarkType": "Nginx",
+      "benchmarkCategory": "Storage",
+      "sutType": "vm",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user30@amd.com",
+      "resultType": "AUTO"
+    },
+    "invalidFields": [
+      "instanceType"
+    ],
+    "Data": [
+      {
+        "field": "instanceType",
+        "value": "g8a.4xlarge",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "REJECTED",
+    "reason": "L0 data",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.695471+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "REJECTED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-31": {
+    "status": "success",
+    "snapshot_id": "a79b4e7b-f485-467a-a258-300ab0bec740",
+    "execution_details": {
+      "execution_id": "exec-31",
+      "benchmarkType": "Nginx",
+      "benchmarkCategory": "Database",
+      "sutType": "vm",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user31@amd.com",
+      "resultType": "AUTO"
+    },
+    "invalidFields": [
+      "instanceType"
+    ],
+    "Data": [
+      {
+        "field": "instanceType",
+        "value": "g8a.4xlarge",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "ACCEPTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "APPROVED",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.695509+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "APPROVED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-32": {
+    "status": "success",
+    "snapshot_id": "fc0a88c3-aace-47eb-869a-772f6905e205",
+    "execution_details": {
+      "execution_id": "exec-32",
+      "benchmarkType": "Redis",
+      "benchmarkCategory": "Storage",
+      "sutType": "cloud",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user32@amd.com",
+      "resultType": "MANUAL"
+    },
+    "invalidFields": [
+      "CPUModel"
+    ],
+    "Data": [
+      {
+        "field": "CPUModel",
+        "value": "AMD EPYC",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "ACCEPTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "APPROVED",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.695545+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "APPROVED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-33": {
+    "status": "success",
+    "snapshot_id": "877ef490-9487-4d18-ae51-c21dc769415f",
+    "execution_details": {
+      "execution_id": "exec-33",
+      "benchmarkType": "Nginx",
+      "benchmarkCategory": "Others",
+      "sutType": "baremetal",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user33@amd.com",
+      "resultType": "MANUAL"
+    },
+    "invalidFields": [
+      "CPUModel"
+    ],
+    "Data": [
+      {
+        "field": "CPUModel",
+        "value": "AMD EPYC",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "REJECTED",
+    "reason": "L0 data",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.695581+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "REJECTED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-34": {
+    "status": "success",
+    "snapshot_id": "d0c30002-5f28-471c-95b4-94d4464e6912",
+    "execution_details": {
+      "execution_id": "exec-34",
+      "benchmarkType": "FIO",
+      "benchmarkCategory": "Storage",
+      "sutType": "baremetal",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user34@amd.com",
+      "resultType": "MANUAL"
+    },
+    "invalidFields": [
+      "CPUModel"
+    ],
+    "Data": [
+      {
+        "field": "CPUModel",
+        "value": "AMD EPYC",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "ACCEPTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "APPROVED",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.695617+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "APPROVED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-35": {
+    "status": "success",
+    "snapshot_id": "df61e997-3d9e-4a06-a68b-9f171b9dc92c",
+    "execution_details": {
+      "execution_id": "exec-35",
+      "benchmarkType": "FIO",
+      "benchmarkCategory": "Video",
+      "sutType": "vm",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user35@amd.com",
+      "resultType": "MANUAL"
+    },
+    "invalidFields": [
+      "CPUModel"
+    ],
+    "Data": [
+      {
+        "field": "CPUModel",
+        "value": "AMD EPYC",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "REJECTED",
+    "reason": "L0 data",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.695653+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "REJECTED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-36": {
+    "status": "success",
+    "snapshot_id": "d1079812-c0ed-48fe-8d95-d9bb24a208aa",
+    "execution_details": {
+      "execution_id": "exec-36",
+      "benchmarkType": "FFMPEG",
+      "benchmarkCategory": "Database",
+      "sutType": "baremetal",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user36@amd.com",
+      "resultType": "AUTO"
+    },
+    "invalidFields": [
+      "CPUModel"
+    ],
+    "Data": [
+      {
+        "field": "CPUModel",
+        "value": "AMD EPYC",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "ACCEPTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "APPROVED",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.695689+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "APPROVED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-37": {
+    "status": "success",
+    "snapshot_id": "65a5747e-93ee-44b9-b912-67151b6622f3",
+    "execution_details": {
+      "execution_id": "exec-37",
+      "benchmarkType": "FIO",
+      "benchmarkCategory": "Video",
+      "sutType": "vm",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user37@amd.com",
+      "resultType": "AUTO"
+    },
+    "invalidFields": [
+      "instanceType"
+    ],
+    "Data": [
+      {
+        "field": "instanceType",
+        "value": "g8a.4xlarge",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "ACCEPTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "APPROVED",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.695726+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "APPROVED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-38": {
+    "status": "success",
+    "snapshot_id": "188dfde4-93f3-4a1a-ab40-e510d480a5d5",
+    "execution_details": {
+      "execution_id": "exec-38",
+      "benchmarkType": "FIO",
+      "benchmarkCategory": "Others",
+      "sutType": "vm",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user38@amd.com",
+      "resultType": "AUTO"
+    },
+    "invalidFields": [
+      "instanceType"
+    ],
+    "Data": [
+      {
+        "field": "instanceType",
+        "value": "g8a.4xlarge",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "REJECTED",
+    "reason": "L0 data",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.695765+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "REJECTED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-39": {
+    "status": "success",
+    "snapshot_id": "1601e65a-e2b9-4222-beb7-b0a6bf33b8e5",
+    "execution_details": {
+      "execution_id": "exec-39",
+      "benchmarkType": "Redis",
+      "benchmarkCategory": "Database",
+      "sutType": "vm",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user39@amd.com",
+      "resultType": "AUTO"
+    },
+    "invalidFields": [
+      "instanceType"
+    ],
+    "Data": [
+      {
+        "field": "instanceType",
+        "value": "g8a.4xlarge",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "ACCEPTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "APPROVED",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.695803+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "APPROVED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-40": {
+    "status": "success",
+    "snapshot_id": "929346d5-c72e-4430-a050-7f22448f843a",
+    "execution_details": {
+      "execution_id": "exec-40",
+      "benchmarkType": "Nginx",
+      "benchmarkCategory": "Others",
+      "sutType": "baremetal",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user40@amd.com",
+      "resultType": "AUTO"
+    },
+    "invalidFields": [
+      "CPUModel"
+    ],
+    "Data": [
+      {
+        "field": "CPUModel",
+        "value": "AMD EPYC",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "ACCEPTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "APPROVED",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.695841+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "APPROVED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-41": {
+    "status": "success",
+    "snapshot_id": "85b26f76-9266-40a8-8a69-1b0d812154d1",
+    "execution_details": {
+      "execution_id": "exec-41",
+      "benchmarkType": "Redis",
+      "benchmarkCategory": "Others",
+      "sutType": "baremetal",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user41@amd.com",
+      "resultType": "MANUAL"
+    },
+    "invalidFields": [
+      "CPUModel"
+    ],
+    "Data": [
+      {
+        "field": "CPUModel",
+        "value": "AMD EPYC",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "REJECTED",
+    "reason": "L0 data",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.695876+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "REJECTED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-42": {
+    "status": "success",
+    "snapshot_id": "68a9a760-d0db-4551-be42-4e27eed4a2ba",
+    "execution_details": {
+      "execution_id": "exec-42",
+      "benchmarkType": "ACES DGEMM",
+      "benchmarkCategory": "Video",
+      "sutType": "vm",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user42@amd.com",
+      "resultType": "AUTO"
+    },
+    "invalidFields": [
+      "instanceType"
+    ],
+    "Data": [
+      {
+        "field": "instanceType",
+        "value": "g8a.4xlarge",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "REJECTED",
+    "reason": "L0 data",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.695912+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "REJECTED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-43": {
+    "status": "success",
+    "snapshot_id": "11be298b-cad2-46f7-92fe-aa9de26210ee",
+    "execution_details": {
+      "execution_id": "exec-43",
+      "benchmarkType": "Nginx",
+      "benchmarkCategory": "Others",
+      "sutType": "baremetal",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user43@amd.com",
+      "resultType": "MANUAL"
+    },
+    "invalidFields": [
+      "instanceType"
+    ],
+    "Data": [
+      {
+        "field": "instanceType",
+        "value": "g8a.4xlarge",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "REJECTED",
+    "reason": "L0 data",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.695947+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "REJECTED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-44": {
+    "status": "success",
+    "snapshot_id": "4f33b14e-5ae7-4b94-96fc-66ee573ac5f8",
+    "execution_details": {
+      "execution_id": "exec-44",
+      "benchmarkType": "Redis",
+      "benchmarkCategory": "Others",
+      "sutType": "baremetal",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user44@amd.com",
+      "resultType": "MANUAL"
+    },
+    "invalidFields": [
+      "instanceType"
+    ],
+    "Data": [
+      {
+        "field": "instanceType",
+        "value": "g8a.4xlarge",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "REJECTED",
+    "reason": "L0 data",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.695984+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "REJECTED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-45": {
+    "status": "success",
+    "snapshot_id": "aaa8f432-1605-453c-bd42-e28ceacbd6fc",
+    "execution_details": {
+      "execution_id": "exec-45",
+      "benchmarkType": "Redis",
+      "benchmarkCategory": "Database",
+      "sutType": "cloud",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user45@amd.com",
+      "resultType": "MANUAL"
+    },
+    "invalidFields": [
+      "instanceType"
+    ],
+    "Data": [
+      {
+        "field": "instanceType",
+        "value": "g8a.4xlarge",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "REJECTED",
+    "reason": "L0 data",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.696021+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "REJECTED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-46": {
+    "status": "success",
+    "snapshot_id": "7ff53964-30ab-4e43-87a7-82e4c2f1e88f",
+    "execution_details": {
+      "execution_id": "exec-46",
+      "benchmarkType": "Nginx",
+      "benchmarkCategory": "Storage",
+      "sutType": "baremetal",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user46@amd.com",
+      "resultType": "AUTO"
+    },
+    "invalidFields": [
+      "instanceType"
+    ],
+    "Data": [
+      {
+        "field": "instanceType",
+        "value": "g8a.4xlarge",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "ACCEPTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "APPROVED",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.696063+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "APPROVED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-47": {
+    "status": "success",
+    "snapshot_id": "114faf4d-8df0-48ed-99dc-f627166ed981",
+    "execution_details": {
+      "execution_id": "exec-47",
+      "benchmarkType": "FIO",
+      "benchmarkCategory": "Web",
+      "sutType": "baremetal",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user47@amd.com",
+      "resultType": "MANUAL"
+    },
+    "invalidFields": [
+      "CPUModel"
+    ],
+    "Data": [
+      {
+        "field": "CPUModel",
+        "value": "AMD EPYC",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "REJECTED",
+    "reason": "L0 data",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.696099+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "REJECTED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-48": {
+    "status": "success",
+    "snapshot_id": "75f0b96e-7e14-42c1-b4a5-1ffe0f4bce31",
+    "execution_details": {
+      "execution_id": "exec-48",
+      "benchmarkType": "Redis",
+      "benchmarkCategory": "Video",
+      "sutType": "baremetal",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user48@amd.com",
+      "resultType": "MANUAL"
+    },
+    "invalidFields": [
+      "instanceType"
+    ],
+    "Data": [
+      {
+        "field": "instanceType",
+        "value": "g8a.4xlarge",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "ACCEPTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "APPROVED",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.696134+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "APPROVED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-49": {
+    "status": "success",
+    "snapshot_id": "16c52ec4-d946-4856-a704-d18881bc3e63",
+    "execution_details": {
+      "execution_id": "exec-49",
+      "benchmarkType": "FIO",
+      "benchmarkCategory": "Video",
+      "sutType": "baremetal",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user49@amd.com",
+      "resultType": "MANUAL"
+    },
+    "invalidFields": [
+      "instanceType"
+    ],
+    "Data": [
+      {
+        "field": "instanceType",
+        "value": "g8a.4xlarge",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "REJECTED",
+    "reason": "L0 data",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.696171+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "REJECTED",
+      "valueField": "standardization_status"
+    }
+  },
+  "exec-50": {
+    "status": "success",
+    "snapshot_id": "40590bd1-1a00-445a-975c-2386b826e914",
+    "execution_details": {
+      "execution_id": "exec-50",
+      "benchmarkType": "ACES DGEMM",
+      "benchmarkCategory": "Storage",
+      "sutType": "cloud",
+      "runCategory": "Benchmark_Test",
+      "createdOn": "2025-08-25",
+      "tester": "user50@amd.com",
+      "resultType": "AUTO"
+    },
+    "invalidFields": [
+      "instanceType"
+    ],
+    "Data": [
+      {
+        "field": "instanceType",
+        "value": "g8a.4xlarge",
+        "mapping": "",
+        "comparing_data": [
+          {
+            "suggestion1": "opt1",
+            "score1": 0.9,
+            "status": "ACCEPTED"
+          },
+          {
+            "suggestion2": "opt2",
+            "score2": 0.8,
+            "status": "REJECTED"
+          },
+          {
+            "suggestion3": "opt3",
+            "score3": 0.7,
+            "status": "REJECTED"
+          }
+        ]
+      }
+    ],
+    "standardization_status": "APPROVED",
+    "history": {
+      "updatedOn": "2026-04-01T02:16:42.696209+00:00",
+      "updatedBy": "mock@amd.com",
+      "from": "PENDING",
+      "to": "APPROVED",
+      "valueField": "standardization_status"
+    }
+  }
+}
