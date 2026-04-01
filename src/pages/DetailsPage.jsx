@@ -63,9 +63,10 @@ const DetailsPage = () => {
     ? data.map((item, index) => ({
         id: index,
         fieldName: item?.field || "---",
-        currentValue: item?.value || "---",
+        OriginalValue: item?.value || "---",
         mapping: item?.mapping || "---",
         suggestions: parseSuggestions(item?.comparing_data),
+        valid: item?.validation_status
       }))
     : [];
 

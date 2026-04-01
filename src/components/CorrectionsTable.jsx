@@ -115,7 +115,7 @@ const CorrectionsTable = ({ tableRows, onAccept, onRejectAll }) => {
               <TableCell sx={{ ...stickyHeadCell, fontWeight: 700, minWidth: 160 }}>
                 Field Name
               </TableCell>
-              <TableCell sx={{ fontWeight: 700, minWidth: 180 }}>Current Value</TableCell>
+              <TableCell sx={{ fontWeight: 700, minWidth: 180 }}>Original Value</TableCell>
               {Array.from({ length: maxSuggestions }, (_, i) => (
                 <TableCell key={i} sx={{ fontWeight: 700, minWidth: 180 }}>
                   Suggestion {i + 1}
@@ -143,13 +143,13 @@ const CorrectionsTable = ({ tableRows, onAccept, onRejectAll }) => {
                         placement="top"
                         slotProps={{ tooltip: { sx: { fontSize: "13px", maxWidth: 400 } } }}
                       >
-                        <Typography sx={{ fontWeight: 600, cursor: "pointer", width: "fit-content" }}>
+                        <Typography color = {row.valid === "valid" ? 'success' : "error"} sx={{ fontWeight: 600, cursor: "pointer", width: "fit-content" }}>
                           {row.fieldName}
                         </Typography>
                       </Tooltip>
                     </TableCell>
 
-                    <TableCell>{row.currentValue}</TableCell>
+                    <TableCell>{row.OriginalValue}</TableCell>
 
                     {/* Dynamic suggestion chips */}
                     {Array.from({ length: maxSuggestions }, (_, i) => {
@@ -192,17 +192,18 @@ const CorrectionsTable = ({ tableRows, onAccept, onRejectAll }) => {
 
                     {/* Choose Value */}
                     <TableCell>
+                      {row.valid === "valid" ? "NA" : 
                       <ChooseValueCell
                         key={`${row.id}-${selectedIdx ?? "none"}`}
                         fieldName={row.fieldName}
                         value={chosenValue ?? null}
                         onChange={(val) => handleChosenValueChange(row.id, val)}
-                      />
+                      />}
                     </TableCell>
 
                     {/* Actions */}
                     <TableCell>
-                      <Box sx={{ display: "flex", gap: 1 }}>
+                      {row.valid === "valid" ? "NA" :<Box sx={{ display: "flex", gap: 1 }}>
                         <Button
                           size="small"
                           variant="contained"
@@ -222,7 +223,7 @@ const CorrectionsTable = ({ tableRows, onAccept, onRejectAll }) => {
                         >
                           Reject All
                         </Button>
-                      </Box>
+                      </Box>}
                     </TableCell>
                   </TableRow>
                 );
