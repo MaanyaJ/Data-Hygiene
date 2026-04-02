@@ -72,16 +72,6 @@ const DetailsPage = () => {
       }))
     : [];
 
-  const handleAccept = (row, acceptedSuggestion) => {
-    console.log("Accepted:", row.fieldName, "->", acceptedSuggestion);
-    // TODO: call your API to persist the accepted value
-  };
-
-  const handleRejectAll = (row) => {
-    console.log("Rejected all for:", row.fieldName);
-    // TODO: call your API to reject
-  };
-
   return (
         <Box>
           <Navbar/>
@@ -89,9 +79,8 @@ const DetailsPage = () => {
           <ExecutionInfoBox executionInfo={executionData} />
           <CorrectionsTable
             tableRows={tableRows}
-            onAccept={handleAccept}
-            onRejectAll={handleRejectAll}
             invalidFields = {invalidFields}
+            execID = {executionData.execution_id}
           />
         </Box>
         </Box>

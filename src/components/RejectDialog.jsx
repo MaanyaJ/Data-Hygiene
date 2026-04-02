@@ -97,7 +97,7 @@ const RejectDialog = ({ open, onClose, row, onL0Data, onDraftSubmit }) => {
         body: JSON.stringify(formValues),
       });
 
-      onDraftSubmit?.(row, formValues);
+      onDraftSubmit?.(row);
       resetAndClose();
     } catch (error) {
         console.log(error)
