@@ -5,9 +5,8 @@ import ErrorPage from "../components/ErrorPage";
 import Loader from "../components/Loader";
 import ExecutionInfoBox from "../components/ExecutionInfoBox";
 import CorrectionsTable from "../components/CorrectionsTable";
+import Navbar from "../components/Navbar";
 
-// comparing_data: [{ suggestion1, score1 }, { suggestion2, score2 }, ...]
-// each object in the array holds one suggestion at its own index
 const parseSuggestions = (comparingData = []) => {
   if (!Array.isArray(comparingData)) return [];
 
@@ -26,6 +25,7 @@ const DetailsPage = () => {
   const [executionData, setExecutionData] = useState(null);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [invalidFields, setInvalidFields] = useState([])
 
   const fetchInvalidFields = async () => {
     setLoading(true);
@@ -39,6 +39,8 @@ const DetailsPage = () => {
       if (!res.ok) throw new Error("Failed to fetch record details");
 
       const json = await res.json();
+
+      setInvalidFields(json.invalidFields)
 
       setExecutionData(json.execution_details);
       setData(json.Data);
@@ -81,18 +83,18 @@ const DetailsPage = () => {
   };
 
   return (
-    <Container maxWidth="xl">
-      <Paper elevation={0}>
-        <Box sx={{ px: 4, pt: 4, pb: 4 }}>
+        <Box>
+          <Navbar/>
+          <Box sx={{ p:4}}>
           <ExecutionInfoBox executionInfo={executionData} />
           <CorrectionsTable
             tableRows={tableRows}
             onAccept={handleAccept}
             onRejectAll={handleRejectAll}
+            invalidFields = {invalidFields}
           />
         </Box>
-      </Paper>
-    </Container>
+        </Box>
   );
 };
 

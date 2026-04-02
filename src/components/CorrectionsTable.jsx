@@ -49,7 +49,7 @@ const scoreToColor = (score) => {
   }
 };
 
-const CorrectionsTable = ({ tableRows, onAccept, onRejectAll }) => {
+const CorrectionsTable = ({ tableRows, onAccept, onRejectAll, invalidFields }) => {
   const [selectedSuggestions, setSelectedSuggestions] = useState({});
   const [chosenValues, setChosenValues] = useState({});
   const [rejectDialogRow, setRejectDialogRow] = useState(null);
@@ -214,7 +214,7 @@ const CorrectionsTable = ({ tableRows, onAccept, onRejectAll }) => {
                         >
                           Accept
                         </Button>
-                        <Button
+                        {invalidFields.includes(row.fieldName) ? <Button
                           size="small"
                           variant="contained"
                           color="error"
@@ -222,7 +222,7 @@ const CorrectionsTable = ({ tableRows, onAccept, onRejectAll }) => {
                           onClick={() => handleRejectAll(row)}
                         >
                           Reject All
-                        </Button>
+                        </Button> : ""}
                       </Box>}
                     </TableCell>
                   </TableRow>

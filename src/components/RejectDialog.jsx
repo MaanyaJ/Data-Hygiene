@@ -72,49 +72,35 @@ const RejectDialog = ({ open, onClose, row, onL0Data, onDraftSubmit }) => {
   };
 
   // Step 1 → Submit Draft Record chosen
-  // TODO: replace URL with actual API endpoint
   const handleDraftOptionClick = async () => {
     setStep(STEPS.DRAFT_FORM);
     setLoadingFields(true);
     try {
-      // TODO: call your API with row.fieldName to get the detail fields
-      // e.g. GET /draft-fields?fieldName=CPUModel
-      // const res = await fetch(`http://192.168.0.182:8000/draft-fields?fieldName=${encodeURIComponent(row.fieldName)}`);
-      // const data = await res.json();
-      // setDetailFields(data.fields); // expected: [{ name: string, label: string, type?: string }]
-
-      // ---- placeholder until API is ready ----
-      await new Promise((r) => setTimeout(r, 800)); // fake delay
-      setDetailFields([
-        { name: "field1", label: "Fieldname1" },
-        { name: "field2", label: "fieldname2" },
-      ]);
-      // ----------------------------------------
-    } catch {
+      const res = await fetch(`http://192.168.0.182:8000/draft-records/fields?type=${encodeURIComponent(row.fieldName)}`);
+      const data = await res.json();
+      setDetailFields(data.fields);
+    } catch (error) {
       setDetailFields([]);
+      console.log(error)
     } finally {
       setLoadingFields(false);
     }
   };
 
   // Step 2 → Submit form
-  // TODO: replace with actual submit API call
   const handleSubmit = async () => {
     setSubmitting(true);
     try {
-      // TODO: call your submit API with formValues + row details
-      // e.g. POST /submit-draft
-      // await fetch("http://192.168.0.182:8000/submit-draft", {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify({ fieldName: row.fieldName, ...formValues }),
-      // });
+      await fetch(`http://192.168.0.182:8000/draft-records/fields?type=${encodeURIComponent(row.fieldName)}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formValues),
+      });
 
-      await new Promise((r) => setTimeout(r, 600)); // fake delay
       onDraftSubmit?.(row, formValues);
       resetAndClose();
-    } catch {
-      // TODO: handle error
+    } catch (error) {
+        console.log(error)
     } finally {
       setSubmitting(false);
     }
@@ -124,8 +110,7 @@ const RejectDialog = ({ open, onClose, row, onL0Data, onDraftSubmit }) => {
     setFormValues((prev) => ({ ...prev, [name]: value }));
   };
 
-  const allFilled = detailFields.every((f) => !!formValues[f.name]?.trim());
-
+const allFilled = detailFields.every((f) => !!formValues[f]?.trim());
   return (
     <Dialog
       open={open}
@@ -198,12 +183,12 @@ const RejectDialog = ({ open, onClose, row, onL0Data, onDraftSubmit }) => {
               <Stack gap={2.5} sx={{ mt: 0.5 }}>
                 {detailFields.map((field) => (
                   <TextField
-                    key={field.name}
-                    label={field.label}
+                    key={field}
+                    label={field === "value" ? row.fieldName : field}
                     size="small"
                     fullWidth
-                    value={formValues[field.name] ?? ""}
-                    onChange={(e) => handleFieldChange(field.name, e.target.value)}
+                    value={formValues[field] ?? ""}
+                    onChange={(e) => handleFieldChange(field, e.target.value)}
                   />
                 ))}
               </Stack>
