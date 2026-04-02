@@ -5,6 +5,7 @@ import ErrorPage from "../components/ErrorPage";
 import Loader from "../components/Loader";
 import ExecutionInfoBox from "../components/ExecutionInfoBox";
 import CorrectionsTable from "../components/CorrectionsTable";
+import Navbar from "../components/Navbar";
 
 const parseSuggestions = (comparingData = []) => {
   if (!Array.isArray(comparingData)) return [];
@@ -82,9 +83,9 @@ const DetailsPage = () => {
   };
 
   return (
-    <Container maxWidth="xl">
-      <Paper elevation={0}>
-        <Box sx={{ px: 4, pt: 4, pb: 4 }}>
+        <Box>
+          <Navbar/>
+          <Box sx={{ p:4}}>
           <ExecutionInfoBox executionInfo={executionData} />
           <CorrectionsTable
             tableRows={tableRows}
@@ -93,8 +94,7 @@ const DetailsPage = () => {
             invalidFields = {invalidFields}
           />
         </Box>
-      </Paper>
-    </Container>
+        </Box>
   );
 };
 
