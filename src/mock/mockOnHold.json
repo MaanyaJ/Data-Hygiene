@@ -1,0 +1,578 @@
+{
+  "status": "success",
+  "total_onhold_records": 50,
+  "red": 16,
+  "green": 17,
+  "yellow": 17,
+  "page": 1,
+  "size": 50,
+  "returned_records": 50,
+  "data": [
+    {
+      "ExecutionId": "hold-1",
+      "Status": "ONHOLD",
+      "BenchmarkType": "FFMPEG",
+      "BenchmarkCategory": "Storage",
+      "InvalidFields": [
+        "CPUModel"
+      ],
+      "updatedOn": "2026-04-01T10:29:58.412Z",
+      "holdedOn": "2026-03-30T01:35:17.936Z"
+    },
+    {
+      "ExecutionId": "hold-2",
+      "Status": "ONHOLD",
+      "BenchmarkType": "Redis",
+      "BenchmarkCategory": "Database",
+      "InvalidFields": [
+        "instanceType"
+      ],
+      "updatedOn": "2026-04-01T09:29:58.412Z",
+      "holdedOn": "2026-04-01T04:47:10.795Z"
+    },
+    {
+      "ExecutionId": "hold-3",
+      "Status": "ONHOLD",
+      "BenchmarkType": "ACES DGEMM",
+      "BenchmarkCategory": "Web",
+      "InvalidFields": [
+        "CPUModel",
+        "instanceType"
+      ],
+      "updatedOn": "2026-04-01T08:29:58.412Z",
+      "holdedOn": "2026-03-31T18:11:13.860Z"
+    },
+    {
+      "ExecutionId": "hold-4",
+      "Status": "ONHOLD",
+      "BenchmarkType": "Nginx",
+      "BenchmarkCategory": "Video",
+      "InvalidFields": [
+        "CPUModel"
+      ],
+      "updatedOn": "2026-04-01T07:29:58.412Z",
+      "holdedOn": "2026-03-29T18:53:44.741Z"
+    },
+    {
+      "ExecutionId": "hold-5",
+      "Status": "ONHOLD",
+      "BenchmarkType": "FIO",
+      "BenchmarkCategory": "Others",
+      "InvalidFields": [
+        "instanceType"
+      ],
+      "updatedOn": "2026-04-01T06:29:58.412Z",
+      "holdedOn": "2026-03-31T23:14:39.989Z"
+    },
+    {
+      "ExecutionId": "hold-6",
+      "Status": "ONHOLD",
+      "BenchmarkType": "FFMPEG",
+      "BenchmarkCategory": "Storage",
+      "InvalidFields": [
+        "CPUModel",
+        "instanceType"
+      ],
+      "updatedOn": "2026-04-01T05:29:58.412Z",
+      "holdedOn": "2026-03-29T17:26:42.897Z"
+    },
+    {
+      "ExecutionId": "hold-7",
+      "Status": "ONHOLD",
+      "BenchmarkType": "Redis",
+      "BenchmarkCategory": "Database",
+      "InvalidFields": [
+        "CPUModel"
+      ],
+      "updatedOn": "2026-04-01T04:29:58.412Z",
+      "holdedOn": "2026-03-30T12:04:34.834Z"
+    },
+    {
+      "ExecutionId": "hold-8",
+      "Status": "ONHOLD",
+      "BenchmarkType": "ACES DGEMM",
+      "BenchmarkCategory": "Web",
+      "InvalidFields": [
+        "instanceType"
+      ],
+      "updatedOn": "2026-04-01T03:29:58.412Z",
+      "holdedOn": "2026-03-31T17:27:55.902Z"
+    },
+    {
+      "ExecutionId": "hold-9",
+      "Status": "ONHOLD",
+      "BenchmarkType": "Nginx",
+      "BenchmarkCategory": "Video",
+      "InvalidFields": [
+        "CPUModel",
+        "instanceType"
+      ],
+      "updatedOn": "2026-04-01T02:29:58.412Z",
+      "holdedOn": "2026-03-29T21:09:40.695Z"
+    },
+    {
+      "ExecutionId": "hold-10",
+      "Status": "ONHOLD",
+      "BenchmarkType": "FIO",
+      "BenchmarkCategory": "Others",
+      "InvalidFields": [
+        "CPUModel"
+      ],
+      "updatedOn": "2026-04-01T01:29:58.412Z",
+      "holdedOn": "2026-03-31T22:17:20.158Z"
+    },
+    {
+      "ExecutionId": "hold-11",
+      "Status": "ONHOLD",
+      "BenchmarkType": "FFMPEG",
+      "BenchmarkCategory": "Storage",
+      "InvalidFields": [
+        "instanceType"
+      ],
+      "updatedOn": "2026-04-01T00:29:58.412Z",
+      "holdedOn": "2026-04-01T04:46:36.398Z"
+    },
+    {
+      "ExecutionId": "hold-12",
+      "Status": "ONHOLD",
+      "BenchmarkType": "Redis",
+      "BenchmarkCategory": "Database",
+      "InvalidFields": [
+        "CPUModel",
+        "instanceType"
+      ],
+      "updatedOn": "2026-03-31T23:29:58.412Z",
+      "holdedOn": "2026-04-01T05:35:48.854Z"
+    },
+    {
+      "ExecutionId": "hold-13",
+      "Status": "ONHOLD",
+      "BenchmarkType": "ACES DGEMM",
+      "BenchmarkCategory": "Web",
+      "InvalidFields": [
+        "CPUModel"
+      ],
+      "updatedOn": "2026-03-31T22:29:58.412Z",
+      "holdedOn": "2026-03-31T02:44:12.780Z"
+    },
+    {
+      "ExecutionId": "hold-14",
+      "Status": "ONHOLD",
+      "BenchmarkType": "Nginx",
+      "BenchmarkCategory": "Video",
+      "InvalidFields": [
+        "instanceType"
+      ],
+      "updatedOn": "2026-03-31T21:29:58.412Z",
+      "holdedOn": "2026-03-31T07:53:54.915Z"
+    },
+    {
+      "ExecutionId": "hold-15",
+      "Status": "ONHOLD",
+      "BenchmarkType": "FIO",
+      "BenchmarkCategory": "Others",
+      "InvalidFields": [
+        "CPUModel",
+        "instanceType"
+      ],
+      "updatedOn": "2026-03-31T20:29:58.412Z",
+      "holdedOn": "2026-03-30T22:59:51.349Z"
+    },
+    {
+      "ExecutionId": "hold-16",
+      "Status": "ONHOLD",
+      "BenchmarkType": "FFMPEG",
+      "BenchmarkCategory": "Storage",
+      "InvalidFields": [
+        "CPUModel"
+      ],
+      "updatedOn": "2026-03-31T19:29:58.412Z",
+      "holdedOn": "2026-03-29T22:37:27.175Z"
+    },
+    {
+      "ExecutionId": "hold-17",
+      "Status": "ONHOLD",
+      "BenchmarkType": "Redis",
+      "BenchmarkCategory": "Database",
+      "InvalidFields": [
+        "instanceType"
+      ],
+      "updatedOn": "2026-03-31T18:29:58.412Z",
+      "holdedOn": "2026-03-31T05:15:51.327Z"
+    },
+    {
+      "ExecutionId": "hold-18",
+      "Status": "ONHOLD",
+      "BenchmarkType": "ACES DGEMM",
+      "BenchmarkCategory": "Web",
+      "InvalidFields": [
+        "CPUModel",
+        "instanceType"
+      ],
+      "updatedOn": "2026-03-31T17:29:58.412Z",
+      "holdedOn": "2026-03-28T14:47:42.061Z"
+    },
+    {
+      "ExecutionId": "hold-19",
+      "Status": "ONHOLD",
+      "BenchmarkType": "Nginx",
+      "BenchmarkCategory": "Video",
+      "InvalidFields": [
+        "CPUModel"
+      ],
+      "updatedOn": "2026-03-31T16:29:58.412Z",
+      "holdedOn": "2026-03-26T20:22:15.087Z"
+    },
+    {
+      "ExecutionId": "hold-20",
+      "Status": "ONHOLD",
+      "BenchmarkType": "FIO",
+      "BenchmarkCategory": "Others",
+      "InvalidFields": [
+        "instanceType"
+      ],
+      "updatedOn": "2026-03-31T15:29:58.412Z",
+      "holdedOn": "2026-03-27T13:29:49.834Z"
+    },
+    {
+      "ExecutionId": "hold-21",
+      "Status": "ONHOLD",
+      "BenchmarkType": "FFMPEG",
+      "BenchmarkCategory": "Storage",
+      "InvalidFields": [
+        "CPUModel",
+        "instanceType"
+      ],
+      "updatedOn": "2026-03-31T14:29:58.412Z",
+      "holdedOn": "2026-03-27T07:25:24.588Z"
+    },
+    {
+      "ExecutionId": "hold-22",
+      "Status": "ONHOLD",
+      "BenchmarkType": "Redis",
+      "BenchmarkCategory": "Database",
+      "InvalidFields": [
+        "CPUModel"
+      ],
+      "updatedOn": "2026-03-31T13:29:58.412Z",
+      "holdedOn": "2026-03-28T23:27:43.202Z"
+    },
+    {
+      "ExecutionId": "hold-23",
+      "Status": "ONHOLD",
+      "BenchmarkType": "ACES DGEMM",
+      "BenchmarkCategory": "Web",
+      "InvalidFields": [
+        "instanceType"
+      ],
+      "updatedOn": "2026-03-31T12:29:58.412Z",
+      "holdedOn": "2026-03-29T03:34:55.011Z"
+    },
+    {
+      "ExecutionId": "hold-24",
+      "Status": "ONHOLD",
+      "BenchmarkType": "Nginx",
+      "BenchmarkCategory": "Video",
+      "InvalidFields": [
+        "CPUModel",
+        "instanceType"
+      ],
+      "updatedOn": "2026-03-31T11:29:58.412Z",
+      "holdedOn": "2026-03-27T01:44:52.871Z"
+    },
+    {
+      "ExecutionId": "hold-25",
+      "Status": "ONHOLD",
+      "BenchmarkType": "FIO",
+      "BenchmarkCategory": "Others",
+      "InvalidFields": [
+        "CPUModel"
+      ],
+      "updatedOn": "2026-03-31T10:29:58.412Z",
+      "holdedOn": "2026-03-28T04:09:00.420Z"
+    },
+    {
+      "ExecutionId": "hold-26",
+      "Status": "ONHOLD",
+      "BenchmarkType": "FFMPEG",
+      "BenchmarkCategory": "Storage",
+      "InvalidFields": [
+        "instanceType"
+      ],
+      "updatedOn": "2026-03-31T09:29:58.412Z",
+      "holdedOn": "2026-03-28T11:57:31.996Z"
+    },
+    {
+      "ExecutionId": "hold-27",
+      "Status": "ONHOLD",
+      "BenchmarkType": "Redis",
+      "BenchmarkCategory": "Database",
+      "InvalidFields": [
+        "CPUModel",
+        "instanceType"
+      ],
+      "updatedOn": "2026-03-31T08:29:58.412Z",
+      "holdedOn": "2026-03-29T07:34:41.650Z"
+    },
+    {
+      "ExecutionId": "hold-28",
+      "Status": "ONHOLD",
+      "BenchmarkType": "ACES DGEMM",
+      "BenchmarkCategory": "Web",
+      "InvalidFields": [
+        "CPUModel"
+      ],
+      "updatedOn": "2026-03-31T07:29:58.412Z",
+      "holdedOn": "2026-03-27T23:52:46.277Z"
+    },
+    {
+      "ExecutionId": "hold-29",
+      "Status": "ONHOLD",
+      "BenchmarkType": "Nginx",
+      "BenchmarkCategory": "Video",
+      "InvalidFields": [
+        "instanceType"
+      ],
+      "updatedOn": "2026-03-31T06:29:58.412Z",
+      "holdedOn": "2026-03-29T03:24:36.756Z"
+    },
+    {
+      "ExecutionId": "hold-30",
+      "Status": "ONHOLD",
+      "BenchmarkType": "FIO",
+      "BenchmarkCategory": "Others",
+      "InvalidFields": [
+        "CPUModel",
+        "instanceType"
+      ],
+      "updatedOn": "2026-03-31T05:29:58.412Z",
+      "holdedOn": "2026-03-27T12:51:03.978Z"
+    },
+    {
+      "ExecutionId": "hold-31",
+      "Status": "ONHOLD",
+      "BenchmarkType": "FFMPEG",
+      "BenchmarkCategory": "Storage",
+      "InvalidFields": [
+        "CPUModel"
+      ],
+      "updatedOn": "2026-03-31T04:29:58.412Z",
+      "holdedOn": "2026-03-28T01:03:33.703Z"
+    },
+    {
+      "ExecutionId": "hold-32",
+      "Status": "ONHOLD",
+      "BenchmarkType": "Redis",
+      "BenchmarkCategory": "Database",
+      "InvalidFields": [
+        "instanceType"
+      ],
+      "updatedOn": "2026-03-31T03:29:58.412Z",
+      "holdedOn": "2026-03-27T02:52:37.050Z"
+    },
+    {
+      "ExecutionId": "hold-33",
+      "Status": "ONHOLD",
+      "BenchmarkType": "ACES DGEMM",
+      "BenchmarkCategory": "Web",
+      "InvalidFields": [
+        "CPUModel",
+        "instanceType"
+      ],
+      "updatedOn": "2026-03-31T02:29:58.412Z",
+      "holdedOn": "2026-03-28T17:11:31.269Z"
+    },
+    {
+      "ExecutionId": "hold-34",
+      "Status": "ONHOLD",
+      "BenchmarkType": "Nginx",
+      "BenchmarkCategory": "Video",
+      "InvalidFields": [
+        "CPUModel"
+      ],
+      "updatedOn": "2026-03-31T01:29:58.412Z",
+      "holdedOn": "2026-03-26T22:22:21.285Z"
+    },
+    {
+      "ExecutionId": "hold-35",
+      "Status": "ONHOLD",
+      "BenchmarkType": "FIO",
+      "BenchmarkCategory": "Others",
+      "InvalidFields": [
+        "instanceType"
+      ],
+      "updatedOn": "2026-03-31T00:29:58.412Z",
+      "holdedOn": "2026-03-25T04:46:51.171Z"
+    },
+    {
+      "ExecutionId": "hold-36",
+      "Status": "ONHOLD",
+      "BenchmarkType": "FFMPEG",
+      "BenchmarkCategory": "Storage",
+      "InvalidFields": [
+        "CPUModel",
+        "instanceType"
+      ],
+      "updatedOn": "2026-03-30T23:29:58.412Z",
+      "holdedOn": "2026-03-22T22:17:42.266Z"
+    },
+    {
+      "ExecutionId": "hold-37",
+      "Status": "ONHOLD",
+      "BenchmarkType": "Redis",
+      "BenchmarkCategory": "Database",
+      "InvalidFields": [
+        "CPUModel"
+      ],
+      "updatedOn": "2026-03-30T22:29:58.412Z",
+      "holdedOn": "2026-03-25T17:01:53.963Z"
+    },
+    {
+      "ExecutionId": "hold-38",
+      "Status": "ONHOLD",
+      "BenchmarkType": "ACES DGEMM",
+      "BenchmarkCategory": "Web",
+      "InvalidFields": [
+        "instanceType"
+      ],
+      "updatedOn": "2026-03-30T21:29:58.412Z",
+      "holdedOn": "2026-03-24T00:53:41.254Z"
+    },
+    {
+      "ExecutionId": "hold-39",
+      "Status": "ONHOLD",
+      "BenchmarkType": "Nginx",
+      "BenchmarkCategory": "Video",
+      "InvalidFields": [
+        "CPUModel",
+        "instanceType"
+      ],
+      "updatedOn": "2026-03-30T20:29:58.412Z",
+      "holdedOn": "2026-03-25T23:16:38.709Z"
+    },
+    {
+      "ExecutionId": "hold-40",
+      "Status": "ONHOLD",
+      "BenchmarkType": "FIO",
+      "BenchmarkCategory": "Others",
+      "InvalidFields": [
+        "CPUModel"
+      ],
+      "updatedOn": "2026-03-30T19:29:58.412Z",
+      "holdedOn": "2026-03-24T00:56:07.604Z"
+    },
+    {
+      "ExecutionId": "hold-41",
+      "Status": "ONHOLD",
+      "BenchmarkType": "FFMPEG",
+      "BenchmarkCategory": "Storage",
+      "InvalidFields": [
+        "instanceType"
+      ],
+      "updatedOn": "2026-03-30T18:29:58.412Z",
+      "holdedOn": "2026-03-23T22:52:56.717Z"
+    },
+    {
+      "ExecutionId": "hold-42",
+      "Status": "ONHOLD",
+      "BenchmarkType": "Redis",
+      "BenchmarkCategory": "Database",
+      "InvalidFields": [
+        "CPUModel",
+        "instanceType"
+      ],
+      "updatedOn": "2026-03-30T17:29:58.412Z",
+      "holdedOn": "2026-03-24T13:11:03.166Z"
+    },
+    {
+      "ExecutionId": "hold-43",
+      "Status": "ONHOLD",
+      "BenchmarkType": "ACES DGEMM",
+      "BenchmarkCategory": "Web",
+      "InvalidFields": [
+        "CPUModel"
+      ],
+      "updatedOn": "2026-03-30T16:29:58.412Z",
+      "holdedOn": "2026-03-26T06:37:25.399Z"
+    },
+    {
+      "ExecutionId": "hold-44",
+      "Status": "ONHOLD",
+      "BenchmarkType": "Nginx",
+      "BenchmarkCategory": "Video",
+      "InvalidFields": [
+        "instanceType"
+      ],
+      "updatedOn": "2026-03-30T15:29:58.412Z",
+      "holdedOn": "2026-03-23T21:25:08.642Z"
+    },
+    {
+      "ExecutionId": "hold-45",
+      "Status": "ONHOLD",
+      "BenchmarkType": "FIO",
+      "BenchmarkCategory": "Others",
+      "InvalidFields": [
+        "CPUModel",
+        "instanceType"
+      ],
+      "updatedOn": "2026-03-30T14:29:58.412Z",
+      "holdedOn": "2026-03-24T19:22:29.928Z"
+    },
+    {
+      "ExecutionId": "hold-46",
+      "Status": "ONHOLD",
+      "BenchmarkType": "FFMPEG",
+      "BenchmarkCategory": "Storage",
+      "InvalidFields": [
+        "CPUModel"
+      ],
+      "updatedOn": "2026-03-30T13:29:58.412Z",
+      "holdedOn": "2026-03-24T19:11:43.206Z"
+    },
+    {
+      "ExecutionId": "hold-47",
+      "Status": "ONHOLD",
+      "BenchmarkType": "Redis",
+      "BenchmarkCategory": "Database",
+      "InvalidFields": [
+        "instanceType"
+      ],
+      "updatedOn": "2026-03-30T12:29:58.412Z",
+      "holdedOn": "2026-03-23T12:21:40.103Z"
+    },
+    {
+      "ExecutionId": "hold-48",
+      "Status": "ONHOLD",
+      "BenchmarkType": "ACES DGEMM",
+      "BenchmarkCategory": "Web",
+      "InvalidFields": [
+        "CPUModel",
+        "instanceType"
+      ],
+      "updatedOn": "2026-03-30T11:29:58.412Z",
+      "holdedOn": "2026-03-25T13:06:17.312Z"
+    },
+    {
+      "ExecutionId": "hold-49",
+      "Status": "ONHOLD",
+      "BenchmarkType": "Nginx",
+      "BenchmarkCategory": "Video",
+      "InvalidFields": [
+        "CPUModel"
+      ],
+      "updatedOn": "2026-03-30T10:29:58.412Z",
+      "holdedOn": "2026-03-25T05:13:03.358Z"
+    },
+    {
+      "ExecutionId": "hold-50",
+      "Status": "ONHOLD",
+      "BenchmarkType": "FIO",
+      "BenchmarkCategory": "Others",
+      "InvalidFields": [
+        "instanceType"
+      ],
+      "updatedOn": "2026-03-30T09:29:58.412Z",
+      "holdedOn": "2026-03-23T16:09:56.575Z"
+    }
+  ]
+}

@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Box } from "@mui/material";
 import LandingPageHeader from "../components/LandingPageHeader";
 import RecordList from "../components/RecordList";
 import ErrorPage from "../components/ErrorPage";
 import Navbar from "../components/Navbar";
-import { usePaginatedRecords } from "../hooks/UsePaginatedRecords";
+import { usePaginatedRecords } from "../hooks/usePaginatedRecords";
 
 export const FILTERS = [
   { label: "All",      value: "" },
@@ -15,6 +15,16 @@ export const FILTERS = [
 
 const LandingPage = () => {
   const [filter, setFilter] = useState("");
+
+  const handleFilterChange = (value) =>
+    setFilter((prev) => (prev === value ? "" : value));
+
+  // useMemo ensures a new object is only created when `filter` actually changes,
+  // so the hook doesn't see a new reference on every render and loop infinitely.
+  const extraParams = useMemo(
+    () => (filter ? { status: filter } : {}),
+    [filter]
+  );
 
   const {
     records,
@@ -27,16 +37,8 @@ const LandingPage = () => {
     setSearchInput,
     loadMore,
     retry,
-  } = usePaginatedRecords({
-    extraParams: filter ? { status: filter } : {},
-    // When a status filter is active it's sent as a query param.
-    // When "All" is selected (filter === "") no status param is sent.
-  });
+  } = usePaginatedRecords({ extraParams });
 
-  const handleFilterChange = (value) =>
-    setFilter((prev) => (prev === value ? "" : value));
-
-  // ── Error state ───────────────────────────────────────────────────────────
   if (error) {
     return (
       <ErrorPage
@@ -46,7 +48,6 @@ const LandingPage = () => {
     );
   }
 
-  // ── Render ────────────────────────────────────────────────────────────────
   return (
     <Box>
       <Navbar />

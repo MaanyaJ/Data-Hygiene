@@ -12,6 +12,7 @@ const NAV_LINKS = [
     { label: "All", path: "/all" },
     { label: "Active List", path: "/active" },
     { label: "Completed List", path: "/completed" },
+    { label: "On Hold", path: "/on-hold" },
 ];
 
 const Navbar = () => {

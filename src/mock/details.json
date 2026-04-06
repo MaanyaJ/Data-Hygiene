@@ -1,0 +1,18 @@
+{
+  "execution_id": "e6ce9f8c-e002",
+  "benchmarkType": "FFMPEG",
+  "sutType": "server",
+  "runCategory": "Benchmark_Test",
+  "createdOn": "2025-06-22 05:30:00",
+  "tester": "gl.yukthi@amd.com",
+  "resultType": "MANUAL",
+ 
+  "invalidFields": ["CPUModel"],
+  "Data": [
+    {
+      "field": "CPUModel",
+      "value": "7543",
+      "mapping": "platformProfile.sut.Summary.Server.CPUModel"
+    }
+  ]
+}

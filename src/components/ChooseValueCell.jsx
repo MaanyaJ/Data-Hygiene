@@ -5,7 +5,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 
-const isCpuField = (fieldName) => fieldName === "CPUs";
+const isCpuField = (fieldName) => fieldName === "coreCount";
 
 const ChooseValueCell = ({ fieldName, value, onChange }) => {
   const [options, setOptions] = useState([]);
@@ -21,7 +21,7 @@ const ChooseValueCell = ({ fieldName, value, onChange }) => {
     setLoadingOptions(true);
     try {
       const res = await fetch(
-        `http://192.168.0.182:8000/unique-values?parameterName=${encodeURIComponent(fieldName)}`
+        `http://192.168.0.182:8003/unique-values?parameterName=${encodeURIComponent(fieldName)}`
       );
       const data = await res.json();
       setOptions(data?.data ?? []);

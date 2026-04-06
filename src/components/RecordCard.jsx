@@ -25,7 +25,13 @@ const RecordCard = ({ record, ageColor }) => {
   return (
     <Stack justifyContent="center" alignItems="center">
       <Card
-        onClick={() => navigate(`/${record.ExecutionId}`)}
+        onClick={() => {
+          if (["approved", "rejected", "completed"].includes(status)) {
+            navigate(`/completed/${record.ExecutionId}`);
+          } else {
+            navigate(`/${record.ExecutionId}`);
+          }
+        }}
         sx={{
           width: "60vw",
           backgroundColor: ageColor ? ageColor.bg : "#f9f9f9",

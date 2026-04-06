@@ -1,13 +1,28 @@
-import React, { useMemo, useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Box, Typography } from "@mui/material";
 import MyActiveListHeader from "../components/MyActiveListHeader";
 import RecordList from "../components/RecordList";
 import ErrorPage from "../components/ErrorPage";
-import { usePaginatedRecords } from "../hooks/UsePaginatedRecords";
+import { usePaginatedRecords } from "../hooks/usePaginatedRecords";
+
+// ── Age helper ────────────────────────────────────────────────────────────────
+const getDiffDays = (record) => {
+  const date =
+    record?.updatedOn || record?.history?.updatedOn || record?.createdOn;
+  if (!date) return null;
+  return (Date.now() - new Date(date).getTime()) / (1000 * 60 * 60 * 24);
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 const MyActiveList = () => {
+  // Client-side age filter — not sent to API
   const [filter, setFilter] = useState("");
 
+  const handleFilterChange = (value) =>
+    setFilter((prev) => (prev === value ? "" : value));
+
+  // No extraParams — fetch all records, filter by age on the client
   const {
     records,
     totalRecords,
@@ -19,38 +34,22 @@ const MyActiveList = () => {
     setSearchInput,
     loadMore,
     retry,
-    meta,
+    meta, // contains red / green / yellow from the API response
   } = usePaginatedRecords();
-  // No extraParams needed here – the active list fetches everything
-  // and relies on the age-based client-side filter below
 
-  // ── Age-based client-side filter ─────────────────────────────────────────
+  // Apply client-side age filter on top of the fetched records
   const filteredRecords = useMemo(() => {
     if (!filter) return records;
-
     return records.filter((record) => {
-      const updatedOn =
-        record?.updatedOn ||
-        record?.history?.updatedOn ||
-        record?.createdOn;
-
-      if (!updatedOn) return false;
-
-      const diffDays =
-        (Date.now() - new Date(updatedOn).getTime()) / (1000 * 60 * 60 * 24);
-
-      if (filter === "<3") return diffDays < 3;
-      if (filter === "3-6") return diffDays >= 3 && diffDays <= 6;
-      if (filter === ">6") return diffDays > 6;
-
+      const days = getDiffDays(record);
+      if (days === null) return false;
+      if (filter === "<3")  return days < 3;
+      if (filter === "3-6") return days >= 3 && days <= 6;
+      if (filter === ">6")  return days > 6;
       return true;
     });
   }, [records, filter]);
 
-  const handleFilterChange = (value) =>
-    setFilter((prev) => (prev === value ? "" : value));
-
-  // ── Error state ───────────────────────────────────────────────────────────
   if (error) {
     return (
       <ErrorPage
@@ -60,7 +59,6 @@ const MyActiveList = () => {
     );
   }
 
-  // ── Render ────────────────────────────────────────────────────────────────
   return (
     <Box>
       <MyActiveListHeader
@@ -85,14 +83,14 @@ const MyActiveList = () => {
         showCount={false}
       />
 
-      {/* No records match the age filter, but records exist */}
+      {/* Records exist but none match the age filter */}
       {filter && !loading && filteredRecords.length === 0 && records.length > 0 && (
         <Box sx={{ textAlign: "center", mt: 2, mb: 4 }}>
           <Typography>No records match the selected filter</Typography>
         </Box>
       )}
 
-      {/* Completely empty result set */}
+      {/* API returned no records at all */}
       {!loading && records.length === 0 && !error && (
         <Box sx={{ textAlign: "center", mt: 2, mb: 4 }}>
           <Typography>No records found</Typography>
