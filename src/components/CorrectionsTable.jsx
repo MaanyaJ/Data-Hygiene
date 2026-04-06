@@ -84,7 +84,7 @@ const CorrectionsTable = ({ tableRows, invalidFields, execID }) => {
         if (!value) return;
 
         try {
-            const res = await fetch("http://192.168.0.182:8000/approve-suggestion", {
+            const res = await fetch("http://192.168.0.182:8003/approve-suggestion", {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -232,7 +232,6 @@ const CorrectionsTable = ({ tableRows, invalidFields, execID }) => {
                                                 >
                                                     Accept
                                                 </Button>
-                                                {invalidFields.includes(row.fieldName) ?
                                                  <Button
                                                     size="small"
                                                     variant="contained"
@@ -242,7 +241,6 @@ const CorrectionsTable = ({ tableRows, invalidFields, execID }) => {
                                                 >
                                                     Reject All
                                                 </Button>
-                                                : ""}
                                             </Box>}
                                         </TableCell>
                                     </TableRow>
