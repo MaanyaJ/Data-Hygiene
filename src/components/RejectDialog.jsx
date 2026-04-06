@@ -76,7 +76,7 @@ const RejectDialog = ({ open, onClose, row, onL0Data, onDraftSubmit }) => {
     setStep(STEPS.DRAFT_FORM);
     setLoadingFields(true);
     try {
-      const res = await fetch(`http://192.168.0.182:8000/draft-records/fields?type=${encodeURIComponent(row.fieldName)}`);
+      const res = await fetch(`http://192.168.0.182:8003/draft-records/fields?type=${encodeURIComponent(row.fieldName)}`);
       const data = await res.json();
       setDetailFields(data.fields);
     } catch (error) {
@@ -91,13 +91,13 @@ const RejectDialog = ({ open, onClose, row, onL0Data, onDraftSubmit }) => {
   const handleSubmit = async () => {
     setSubmitting(true);
     try {
-      await fetch(`http://192.168.0.182:8000/draft-records/fields?type=${encodeURIComponent(row.fieldName)}`, {
+      await fetch(`http://192.168.0.182:8003/draft-records/fields?type=${encodeURIComponent(row.fieldName)}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formValues),
       });
 
-      onDraftSubmit?.(row, formValues);
+      onDraftSubmit?.(row);
       resetAndClose();
     } catch (error) {
         console.log(error)
