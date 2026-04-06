@@ -43,7 +43,7 @@ const OnHoldDetailsPage = () => {
         json = mockDetails[id];
         if (!json) throw new Error(`No mock data found for id "${id}"`);
       } else {
-        const res = await fetch(`http://192.168.0.182:8000/snapshot-records/${id}`);
+        const res = await fetch(`http://192.168.0.182:8003/snapshot-records/${id}`);
         if (!res.ok) throw new Error("Failed to fetch record details");
         json = await res.json();
       }
