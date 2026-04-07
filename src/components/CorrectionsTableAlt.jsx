@@ -10,10 +10,10 @@ import {
   IconButton,
   Collapse,
   Radio,
-  InputBase,
-  Autocomplete,
   TextField,
   CircularProgress,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
@@ -32,7 +32,7 @@ import SuggestionRow from "./CorrectionsTable/SuggestionRow";
 
 /* ─── Main Component ────────────────────────────────────────── */
 
-const CorrectionsTableAlt = ({ data, execID, sutType, standardizationStatus, reason, fetchData }) => {
+const CorrectionsTableAlt = ({ data, execID, sutType, standardizationStatus, reason, fetchData, showNotification }) => {
   const [selectedSuggestions, setSelectedSuggestions] = useState({});
   const [editedSuggestions, setEditedSuggestions] = useState({});
   const [customSuggestions, setCustomSuggestions] = useState({});
@@ -153,9 +153,11 @@ const CorrectionsTableAlt = ({ data, execID, sutType, standardizationStatus, rea
       return next;
     });
 
-    fetchData()
+    showNotification("Record accepted successfully", "success");
+    setTimeout(() => fetchData(), 500);
   } catch (err) {
     console.error(err);
+    showNotification("Failed to accept record", "error");
   }
 };
   const handleReject = (group, groupIdx) => {
@@ -500,11 +502,15 @@ const CorrectionsTableAlt = ({ data, execID, sutType, standardizationStatus, rea
         open={!!rejectDialogRow}
         onClose={() => setRejectDialogRow(null)}
         row={rejectDialogRow}
-        onL0Data={() => {setRejectDialogRow(null)
-          fetchData()
+        onL0Data={() => {
+          showNotification("Rejected due to L0 data", "success");
+          setRejectDialogRow(null);
+          setTimeout(() => fetchData(), 500);
         }}
-        onDraftSubmit={() => {setRejectDialogRow(null)
-          fetchData()
+        onDraftSubmit={() => {
+          showNotification("Draft record submitted", "success");
+          setRejectDialogRow(null);
+          setTimeout(() => fetchData(), 500);
         }}
         execID = {execID}
       />

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Box } from "@mui/material";
+import { Box, Snackbar, Alert } from "@mui/material";
 import ErrorPage from "../components/ErrorPage";
 import Loader from "../components/Loader";
 import ExecutionInfoBox from "../components/ExecutionInfoBox";
@@ -65,6 +65,13 @@ const DetailsPageAlt = () => {
   const [loading, setLoading] = useState(true); // ← true so Loader shows on first paint
   const [standardizationStatus, setStandardizationStatus] = useState("");
   const [reason, setReason] = useState("");
+  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+
+  const showNotification = (message, severity = "success") => {
+    setSnackbar({ open: true, message, severity });
+  };
+
+  const handleSnackbarClose = () => setSnackbar(prev => ({ ...prev, open: false }));
 
   const fetchData = async () => {
     setLoading(true);
@@ -129,10 +136,22 @@ const DetailsPageAlt = () => {
             sutType={executionData.sutType}
             standardizationStatus={standardizationStatus}
             reason={reason}
-            fetchData = {fetchData}
+            fetchData={fetchData}
+            showNotification={showNotification}
           />
         </Box>
       </Box>
+
+      <Snackbar 
+        open={snackbar.open} 
+        autoHideDuration={4000} 
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert onClose={handleSnackbarClose} severity={snackbar.severity} variant="filled" sx={{ width: "100%" }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
