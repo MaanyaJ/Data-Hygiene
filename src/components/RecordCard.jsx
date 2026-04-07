@@ -17,25 +17,24 @@ const STATUS_COLOR = {
   "on hold": "#7c3aed",
 };
 
+const COMPLETED_STATUSES = ["approved", "accepted", "rejected", "completed"];
+
 const RecordCard = ({ record, ageColor }) => {
   const invalidFields = record["InvalidFields"];
   const navigate = useNavigate();
 
   const status = record.Status?.toLowerCase();
   const statusColor = STATUS_COLOR[status] ?? "text.primary";
-
   const isCompleted = status === "accepted" || status === "approved";
+
+  const handleClick = () => {
+    navigate(`/alt/${record.ExecutionId}`);
+  };
 
   return (
     <Stack justifyContent="center" alignItems="center">
       <Card
-        onClick={() => {
-          if (["approved", "accepted", "rejected", "completed"].includes(status)) {
-            navigate(`/completed/${record.ExecutionId}`);
-          } else {
-            navigate(`/alt/${record.ExecutionId}`);
-          }
-        }}
+        onClick={handleClick}
         sx={{
           width: "60vw",
           backgroundColor: ageColor ? ageColor.bg : "#f9f9f9",

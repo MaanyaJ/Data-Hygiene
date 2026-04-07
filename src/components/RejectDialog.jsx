@@ -51,7 +51,7 @@ const STEPS = {
   DRAFT_FORM: "DRAFT_FORM",
 };
 
-const RejectDialog = ({ open, onClose, row, onL0Data, onDraftSubmit }) => {
+const RejectDialog = ({ open, onClose, row, onL0Data, onDraftSubmit, execID }) => {
   const [step, setStep] = useState(STEPS.CHOOSE);
   const [detailFields, setDetailFields] = useState([]); // fields returned by API
   const [formValues, setFormValues] = useState({});
@@ -66,9 +66,21 @@ const RejectDialog = ({ open, onClose, row, onL0Data, onDraftSubmit }) => {
   };
 
   // Step 1 → L0 Data chosen
-  const handleL0Data = () => {
-    onL0Data?.(row);
-    resetAndClose();
+  const handleL0Data = async () => {
+    try {
+      await fetch("http://10.222.237.123:8001/reject-record", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          execution_id: execID,
+        }),
+      });
+
+      onL0Data?.(row);
+      resetAndClose();
+    } catch (error) {
+      console.error("Reject L0 API failed:", error);
+    }
   };
 
   // Step 1 → Submit Draft Record chosen
@@ -91,16 +103,20 @@ const RejectDialog = ({ open, onClose, row, onL0Data, onDraftSubmit }) => {
   const handleSubmit = async () => {
     setSubmitting(true);
     try {
-      await fetch(`http://10.222.237.123:8001/draft-records/fields?type=${encodeURIComponent(row.fieldName)}`, {
+      const payload = {
+        execution_id: execID,
+        ...formValues,
+      };
+      await fetch(`http://10.222.237.123:8001/draft-records/${encodeURIComponent(row.fieldName)}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formValues),
+        body: JSON.stringify(payload),
       });
 
       onDraftSubmit?.(row);
       resetAndClose();
     } catch (error) {
-        console.log(error)
+      console.log(error)
     } finally {
       setSubmitting(false);
     }
@@ -110,7 +126,7 @@ const RejectDialog = ({ open, onClose, row, onL0Data, onDraftSubmit }) => {
     setFormValues((prev) => ({ ...prev, [name]: value }));
   };
 
-const allFilled = detailFields.every((f) => !!formValues[f]?.trim());
+  const allFilled = detailFields.every((f) => !!formValues[f]?.trim());
   return (
     <Dialog
       open={open}
