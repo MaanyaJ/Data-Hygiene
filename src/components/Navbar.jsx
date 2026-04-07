@@ -47,6 +47,7 @@ const Navbar = () => {
                                 borderBottom: isActive ? "2px solid #fff" : "2px solid transparent",
                                 paddingBottom: "4px",
                                 transition: "all 0.2s ease",
+                                fontFamily: "'Inter', sans-serif"
                             })}
                         >
                             {label}

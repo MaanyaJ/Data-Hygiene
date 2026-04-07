@@ -21,7 +21,9 @@ const RecordList = ({
   page,
   loading,
   onLoadMore,
-  showCount
+  showCount,
+  showAgeColors,
+  ageColorFn
 }) => {
   const isRowLoaded = ({ index }) => !!records[index];
 
@@ -46,7 +48,10 @@ const RecordList = ({
     return (
       <div key={key} style={style}>
         <Box sx={{ px: 2, py: 1 }}>
-          <RecordCard record={record}/>
+          <RecordCard 
+            record={record} 
+            ageColor={showAgeColors && ageColorFn ? ageColorFn(record) : null} 
+          />
         </Box>
       </div>
     );

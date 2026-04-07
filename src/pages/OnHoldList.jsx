@@ -10,7 +10,7 @@ import mockOnHold from "../mock/mockOnHold.json";
 
 // ── Age helper (uses holdedOn instead of updatedOn) ───────────────────────────
 const getHoldDays = (record) => {
-  const date = record?.holdedOn;
+  const date = record?.holdedOn || record?.updatedOn || record?.createdOn;
   if (!date) return null;
   return (Date.now() - new Date(date).getTime()) / (1000 * 60 * 60 * 24);
 };
@@ -82,6 +82,8 @@ const OnHoldListMock = () => {
   return (
     <Box>
       <Navbar />
+    
+      <Box sx={{mt: 15}}>
       <OnHoldListHeader
         search={searchInput}
         onSearchChange={setSearchInput}
@@ -102,6 +104,7 @@ const OnHoldListMock = () => {
         showCount={false}
         ageColorFn={getAgeColor}
       />
+      
       {filter && records.length === 0 && (
         <Box sx={{ textAlign: "center", mt: 2, mb: 4 }}>
           <Typography>No records match the selected filter</Typography>
@@ -112,13 +115,15 @@ const OnHoldListMock = () => {
           <Typography>No on-hold records found</Typography>
         </Box>
       )}
+     </Box>
     </Box>
+    
   );
 };
 
 // ── Real API version ──────────────────────────────────────────────────────────
 // Stable outside component to avoid infinite re-fetch loop
-const ONHOLD_PARAMS = { status: "onhold" };
+const ONHOLD_PARAMS = { status: "On Hold" };
 
 const OnHoldListReal = () => {
   const [filter, setFilter] = useState("");
@@ -159,6 +164,7 @@ const OnHoldListReal = () => {
   return (
     <Box>
       <Navbar />
+      <Box sx={{mt: 15}}>
       <OnHoldListHeader
         search={searchInput}
         onSearchChange={setSearchInput}
@@ -189,6 +195,7 @@ const OnHoldListReal = () => {
           <Typography>No on-hold records found</Typography>
         </Box>
       )}
+    </Box>
     </Box>
   );
 };

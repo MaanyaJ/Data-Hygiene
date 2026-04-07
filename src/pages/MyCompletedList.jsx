@@ -12,7 +12,7 @@ const DEBOUNCE_MS = 300;
 
 // ── Mock version ──────────────────────────────────────────────────────────────
 const MyCompletedListMock = () => {
-  const [statusFilter, setStatusFilter] = useState("accepted");
+  const [statusFilter, setStatusFilter] = useState(null);
   const [searchInput,  setSearchInput]  = useState("");
   const [search,       setSearch]       = useState("");
 
@@ -36,6 +36,7 @@ const MyCompletedListMock = () => {
   return (
     <Box>
       <Navbar />
+      <Box sx={{mt: 15}}>
       <MyCompletedListHeader
         search={searchInput}
         onSearchChange={setSearchInput}
@@ -51,11 +52,13 @@ const MyCompletedListMock = () => {
         onLoadMore={() => {}}
         showCount
       />
+      
       {records.length === 0 && (
         <Box sx={{ textAlign: "center", mt: 2, mb: 4 }}>
           <Typography>No completed records found</Typography>
         </Box>
       )}
+      </Box>
     </Box>
   );
 };
@@ -64,25 +67,54 @@ const MyCompletedListMock = () => {
 const COMPLETED_PARAMS_DEFAULT = { status: "accepted" };
 
 const MyCompletedListReal = () => {
-  const [statusFilter, setStatusFilter] = useState("accepted");
+  const [statusFilter, setStatusFilter] = useState(null);
 
+  // ── Single-status view: use paginated hook ──────────────────────────────────
   const extraParams = useMemo(
-    () => ({ status: statusFilter ?? "completed" }),
+    () => (statusFilter ? { status: statusFilter } : { status: "accepted" }),
     [statusFilter]
   );
 
   const {
-    records,
-    totalRecords,
+    records: hookRecords,
+    totalRecords: hookTotal,
     totalPages,
     page,
-    loading,
+    loading: hookLoading,
     error,
     searchInput,
     setSearchInput,
     loadMore,
     retry,
   } = usePaginatedRecords({ extraParams });
+
+  // ── "All completed" view: parallel fetch for accepted + rejected ─────────────
+  const [allRecords, setAllRecords]   = useState([]);
+  const [allLoading, setAllLoading]   = useState(false);
+
+  useEffect(() => {
+    if (statusFilter !== null) return; // handled by hook
+    setAllLoading(true);
+    const base = "http://10.222.237.123:8001/invalid-summary";
+    Promise.all([
+      fetch(`${base}?page=1&size=100&search=&status=accepted`).then((r) => r.json()),
+      fetch(`${base}?page=1&size=100&search=&status=rejected`).then((r)  => r.json()),
+    ])
+      .then(([acc, rej]) => {
+        const merged = [
+          ...(Array.isArray(acc?.data) ? acc.data : []),
+          ...(Array.isArray(rej?.data) ? rej.data : []),
+        ];
+        setAllRecords(merged);
+      })
+      .catch(console.error)
+      .finally(() => setAllLoading(false));
+  }, [statusFilter]);
+
+  // Pick which data set to display
+  const displayRecords = statusFilter ? hookRecords : allRecords;
+  const displayLoading = statusFilter ? hookLoading : allLoading;
+  const displayTotal   = statusFilter ? hookTotal   : allRecords.length;
 
   if (error) {
     return <ErrorPage message={error?.message || "Something went wrong"} onRetry={retry} />;
@@ -91,6 +123,7 @@ const MyCompletedListReal = () => {
   return (
     <Box>
       <Navbar />
+       <Box sx={{mt: 15}}>
       <MyCompletedListHeader
         search={searchInput}
         onSearchChange={setSearchInput}
@@ -98,19 +131,20 @@ const MyCompletedListReal = () => {
         onStatusFilterChange={setStatusFilter}
       />
       <RecordList
-        records={records}
-        totalRecords={totalRecords}
+        records={displayRecords}
+        totalRecords={displayTotal}
         totalPages={totalPages}
         page={page}
-        loading={loading}
+        loading={displayLoading}
         onLoadMore={loadMore}
         showCount
       />
-      {!loading && records.length === 0 && !error && (
+      {!displayLoading && displayRecords.length === 0 && !error && (
         <Box sx={{ textAlign: "center", mt: 2, mb: 4 }}>
           <Typography>No completed records found</Typography>
         </Box>
       )}
+    </Box>
     </Box>
   );
 };

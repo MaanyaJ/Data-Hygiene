@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 
 const STATUS_FILTERS = [
-  { label: "Accepted", value: "approved" },
+  { label: "Accepted", value: "accepted" },
   { label: "Rejected", value: "rejected" },
 ];
 
