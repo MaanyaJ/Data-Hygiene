@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 
 const NAV_LINKS = [
-    { label: "All", path: "/all" },
+    { label: "All", path: "/" },
     { label: "Active List", path: "/active" },
     { label: "Completed List", path: "/completed" },
     { label: "On Hold", path: "/on-hold" },
@@ -20,7 +20,7 @@ const Navbar = () => {
 
 
     return (
-        <AppBar position="sticky" sx={{ backgroundColor: "#17233a" }}>
+        <AppBar position="fixed" sx={{ backgroundColor: "#17233a" }}>
             <Toolbar sx={{ justifyContent: "space-between" }}>
                 {/* Logo */}
                 <Typography

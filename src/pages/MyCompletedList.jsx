@@ -12,7 +12,7 @@ const DEBOUNCE_MS = 300;
 
 // ── Mock version ──────────────────────────────────────────────────────────────
 const MyCompletedListMock = () => {
-  const [statusFilter, setStatusFilter] = useState("approved");
+  const [statusFilter, setStatusFilter] = useState("accepted");
   const [searchInput,  setSearchInput]  = useState("");
   const [search,       setSearch]       = useState("");
 
@@ -26,7 +26,7 @@ const MyCompletedListMock = () => {
     return mockList.data.filter((r) => {
       const statusMatch = statusFilter
         ? r.Status?.toLowerCase() === statusFilter.toLowerCase()
-        : r.Status?.toLowerCase() === "approved" || r.Status?.toLowerCase() === "rejected";
+        : r.Status?.toLowerCase() === "accepted" || r.Status?.toLowerCase() === "rejected";
       const searchMatch = !term || [r.ExecutionId, r.BenchmarkType, r.BenchmarkCategory]
         .some((v) => v?.toLowerCase().includes(term));
       return statusMatch && searchMatch;
@@ -61,10 +61,10 @@ const MyCompletedListMock = () => {
 };
 
 // ── Real API version ──────────────────────────────────────────────────────────
-const COMPLETED_PARAMS_DEFAULT = { status: "approved" };
+const COMPLETED_PARAMS_DEFAULT = { status: "accepted" };
 
 const MyCompletedListReal = () => {
-  const [statusFilter, setStatusFilter] = useState("approved");
+  const [statusFilter, setStatusFilter] = useState("accepted");
 
   const extraParams = useMemo(
     () => ({ status: statusFilter ?? "completed" }),

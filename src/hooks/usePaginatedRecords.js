@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 const PAGE_SIZE = 50;
 const DEBOUNCE_MS = 500;
 
-export const BASE_URL = "http://192.168.0.182:8003/invalid-summary";
+export const BASE_URL = "http://10.222.237.123:8001/invalid-summary";
 
 /**
  * usePaginatedRecords

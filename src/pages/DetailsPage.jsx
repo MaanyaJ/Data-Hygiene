@@ -33,7 +33,7 @@ const DetailsPage = () => {
 
     try {
       const res = await fetch(
-        `http://192.168.0.182:8003/snapshot-records/${id}`
+        `http://10.222.237.123:8001/snapshot-records/${id}`
       );
 
       if (!res.ok) throw new Error("Failed to fetch record details");

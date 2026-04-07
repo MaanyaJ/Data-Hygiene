@@ -7,6 +7,7 @@ import All from './pages/All'
 import MyCompletedList from './pages/MyCompletedList'
 import CompletedDetailsPage from './pages/CompletedDetailsPage'
 import OnHoldList from './pages/OnHoldList'
+import DetailsPageAlt from './pages/DetailsPageAlt'
 
 
 const App = () => {
@@ -15,6 +16,7 @@ const App = () => {
     <Routes>
       <Route path="/" element={<LandingPage/>} />
       <Route path="/:id" element={<DetailsPage/>} />
+      <Route path="/alt/:id" element={<DetailsPageAlt/>} />
       <Route path='/completed/:id' element={<CompletedDetailsPage/>}/>
       <Route path = "/active" element = {<MyActiveList/>}/>
       <Route path='/all' element = {<All/>}/>

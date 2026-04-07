@@ -29,7 +29,7 @@ const RecordCard = ({ record, ageColor }) => {
           if (["approved", "rejected", "completed"].includes(status)) {
             navigate(`/completed/${record.ExecutionId}`);
           } else {
-            navigate(`/${record.ExecutionId}`);
+            navigate(`/alt/${record.ExecutionId}`);
           }
         }}
         sx={{
