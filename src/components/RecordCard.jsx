@@ -12,8 +12,12 @@ import {
 const STATUS_COLOR = {
   pending:  "#ed6c02",
   approved: "#2e7d32",
+  accepted: "#2e7d32",
   rejected: "#d32f2f",
+  "on hold": "#7c3aed",
 };
+
+const COMPLETED_STATUSES = ["approved", "accepted", "rejected", "completed"];
 
 const RecordCard = ({ record, ageColor }) => {
   const invalidFields = record["InvalidFields"];
@@ -21,17 +25,17 @@ const RecordCard = ({ record, ageColor }) => {
 
   const status = record.Status?.toLowerCase();
   const statusColor = STATUS_COLOR[status] ?? "text.primary";
+  const isCompleted = status === "accepted" || status === "approved";
+
+  const handleClick = () => {
+      navigate(`/alt/${record.ExecutionId}`);
+    
+  };
 
   return (
     <Stack justifyContent="center" alignItems="center">
       <Card
-        onClick={() => {
-          if (["approved", "rejected", "completed"].includes(status)) {
-            navigate(`/completed/${record.ExecutionId}`);
-          } else {
-            navigate(`/alt/${record.ExecutionId}`);
-          }
-        }}
+        onClick={handleClick}
         sx={{
           width: "60vw",
           backgroundColor: ageColor ? ageColor.bg : "#f9f9f9",
@@ -80,11 +84,12 @@ const RecordCard = ({ record, ageColor }) => {
             </Stack>
           </Stack>
 
-          {/* {status !== "approved" && <Divider sx={{ my: 1 }} />}
-          {status !== "approved" && <Errors invalidFields={invalidFields} /> } */}
-
-          <Divider sx={{ my: 1 }} />
-          <Errors invalidFields={invalidFields} /> 
+          {!isCompleted && (
+            <>
+              <Divider sx={{ my: 1 }} />
+              <Errors invalidFields={invalidFields} />
+            </>
+          )}
         </CardContent>
       </Card>
     </Stack>
