@@ -64,6 +64,7 @@ const DetailsPageAlt = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true); // ← true so Loader shows on first paint
   const [standardizationStatus, setStandardizationStatus] = useState("");
+  const [reason, setReason] = useState("");
 
   const fetchData = async () => {
     setLoading(true);
@@ -75,6 +76,7 @@ const DetailsPageAlt = () => {
         setExecutionData(mockData.execution_details);
         setData(mockData.data);
         setStandardizationStatus(mockData.standardization_status);
+        setReason(mockData.reason || "");
         return;
       }
 
@@ -86,6 +88,7 @@ const DetailsPageAlt = () => {
 
       setExecutionData(json.execution_details);
       setStandardizationStatus(json.standardization_status);
+      setReason(json.reason || "");
 
       if (
         Array.isArray(json.data) &&
@@ -125,6 +128,8 @@ const DetailsPageAlt = () => {
             execID={executionData.execution_id}
             sutType={executionData.sutType}
             standardizationStatus={standardizationStatus}
+            reason={reason}
+            fetchData = {fetchData}
           />
         </Box>
       </Box>

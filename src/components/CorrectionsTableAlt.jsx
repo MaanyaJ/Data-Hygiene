@@ -32,7 +32,7 @@ import SuggestionRow from "./CorrectionsTable/SuggestionRow";
 
 /* ─── Main Component ────────────────────────────────────────── */
 
-const CorrectionsTableAlt = ({ data, execID, sutType, standardizationStatus }) => {
+const CorrectionsTableAlt = ({ data, execID, sutType, standardizationStatus, reason, fetchData }) => {
   const [selectedSuggestions, setSelectedSuggestions] = useState({});
   const [editedSuggestions, setEditedSuggestions] = useState({});
   const [customSuggestions, setCustomSuggestions] = useState({});
@@ -152,6 +152,8 @@ const CorrectionsTableAlt = ({ data, execID, sutType, standardizationStatus }) =
       delete next[groupIdx];
       return next;
     });
+
+    fetchData()
   } catch (err) {
     console.error(err);
   }
@@ -175,19 +177,28 @@ const CorrectionsTableAlt = ({ data, execID, sutType, standardizationStatus }) =
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Box>
             <Typography variant="h6" sx={{ fontWeight: 700, color: "#0f172a", mb: 0.25 }}>
-             Inconsistent feilds
+              {(() => {
+                const status = standardizationStatus?.toLowerCase();
+                if (status === "accepted") return "Corrected Fields";
+                if (status === "on hold") return "Fields for Review";
+                if (status === "rejected") return "Rejected Fields";
+                return "Inconsistent Fields"; // Default for pending/rejected
+              })()}
             </Typography>
           </Box>
-          <Chip
-            label={`${data.length} issue${data.length !== 1 ? "s" : ""}`}
-            size="small"
-            sx={{
-              backgroundColor: "#fef2f2",
-              color: "#dc2626",
-              fontWeight: 700,
-              border: "1px solid #fca5a5",
-            }}
-          />
+          {standardizationStatus?.toLowerCase() !== "accepted" && 
+           standardizationStatus?.toLowerCase() !== "rejected" && (
+            <Chip
+              label={`${data.length} issue${data.length !== 1 ? "s" : ""}`}
+              size="small"
+              sx={{
+                backgroundColor: "#fef2f2",
+                color: "#dc2626",
+                fontWeight: 700,
+                border: "1px solid #fca5a5",
+              }}
+            />
+          )}
         </Stack>
 
         {data.map((group, groupIdx) => {
@@ -238,6 +249,69 @@ const CorrectionsTableAlt = ({ data, execID, sutType, standardizationStatus }) =
                         backgroundColor: "#eff6ff",
                         color: "#2563eb",
                         border: "1px solid #bfdbfe",
+                        "& .MuiChip-label": { px: 1 },
+                      }}
+                    />
+                  )}
+
+                  {standardizationStatus?.toLowerCase() === "rejected" && (
+                    <>
+                      <Chip
+                        label="Rejected"
+                        size="small"
+                        sx={{
+                          height: 20,
+                          fontSize: 11,
+                          fontWeight: 700,
+                          backgroundColor: "#fef2f2",
+                          color: "#dc2626",
+                          border: "1px solid #fca5a5",
+                          "& .MuiChip-label": { px: 1 },
+                        }}
+                      />
+                      <Chip
+                        label={reason || "No reason provided"}
+                        size="small"
+                        sx={{
+                          height: 20,
+                          fontSize: 11,
+                          fontWeight: 700,
+                          backgroundColor: "#fef2f2",
+                          color: "#dc2626",
+                          border: "1px solid #fca5a5",
+                          "& .MuiChip-label": { px: 1 },
+                        }}
+                      />
+                    </>
+                  )}
+
+                  {standardizationStatus?.toLowerCase() === "on hold" && (
+                    <Chip
+                      label="On Hold"
+                      size="small"
+                      sx={{
+                        height: 20,
+                        fontSize: 11,
+                        fontWeight: 700,
+                        backgroundColor: "#f5f3ff",
+                        color: "#7c3aed",
+                        border: "1px solid #ddd6fe",
+                        "& .MuiChip-label": { px: 1 },
+                      }}
+                    />
+                  )}
+
+                  {standardizationStatus?.toLowerCase() === "accepted" && (
+                    <Chip
+                      label="Accepted"
+                      size="small"
+                      sx={{
+                        height: 20,
+                        fontSize: 11,
+                        fontWeight: 700,
+                        backgroundColor: "#f0fdf4",
+                        color: "#16a34a",
+                        border: "1px solid #bbf7d0",
                         "& .MuiChip-label": { px: 1 },
                       }}
                     />
@@ -371,50 +445,51 @@ const CorrectionsTableAlt = ({ data, execID, sutType, standardizationStatus }) =
                   );
                 })()}
 
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  justifyContent="flex-end"
-                  gap={1}
-                  sx={{ px: 1.5, py: 0.5, borderTop: "1px solid #f1f5f9", backgroundColor: "#fafafa" }}
-                >
-                  <Button
-                    variant="contained"
-                    size="small"
-                    disabled={!canAccept || !isPending}
-                    startIcon={<CheckCircleOutlineIcon />}
-                    onClick={() => handleAccept(group, groupIdx)}
-                    sx={{
-                      textTransform: "none",
-                      fontWeight: 700,
-                      borderRadius: 1.5,
-                      backgroundColor: "#16a34a",
-                      "&:hover": { backgroundColor: "#15803d" },
-                      "&.Mui-disabled": { backgroundColor: "#d1fae5", color: "#6ee7b7" },
-                    }}
+                {isPending && (
+                  <Stack
+                    direction="row"
+                    alignItems="center"
+                    justifyContent="flex-end"
+                    gap={1}
+                    sx={{ px: 1.5, py: 0.5, borderTop: "1px solid #f1f5f9", backgroundColor: "#fafafa" }}
                   >
-                    Accept
-                  </Button>
-                  {!canAccept && (
                     <Button
-                      variant="outlined"
+                      variant="contained"
                       size="small"
-                      startIcon={<CancelOutlinedIcon />}
-                      onClick={() => handleReject(group, groupIdx)}
+                      disabled={!canAccept}
+                      startIcon={<CheckCircleOutlineIcon />}
+                      onClick={() => handleAccept(group, groupIdx)}
                       sx={{
                         textTransform: "none",
                         fontWeight: 700,
                         borderRadius: 1.5,
-                        borderColor: "#fca5a5",
-                        color: "#dc2626",
-                        "&:hover": { backgroundColor: "#fff5f5", borderColor: "#ef4444" },
+                        backgroundColor: "#16a34a",
+                        "&:hover": { backgroundColor: "#15803d" },
+                        "&.Mui-disabled": { backgroundColor: "#d1fae5", color: "#6ee7b7" },
                       }}
-                      disabled={!isPending}
                     >
-                      Reject All
+                      Accept
                     </Button>
-                  )}
-                </Stack>
+                    {!canAccept && (
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        startIcon={<CancelOutlinedIcon />}
+                        onClick={() => handleReject(group, groupIdx)}
+                        sx={{
+                          textTransform: "none",
+                          fontWeight: 700,
+                          borderRadius: 1.5,
+                          borderColor: "#fca5a5",
+                          color: "#dc2626",
+                          "&:hover": { backgroundColor: "#fff5f5", borderColor: "#ef4444" },
+                        }}
+                      >
+                        Reject All
+                      </Button>
+                    )}
+                  </Stack>
+                )}
               </Collapse>
             </Paper>
           );
@@ -425,8 +500,12 @@ const CorrectionsTableAlt = ({ data, execID, sutType, standardizationStatus }) =
         open={!!rejectDialogRow}
         onClose={() => setRejectDialogRow(null)}
         row={rejectDialogRow}
-        onL0Data={() => setRejectDialogRow(null)}
-        onDraftSubmit={() => setRejectDialogRow(null)}
+        onL0Data={() => {setRejectDialogRow(null)
+          fetchData()
+        }}
+        onDraftSubmit={() => {setRejectDialogRow(null)
+          fetchData()
+        }}
         execID = {execID}
       />
     </>

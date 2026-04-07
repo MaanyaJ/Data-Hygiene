@@ -5,8 +5,8 @@ import { capitalize, SELECTED } from "./constants";
 const SuggestionRow = ({ suggestion, isSelected, onSelect, isPending = true }) => {
   const p = SELECTED;
   
-  // Extract and exclude score from visible columns
-  const { score, ...suggestionData } = suggestion;
+  // Extract and exclude score/status from visible columns
+  const { score, status, ...suggestionData } = suggestion;
   const entries = Object.entries(suggestionData);
   
   const [primaryKey, primaryVal] = entries[0] ?? [];
