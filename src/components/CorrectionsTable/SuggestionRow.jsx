@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Typography, Stack, Radio } from "@mui/material";
 import { capitalize, SELECTED } from "./constants";
 
-const SuggestionRow = ({ suggestion, isSelected, onSelect }) => {
+const SuggestionRow = ({ suggestion, isSelected, onSelect, isPending = true }) => {
   const p = SELECTED;
   const entries = Object.entries(suggestion);
   const [primaryKey, primaryVal] = entries[0] ?? [];
@@ -10,22 +10,25 @@ const SuggestionRow = ({ suggestion, isSelected, onSelect }) => {
 
   return (
     <Box
-      onClick={onSelect}
+      onClick={isPending ? onSelect : undefined}
       sx={{
         display: "flex",
         alignItems: "center",
         gap: 0,
-        cursor: "pointer",
+        cursor: isPending ? "pointer" : "not-allowed",
         border: `1.5px solid ${isSelected ? p.accent : "#e2e8f0"}`,
         borderRadius: 2,
         overflow: "hidden",
         backgroundColor: isSelected ? p.light : "#fff",
         transition: "all 0.15s ease",
-        "&:hover": {
-          borderColor: p.accent,
-          backgroundColor: p.light,
-        },
-        boxShadow: isSelected ? `0 0 0 3px ${p.accent}20` : "none",
+        opacity: isPending ? 1 : 0.5,
+        ...( isPending && {
+          "&:hover": {
+            borderColor: p.accent,
+            backgroundColor: p.light,
+          },
+          boxShadow: isSelected ? `0 0 0 3px ${p.accent}20` : "none",
+        }),
       }}
     >
       {/* Left — Radio */}
@@ -45,7 +48,8 @@ const SuggestionRow = ({ suggestion, isSelected, onSelect }) => {
       >
         <Radio
           checked={isSelected}
-          onChange={onSelect}
+          onChange={isPending ? onSelect : undefined}
+          disabled={!isPending}
           size="small"
           sx={{
             color: "#cbd5e1",
@@ -56,34 +60,26 @@ const SuggestionRow = ({ suggestion, isSelected, onSelect }) => {
         />
       </Box>
 
-      {/* Primary value — the invalid field */}
+      {/* Primary value */}
       <Box sx={{ px: 1.5, py: 0.25, minWidth: 140, flexShrink: 0 }}>
         <Typography sx={{ fontSize: 10, color: "#94a3b8", fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5, mb: 0 }}>
           {capitalize(primaryKey)}
         </Typography>
-        <Typography
-          sx={{
-            fontSize: 14,
-            fontWeight: 700,
-            color: isSelected ? p.text : "#0f172a",
-          }}
-        >
+        <Typography sx={{ fontSize: 14, fontWeight: 700, color: isSelected ? p.text : "#0f172a" }}>
           {primaryVal || "—"}
         </Typography>
       </Box>
 
-      {/* Vertical divider between primary and secondary */}
+      {/* Vertical divider */}
       {secondaryEntries.length > 0 && (
         <Box sx={{ width: "1px", alignSelf: "stretch", backgroundColor: "#e2e8f0", flexShrink: 0 }} />
       )}
 
-      {/* Secondary fields — displayed horizontally */}
+      {/* Secondary fields */}
       <Stack
         direction="row"
         alignItems="center"
-        divider={
-          <Box sx={{ width: "1px", alignSelf: "stretch", backgroundColor: "#f1f5f9", flexShrink: 0 }} />
-        }
+        divider={<Box sx={{ width: "1px", alignSelf: "stretch", backgroundColor: "#f1f5f9", flexShrink: 0 }} />}
         sx={{ flex: 1, flexWrap: "wrap" }}
       >
         {secondaryEntries.map(([key, val], i) => (
@@ -91,13 +87,7 @@ const SuggestionRow = ({ suggestion, isSelected, onSelect }) => {
             <Typography sx={{ fontSize: 10, color: "#94a3b8", fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5, mb: 0 }}>
               {capitalize(key)}
             </Typography>
-            <Typography
-              sx={{
-                fontSize: 13,
-                fontWeight: 600,
-                color: isSelected ? p.text : "#334155",
-              }}
-            >
+            <Typography sx={{ fontSize: 13, fontWeight: 600, color: isSelected ? p.text : "#334155" }}>
               {val || "—"}
             </Typography>
           </Box>

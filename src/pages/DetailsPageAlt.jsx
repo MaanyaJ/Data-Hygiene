@@ -65,6 +65,7 @@ const DetailsPageAlt = () => {
   const [executionData, setExecutionData] = useState(null);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [standardizationStatus, setStandardizationStatus] = useState("")
 
   const fetchData = async () => {
     setLoading(true);
@@ -91,6 +92,7 @@ const DetailsPageAlt = () => {
       console.log("API response:", json);
 
       setExecutionData(json.execution_details);
+      setStandardizationStatus(json.standardization_status)
 
       // New API format: json.data[] with invalid_field key → use directly
       if (
@@ -131,6 +133,8 @@ const DetailsPageAlt = () => {
         <CorrectionsTableAlt 
           data={data}
           execID={executionData.execution_id}
+          sutType = {executionData.sutType}
+          standardizationStatus = {standardizationStatus}
         />
         </Box>
       </Box>

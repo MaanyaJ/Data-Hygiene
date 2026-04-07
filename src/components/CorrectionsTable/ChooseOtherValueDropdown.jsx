@@ -2,36 +2,38 @@ import React, { useState, useEffect } from "react";
 import { Box, Typography, Autocomplete, TextField, CircularProgress } from "@mui/material";
 import { SELECTED } from "./constants";
 
-const ChooseOtherValueDropdown = ({ invalidField, isSelected, onCustomMetadataFetch, onSelectCustom, onClearCustom }) => {
+const ChooseOtherValueDropdown = ({
+  invalidField,
+  isSelected,
+  onCustomMetadataFetch,
+  onSelectCustom,
+  onClearCustom,
+  isPending = true,
+}) => {
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [fetchingMeta, setFetchingMeta] = useState(false);
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(null);
 
-  // Clear dropdown if user selects a regular suggestion instead
   useEffect(() => {
-    if (!isSelected) {
-      setValue(null);
-    }
+    if (!isSelected) setValue(null);
   }, [isSelected]);
 
   const primaryField = invalidField?.split(",")[0].trim() || "";
 
   const handleOpen = async () => {
+    if (!isPending) return;
     setOpen(true);
     if (options.length > 0) return;
 
     setLoading(true);
     try {
-      const primaryField = invalidField?.split(",")[0].trim() || "";
       const res = await fetch(`http://10.222.237.123:8001/unique-values?parameterName=${encodeURIComponent(primaryField)}`);
       const json = await res.json();
-      
+
       let parsedOptions = [];
       if (json?.unique_values) {
-        // The API returns { unique_values: { CPUModel: [...] } }
-        // We grab the first value in that object which should be our target array
         const objVals = Object.values(json.unique_values);
         if (objVals.length > 0 && Array.isArray(objVals[0])) {
           parsedOptions = objVals[0];
@@ -52,28 +54,28 @@ const ChooseOtherValueDropdown = ({ invalidField, isSelected, onCustomMetadataFe
   };
 
   const handleChange = async (newVal) => {
+    if (!isPending) return;
     setValue(newVal);
     if (!newVal) {
       if (onClearCustom) onClearCustom();
       return;
     }
-    
+
     onSelectCustom();
     setFetchingMeta(true);
     try {
       const res = await fetch(`http://10.222.237.123:8001/metadata-values/${encodeURIComponent(primaryField)}/${encodeURIComponent(newVal)}`);
       const json = await res.json();
-      console.log("metadata-values API raw response:", json);
-      
+
       let meta = json;
       if (json?.metadata_records && Array.isArray(json.metadata_records) && json.metadata_records.length > 0) {
         meta = json.metadata_records[0].metadata || json.metadata_records[0];
       } else if (json?.data) {
         meta = json.data;
       } else if (json?.metadata) {
-        meta = json.metadata; 
+        meta = json.metadata;
       }
-      
+
       onCustomMetadataFetch(meta);
     } catch (err) {
       console.error("metadata-values fetch error:", err);
@@ -85,20 +87,24 @@ const ChooseOtherValueDropdown = ({ invalidField, isSelected, onCustomMetadataFe
   const p = SELECTED;
 
   return (
-    <Box sx={{ 
-      mx: 1.5, 
-      mb: 1, 
-      py: 0.5,
-      px: 1.5,
-      display: "flex", 
-      alignItems: "center", 
-      gap: 1.5,
-      border: `1.5px solid ${isSelected ? p.accent : "#e2e8f0"}`,
-      borderRadius: 2,
-      backgroundColor: isSelected ? p.light : "#fff",
-      boxShadow: isSelected ? `0 0 0 3px ${p.accent}20` : "none",
-      transition: "all 0.15s ease",
-    }}>
+    <Box
+      sx={{
+        mx: 1.5,
+        mb: 1,
+        py: 0.5,
+        px: 1.5,
+        display: "flex",
+        alignItems: "center",
+        gap: 1.5,
+        border: `1.5px solid ${isSelected ? p.accent : "#e2e8f0"}`,
+        borderRadius: 2,
+        backgroundColor: isSelected ? p.light : "#fff",
+        boxShadow: isSelected ? `0 0 0 3px ${p.accent}20` : "none",
+        transition: "all 0.15s ease",
+        opacity: isPending ? 1 : 0.5,
+        pointerEvents: isPending ? "auto" : "none",  // blocks all interaction
+      }}
+    >
       <Box sx={{ flex: 1 }}>
         <Typography sx={{ fontSize: 13, fontWeight: 600, color: "#64748b", mb: 0.5 }}>
           Choose from other values:
@@ -111,6 +117,7 @@ const ChooseOtherValueDropdown = ({ invalidField, isSelected, onCustomMetadataFe
           options={options}
           loading={loading}
           value={value}
+          disabled={!isPending}
           onChange={(_, newVal) => handleChange(newVal)}
           sx={{ maxWidth: 300 }}
           renderInput={(params) => (

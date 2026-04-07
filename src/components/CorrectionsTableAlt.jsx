@@ -32,7 +32,7 @@ import SuggestionRow from "./CorrectionsTable/SuggestionRow";
 
 /* ─── Main Component ────────────────────────────────────────── */
 
-const CorrectionsTableAlt = ({ data, execID }) => {
+const CorrectionsTableAlt = ({ data, execID, sutType, standardizationStatus }) => {
   const [selectedSuggestions, setSelectedSuggestions] = useState({});
   const [editedSuggestions, setEditedSuggestions] = useState({});
   const [customSuggestions, setCustomSuggestions] = useState({});
@@ -40,6 +40,7 @@ const CorrectionsTableAlt = ({ data, execID }) => {
     Object.fromEntries((data ?? []).map((_, i) => [i, false]))
   );
   const [rejectDialogRow, setRejectDialogRow] = useState(null);
+  const isPending = standardizationStatus?.toLowerCase() === "pending";
 
   const handleSelect = (groupIdx, suggIdx) => {
     setSelectedSuggestions((prev) => {
@@ -99,36 +100,62 @@ const CorrectionsTableAlt = ({ data, execID }) => {
     setExpandedGroups((prev) => ({ ...prev, [idx]: !prev[idx] }));
 
   const handleAccept = async (group, groupIdx) => {
-    const suggIdx = selectedSuggestions[groupIdx];
-    if (suggIdx === undefined) return;
-    
-    const baseChosen = suggIdx === "custom" 
-      ? (customSuggestions[groupIdx] || {}) 
+  const suggIdx = selectedSuggestions[groupIdx];
+  if (suggIdx === undefined) return;
+
+  // 1. Get base suggestion
+  const baseChosen =
+    suggIdx === "custom"
+      ? customSuggestions[groupIdx] || {}
       : group.suggestions[suggIdx];
 
-    const customEdits = editedSuggestions[groupIdx] || {};
-    const chosen = { ...baseChosen, ...customEdits };
+  // 2. Apply edits
+  const customEdits = editedSuggestions[groupIdx] || {};
+  const merged = { ...baseChosen, ...customEdits };
 
-    try {
-      await fetch("http://10.222.237.123:8001/approve-suggestion", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          execution_id: execID,
-          field_name: group.invalid_field,
-          accepted_value: chosen,
-        }),
-      });
-      setSelectedSuggestions((prev) => {
-        const next = { ...prev };
-        delete next[groupIdx];
-        return next;
-      });
-    } catch (err) {
-      console.error(err);
-    }
+  // 3. Extract main field value
+  const primaryField = group.invalid_field;
+
+  const value =
+    merged?.[primaryField] ||
+    merged?.[primaryField?.toLowerCase()];
+
+  if (!value) return;
+
+  // 4. Build payload
+  const payload = {
+    execution_id: execID,
+    field_name: primaryField,
+    accepted_value: value,
   };
 
+  // 5. Add corecount ONLY for VM
+  if (sutType?.toLowerCase() === "vm") {
+    const coreCountVal =
+      merged?.coreCount || merged?.CoreCount;
+
+    if (coreCountVal !== undefined) {
+      payload.coreCount = coreCountVal;
+    }
+  }
+
+  try {
+    await fetch("http://10.222.237.123:8001/approve-suggestion", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    // reset selection
+    setSelectedSuggestions((prev) => {
+      const next = { ...prev };
+      delete next[groupIdx];
+      return next;
+    });
+  } catch (err) {
+    console.error(err);
+  }
+};
   const handleReject = (group, groupIdx) => {
     setRejectDialogRow({ ...group, id: groupIdx, fieldName: group.invalid_field });
   };
@@ -251,6 +278,7 @@ const CorrectionsTableAlt = ({ data, execID }) => {
                         suggestion={sugg}
                         isSelected={selectedIdx === si}
                         onSelect={() => handleSelect(groupIdx, si)}
+                        isPending= {isPending}
                       />
                     ))
                   ) : (
@@ -267,6 +295,7 @@ const CorrectionsTableAlt = ({ data, execID }) => {
                   onSelectCustom={() => handleSelectCustom(groupIdx)}
                   onClearCustom={() => handleClearCustom(groupIdx)}
                   onCustomMetadataFetch={(meta) => handleCustomMetadataFetch(groupIdx, meta)}
+                  isPending= {isPending}
                 />
 
                 {/* Selected Value section */}
@@ -333,7 +362,7 @@ const CorrectionsTableAlt = ({ data, execID }) => {
                             label={capitalize(key)}
                             value={val}
                             color={sp.text}
-                            isEditable={key.toLowerCase() === "corecount"}
+                            isEditable={key.toLowerCase() === "corecount" && sutType === "vm"}
                             onSave={(newVal) => handleEditField(groupIdx, key, newVal)}
                           />
                         ))}
@@ -352,7 +381,7 @@ const CorrectionsTableAlt = ({ data, execID }) => {
                   <Button
                     variant="contained"
                     size="small"
-                    disabled={!canAccept}
+                    disabled={!canAccept || !isPending}
                     startIcon={<CheckCircleOutlineIcon />}
                     onClick={() => handleAccept(group, groupIdx)}
                     sx={{
@@ -380,6 +409,7 @@ const CorrectionsTableAlt = ({ data, execID }) => {
                         color: "#dc2626",
                         "&:hover": { backgroundColor: "#fff5f5", borderColor: "#ef4444" },
                       }}
+                      disabled={!isPending}
                     >
                       Reject All
                     </Button>
@@ -397,6 +427,7 @@ const CorrectionsTableAlt = ({ data, execID }) => {
         row={rejectDialogRow}
         onL0Data={() => setRejectDialogRow(null)}
         onDraftSubmit={() => setRejectDialogRow(null)}
+        execID = {execID}
       />
     </>
   );
