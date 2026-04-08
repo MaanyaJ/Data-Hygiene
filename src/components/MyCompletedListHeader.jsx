@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Box,
   Typography,
@@ -6,6 +5,8 @@ import {
   Stack,
   FormControlLabel,
   Checkbox,
+  CircularProgress,
+  InputAdornment,
 } from "@mui/material";
 
 const STATUS_FILTERS = [
@@ -13,15 +14,15 @@ const STATUS_FILTERS = [
   { label: "Rejected", value: "rejected" },
 ];
 
-const MyCompletedListHeader = ({ search, onSearchChange, statusFilter, onStatusFilterChange }) => {
+const MyCompletedListHeader = ({ search, onSearchChange, statusFilter, onStatusFilterChange, loading }) => {
   return (
     <Box>
-      <Typography variant="h3" align="center" sx={{ my: 3 }}>
+      <Typography variant="h3" align="center" sx={{ my: 3, mt: -4 }}>
         My Completed List
       </Typography>
 
       <Stack
-        direction="row"
+        direction="column"
         alignItems="center"
         justifyContent="center"
         gap={4}
@@ -34,7 +35,7 @@ const MyCompletedListHeader = ({ search, onSearchChange, statusFilter, onStatusF
           sx={{ width: 500 }}
         />
 
-        <Stack direction="row" alignItems="center">
+        <Stack direction="row" alignItems="center" sx={{ mt: -2 }}>
           {STATUS_FILTERS.map(({ label, value }) => (
             <FormControlLabel
               key={value}

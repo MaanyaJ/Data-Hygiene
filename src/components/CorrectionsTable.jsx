@@ -84,7 +84,7 @@ const CorrectionsTable = ({ tableRows, invalidFields, execID }) => {
         if (!value) return;
 
         try {
-            const res = await fetch("http://10.222.237.123:8001/approve-suggestion", {
+            const res = await fetch("http://127.0.0.1:8001/approve-suggestion", {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -232,7 +232,7 @@ const CorrectionsTable = ({ tableRows, invalidFields, execID }) => {
                                                 >
                                                     Accept
                                                 </Button>
-                                                 <Button
+                                                <Button
                                                     size="small"
                                                     variant="contained"
                                                     color="error"

@@ -3,6 +3,7 @@ import { Box, Typography } from "@mui/material";
 import MyActiveListHeader from "../components/MyActiveListHeader";
 import RecordList from "../components/RecordList";
 import ErrorPage from "../components/ErrorPage";
+import Navbar from "../components/Navbar";
 import { usePaginatedRecords } from "../hooks/usePaginatedRecords";
 
 // ── Age helper ────────────────────────────────────────────────────────────────
@@ -29,6 +30,9 @@ const getAgeColor = (record) => {
 
 // ─────────────────────────────────────────────────────────────────────────────
 
+// Stable outside component to avoid infinite re-fetch loop
+const ACTIVE_PARAMS = { status: "pending" };
+
 const MyActiveList = () => {
   // Client-side age filter — not sent to API
   const [filter, setFilter] = useState("");
@@ -36,7 +40,7 @@ const MyActiveList = () => {
   const handleFilterChange = (value) =>
     setFilter((prev) => (prev === value ? "" : value));
 
-  // No extraParams — fetch all records, filter by age on the client
+  // extraParams — fetch only "pending" records from the API
   const {
     records,
     totalRecords,
@@ -49,7 +53,7 @@ const MyActiveList = () => {
     loadMore,
     retry,
     meta, // contains red / green / yellow from the API response
-  } = usePaginatedRecords();
+  } = usePaginatedRecords({ extraParams: ACTIVE_PARAMS });
 
   // Apply client-side age filter on top of the fetched records
   const filteredRecords = useMemo(() => {
@@ -75,44 +79,45 @@ const MyActiveList = () => {
 
   return (
     <Box>
-       <Box sx={{mt: 15}}>
-      <MyActiveListHeader
-        search={searchInput}
-        onSearchChange={setSearchInput}
-        filter={filter}
-        onFilterChange={handleFilterChange}
-        red={meta.red ?? 0}
-        green={meta.green ?? 0}
-        yellow={meta.yellow ?? 0}
-        countsLoading={loading}
-      />
+      <Navbar />
+      <Box sx={{ mt: 15 }}>
+        <MyActiveListHeader
+          search={searchInput}
+          onSearchChange={setSearchInput}
+          filter={filter}
+          onFilterChange={handleFilterChange}
+          red={meta.red ?? 0}
+          green={meta.green ?? 0}
+          yellow={meta.yellow ?? 0}
+          countsLoading={loading}
+        />
 
-      <RecordList
-        records={filteredRecords}
-        totalRecords={totalRecords}
-        totalPages={totalPages}
-        page={page}
-        loading={loading}
-        onLoadMore={loadMore}
-        showAgeColors
-        showCount={false}
-        ageColorFn={getAgeColor}
-      />
+        <RecordList
+          records={filteredRecords}
+          totalRecords={totalRecords}
+          totalPages={totalPages}
+          page={page}
+          loading={loading}
+          onLoadMore={loadMore}
+          showAgeColors
+          showCount={false}
+          ageColorFn={getAgeColor}
+        />
 
-      {/* Records exist but none match the age filter */}
-      {filter && !loading && filteredRecords.length === 0 && records.length > 0 && (
-        <Box sx={{ textAlign: "center", mt: 2, mb: 4 }}>
-          <Typography>No records match the selected filter</Typography>
-        </Box>
-      )}
+        {/* Records exist but none match the age filter */}
+        {filter && !loading && filteredRecords.length === 0 && records.length > 0 && (
+          <Box sx={{ textAlign: "center", mt: 2, mb: 4 }}>
+            <Typography>No records match the selected filter</Typography>
+          </Box>
+        )}
 
-      {/* API returned no records at all */}
-      {!loading && records.length === 0 && !error && (
-        <Box sx={{ textAlign: "center", mt: 2, mb: 4 }}>
-          <Typography>No records found</Typography>
-        </Box>
-      )}
-    </Box>
+        {/* API returned no records at all */}
+        {!loading && records.length === 0 && !error && (
+          <Box sx={{ textAlign: "center", mt: 2, mb: 4 }}>
+            <Typography>No records found</Typography>
+          </Box>
+        )}
+      </Box>
     </Box>
   );
 };

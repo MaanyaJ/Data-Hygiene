@@ -51,11 +51,11 @@ const OnHoldListHeader = ({
 
   return (
     <Box>
-      <Typography variant="h3" align="center" sx={{ my: 3 }}>
+      <Typography variant="h3" align="center" sx={{ my: 3, mt: -4 }}>
         On Hold List
       </Typography>
       <Stack
-        direction="row"
+        direction="column"
         alignItems="center"
         justifyContent="center"
         gap={4}

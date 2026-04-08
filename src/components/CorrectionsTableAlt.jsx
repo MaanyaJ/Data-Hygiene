@@ -29,6 +29,7 @@ import ExistingDataRow from "./CorrectionsTable/ExistingDataRow";
 import EditableField from "./CorrectionsTable/EditableField";
 import ChooseOtherValueDropdown from "./CorrectionsTable/ChooseOtherValueDropdown";
 import SuggestionRow from "./CorrectionsTable/SuggestionRow";
+import { API_URL } from "../config";
 
 /* ─── Main Component ────────────────────────────────────────── */
 
@@ -100,66 +101,66 @@ const CorrectionsTableAlt = ({ data, execID, sutType, standardizationStatus, rea
     setExpandedGroups((prev) => ({ ...prev, [idx]: !prev[idx] }));
 
   const handleAccept = async (group, groupIdx) => {
-  const suggIdx = selectedSuggestions[groupIdx];
-  if (suggIdx === undefined) return;
+    const suggIdx = selectedSuggestions[groupIdx];
+    if (suggIdx === undefined) return;
 
-  // 1. Get base suggestion
-  const baseChosen =
-    suggIdx === "custom"
-      ? customSuggestions[groupIdx] || {}
-      : group.suggestions[suggIdx];
+    // 1. Get base suggestion
+    const baseChosen =
+      suggIdx === "custom"
+        ? customSuggestions[groupIdx] || {}
+        : group.suggestions[suggIdx];
 
-  // 2. Apply edits
-  const customEdits = editedSuggestions[groupIdx] || {};
-  const merged = { ...baseChosen, ...customEdits };
+    // 2. Apply edits
+    const customEdits = editedSuggestions[groupIdx] || {};
+    const merged = { ...baseChosen, ...customEdits };
 
-  // 3. Extract main field value
-  const primaryField = group.invalid_field;
+    // 3. Extract main field value
+    const primaryField = group.invalid_field;
 
-  const value =
-    merged?.[primaryField] ||
-    merged?.[primaryField?.toLowerCase()];
+    const value =
+      merged?.[primaryField] ||
+      merged?.[primaryField?.toLowerCase()];
 
-  if (!value) return;
+    if (!value) return;
 
-  // 4. Build payload
-  const payload = {
-    execution_id: execID,
-    field_name: primaryField,
-    accepted_value: value,
-  };
+    // 4. Build payload
+    const payload = {
+      execution_id: execID,
+      field_name: primaryField,
+      accepted_value: value,
+    };
 
-  // 5. Add corecount ONLY for VM
-  if (sutType?.toLowerCase() === "vm") {
-    const coreCountVal =
-      merged?.coreCount || merged?.CoreCount;
+    // 5. Add corecount ONLY for VM
+    if (sutType?.toLowerCase() === "vm") {
+      const coreCountVal =
+        merged?.coreCount || merged?.CoreCount;
 
-    if (coreCountVal !== undefined) {
-      payload.coreCount = coreCountVal;
+      if (coreCountVal !== undefined) {
+        payload.coreCount = coreCountVal;
+      }
     }
-  }
 
-  try {
-    await fetch("http://10.222.237.123:8001/approve-suggestion", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    try {
+      await fetch(`${API_URL}/approve-suggestion`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-    // reset selection
-    setSelectedSuggestions((prev) => {
-      const next = { ...prev };
-      delete next[groupIdx];
-      return next;
-    });
+      // reset selection
+      setSelectedSuggestions((prev) => {
+        const next = { ...prev };
+        delete next[groupIdx];
+        return next;
+      });
 
-    showNotification("Record accepted successfully", "success");
-    setTimeout(() => fetchData(), 500);
-  } catch (err) {
-    console.error(err);
-    showNotification("Failed to accept record", "error");
-  }
-};
+      showNotification("Record accepted successfully", "success");
+      setTimeout(() => fetchData(), 500);
+    } catch (err) {
+      console.error(err);
+      showNotification("Failed to accept record", "error");
+    }
+  };
   const handleReject = (group, groupIdx) => {
     setRejectDialogRow({ ...group, id: groupIdx, fieldName: group.invalid_field });
   };
@@ -188,19 +189,19 @@ const CorrectionsTableAlt = ({ data, execID, sutType, standardizationStatus, rea
               })()}
             </Typography>
           </Box>
-          {standardizationStatus?.toLowerCase() !== "accepted" && 
-           standardizationStatus?.toLowerCase() !== "rejected" && (
-            <Chip
-              label={`${data.length} issue${data.length !== 1 ? "s" : ""}`}
-              size="small"
-              sx={{
-                backgroundColor: "#fef2f2",
-                color: "#dc2626",
-                fontWeight: 700,
-                border: "1px solid #fca5a5",
-              }}
-            />
-          )}
+          {standardizationStatus?.toLowerCase() !== "accepted" &&
+            standardizationStatus?.toLowerCase() !== "rejected" && (
+              <Chip
+                label={`${data.length} issue${data.length !== 1 ? "s" : ""}`}
+                size="small"
+                sx={{
+                  backgroundColor: "#fef2f2",
+                  color: "#dc2626",
+                  fontWeight: 700,
+                  border: "1px solid #fca5a5",
+                }}
+              />
+            )}
         </Stack>
 
         {data.map((group, groupIdx) => {
@@ -354,7 +355,7 @@ const CorrectionsTableAlt = ({ data, execID, sutType, standardizationStatus, rea
                         suggestion={sugg}
                         isSelected={selectedIdx === si}
                         onSelect={() => handleSelect(groupIdx, si)}
-                        isPending= {isPending}
+                        isPending={isPending}
                       />
                     ))
                   ) : (
@@ -371,7 +372,7 @@ const CorrectionsTableAlt = ({ data, execID, sutType, standardizationStatus, rea
                   onSelectCustom={() => handleSelectCustom(groupIdx)}
                   onClearCustom={() => handleClearCustom(groupIdx)}
                   onCustomMetadataFetch={(meta) => handleCustomMetadataFetch(groupIdx, meta)}
-                  isPending= {isPending}
+                  isPending={isPending}
                 />
 
                 {/* Selected Value section */}
@@ -424,7 +425,7 @@ const CorrectionsTableAlt = ({ data, execID, sutType, standardizationStatus, rea
                             letterSpacing: 0.8,
                           }}
                         >
-                          Selected Value (Editable)
+                          Selected Value
                         </Typography>
                       </Box>
 
@@ -512,7 +513,7 @@ const CorrectionsTableAlt = ({ data, execID, sutType, standardizationStatus, rea
           setRejectDialogRow(null);
           setTimeout(() => fetchData(), 500);
         }}
-        execID = {execID}
+        execID={execID}
       />
     </>
   );

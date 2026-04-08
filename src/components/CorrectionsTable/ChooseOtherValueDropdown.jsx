@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Box, Typography, Autocomplete, TextField, CircularProgress } from "@mui/material";
 import { SELECTED } from "./constants";
+import { API_URL } from "../../config";
 
 const ChooseOtherValueDropdown = ({
   invalidField,
@@ -10,6 +11,9 @@ const ChooseOtherValueDropdown = ({
   onClearCustom,
   isPending = true,
 }) => {
+
+  if(!isPending) return;
+
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [fetchingMeta, setFetchingMeta] = useState(false);
@@ -29,7 +33,7 @@ const ChooseOtherValueDropdown = ({
 
     setLoading(true);
     try {
-      const res = await fetch(`http://10.222.237.123:8001/unique-values?parameterName=${encodeURIComponent(primaryField)}`);
+      const res = await fetch(`${API_URL}/unique-values?parameterName=${encodeURIComponent(primaryField)}`);
       const json = await res.json();
 
       let parsedOptions = [];
@@ -64,7 +68,7 @@ const ChooseOtherValueDropdown = ({
     onSelectCustom();
     setFetchingMeta(true);
     try {
-      const res = await fetch(`http://10.222.237.123:8001/metadata-values/${encodeURIComponent(primaryField)}/${encodeURIComponent(newVal)}`);
+      const res = await fetch(`${API_URL}/metadata-values/${encodeURIComponent(primaryField)}/${encodeURIComponent(newVal)}`);
       const json = await res.json();
 
       let meta = json;

@@ -21,7 +21,7 @@ const ChooseValueCell = ({ fieldName, value, onChange }) => {
     setLoadingOptions(true);
     try {
       const res = await fetch(
-        `http://10.222.237.123:8001/unique-values?parameterName=${encodeURIComponent(fieldName)}`
+        `http://127.0.0.1:8001/unique-values?parameterName=${encodeURIComponent(fieldName)}`
       );
       const data = await res.json();
       setOptions(data?.data ?? []);

@@ -13,12 +13,12 @@ import { FILTERS } from "../pages/LandingPage";
 const LandingPageHeader = ({ search, onSearchChange, filter, onFilterChange }) => {
   return (
     <Box>
-      <Typography variant="h3" align="center" sx={{ my: 3 }}>
+      <Typography variant="h3" align="center" sx={{ my: 3,mt:-4 }}>
         Data Hygiene
       </Typography>
 
       <Stack
-        direction="row"
+        direction="column"
         alignItems="center"
         justifyContent="center"
         gap={5}
@@ -30,8 +30,8 @@ const LandingPageHeader = ({ search, onSearchChange, filter, onFilterChange }) =
           onChange={(e) => onSearchChange(e.target.value)}
           sx={{ mb: 2, width: 500 }}
         />
-
-        <FormGroup row>
+        
+        <FormGroup row sx={{mt: -5}}>
           {FILTERS.map(({ label, value }) => (
             <FormControlLabel
               key={value}
@@ -45,6 +45,7 @@ const LandingPageHeader = ({ search, onSearchChange, filter, onFilterChange }) =
             />
           ))}
         </FormGroup>
+        
       </Stack>
     </Box>
   );

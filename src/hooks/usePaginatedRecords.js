@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { API_URL } from "../config";
 
 const PAGE_SIZE = 50;
 const DEBOUNCE_MS = 500;
 
-export const BASE_URL = "http://10.222.237.123:8001/invalid-summary";
+export const BASE_URL = `${API_URL}/invalid-summary`;
 
 /**
  * usePaginatedRecords
@@ -22,12 +23,12 @@ export const BASE_URL = "http://10.222.237.123:8001/invalid-summary";
  *                                         or memoised) to avoid infinite loops.
  */
 export function usePaginatedRecords({ extraParams = {} } = {}) {
-  const [page, setPage]                 = useState(1);
-  const [records, setRecords]           = useState([]);
+  const [page, setPage] = useState(1);
+  const [records, setRecords] = useState([]);
   const [totalRecords, setTotalRecords] = useState(0);
-  const [totalPages, setTotalPages]     = useState(0);
-  const [loading, setLoading]           = useState(false);
-  const [error, setError]               = useState(null);
+  const [totalPages, setTotalPages] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   // Any extra top-level API response fields (e.g. red / green / yellow)
   const [meta, setMeta] = useState({});
@@ -35,9 +36,9 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
   // searchInput → bound to <TextField>
   // search      → debounced value that actually triggers fetches
   const [searchInput, setSearchInput] = useState("");
-  const [search, setSearch]           = useState("");
+  const [search, setSearch] = useState("");
 
-  const abortRef   = useRef(null);
+  const abortRef = useRef(null);
   // Each fetch gets a unique incrementing ID. Only the fetch whose ID matches
   // the latest value is allowed to update state or set loading=false.
   // This is the correct fix for "stuck loading" — no special-casing of AbortError.
@@ -103,7 +104,7 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
         if (fetchId !== fetchIdRef.current) return;
 
         const incoming = Array.isArray(data?.data) ? data.data : [];
-        const total    = data?.total_invalid_records ?? incoming.length;
+        const total = data?.total_invalid_records ?? incoming.length;
 
         setTotalPages(Math.ceil(total / PAGE_SIZE));
         setRecords((prev) => (isNew ? incoming : [...prev, ...incoming]));
@@ -158,6 +159,7 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
     error,
     searchInput,      // bind to <TextField value>
     setSearchInput,   // bind to <TextField onChange>
+    search,           // debounced search term for custom secondary fetches
     loadMore,         // call on "Load More" button
     retry,            // call from <ErrorPage onRetry>
     meta,             // extra API top-level fields (red, green, yellow, ...)

@@ -6,7 +6,7 @@ import Loader from "../components/Loader";
 import ExecutionInfoBox from "../components/ExecutionInfoBox";
 import CorrectionsTableAlt from "../components/CorrectionsTableAlt";
 import Navbar from "../components/Navbar";
-import { USE_MOCK_ALT_DETAILS } from "../config";
+import { USE_MOCK_ALT_DETAILS, API_URL } from "../config";
 import mockData from "../mock/recordDetails.json";
 
 const transformOldApiData = (rawData) => {
@@ -87,7 +87,7 @@ const DetailsPageAlt = () => {
         return;
       }
 
-      const res = await fetch(`http://10.222.237.123:8001/snapshot-records/${id}`);
+      const res = await fetch(`${API_URL}/snapshot-records/${id}`);
       if (!res.ok) throw new Error("Failed to fetch record details");
 
       const json = await res.json();

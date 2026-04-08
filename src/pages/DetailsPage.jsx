@@ -6,6 +6,7 @@ import Loader from "../components/Loader";
 import ExecutionInfoBox from "../components/ExecutionInfoBox";
 import CorrectionsTable from "../components/CorrectionsTable";
 import Navbar from "../components/Navbar";
+import { API_URL } from "../config";
 
 const parseSuggestions = (comparingData = []) => {
   if (!Array.isArray(comparingData)) return [];
@@ -33,7 +34,7 @@ const DetailsPage = () => {
 
     try {
       const res = await fetch(
-        `http://10.222.237.123:8001/snapshot-records/${id}`
+        `${API_URL}/snapshot-records/${id}`
       );
 
       if (!res.ok) throw new Error("Failed to fetch record details");

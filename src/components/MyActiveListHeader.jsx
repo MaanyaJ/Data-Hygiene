@@ -47,12 +47,12 @@ const MyActiveListHeader = ({
   return (
     <Box>
         <Navbar/>
-      <Typography variant="h3" align="center" sx={{ my: 3 }}>
+      <Typography variant="h3" align="center" sx={{ my: 3, mt: -4 }}>
         My Active List
       </Typography>
  
       <Stack
-        direction="row"
+        direction="column"
         alignItems="center"
         justifyContent="center"
         gap={4}

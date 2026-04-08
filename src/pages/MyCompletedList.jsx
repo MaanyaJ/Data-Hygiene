@@ -4,7 +4,7 @@ import MyCompletedListHeader from "../components/MyCompletedListHeader";
 import RecordList from "../components/RecordList";
 import ErrorPage from "../components/ErrorPage";
 import Navbar from "../components/Navbar";
-import { USE_MOCK } from "../config";
+import { USE_MOCK, API_URL } from "../config";
 import { usePaginatedRecords } from "../hooks/usePaginatedRecords";
 import mockList from "../mock/mockList.json";
 
@@ -84,6 +84,7 @@ const MyCompletedListReal = () => {
     error,
     searchInput,
     setSearchInput,
+    search,
     loadMore,
     retry,
   } = usePaginatedRecords({ extraParams });
@@ -95,10 +96,11 @@ const MyCompletedListReal = () => {
   useEffect(() => {
     if (statusFilter !== null) return; // handled by hook
     setAllLoading(true);
-    const base = "http://10.222.237.123:8001/invalid-summary";
+    setAllRecords([]); // Clear records so RecordList shows the loader
+    const base = `${API_URL}/invalid-summary`;
     Promise.all([
-      fetch(`${base}?page=1&size=100&search=&status=accepted`).then((r) => r.json()),
-      fetch(`${base}?page=1&size=100&search=&status=rejected`).then((r)  => r.json()),
+      fetch(`${base}?page=1&size=100&search=${encodeURIComponent(search)}&status=accepted`).then((r) => r.json()),
+      fetch(`${base}?page=1&size=100&search=${encodeURIComponent(search)}&status=rejected`).then((r)  => r.json()),
     ])
       .then(([acc, rej]) => {
         const merged = [
@@ -109,12 +111,14 @@ const MyCompletedListReal = () => {
       })
       .catch(console.error)
       .finally(() => setAllLoading(false));
-  }, [statusFilter]);
+  }, [statusFilter, search]);
 
   // Pick which data set to display
   const displayRecords = statusFilter ? hookRecords : allRecords;
   const displayLoading = statusFilter ? hookLoading : allLoading;
   const displayTotal   = statusFilter ? hookTotal   : allRecords.length;
+
+  const isSearching = displayLoading || searchInput !== search;
 
   if (error) {
     return <ErrorPage message={error?.message || "Something went wrong"} onRetry={retry} />;
@@ -129,6 +133,7 @@ const MyCompletedListReal = () => {
         onSearchChange={setSearchInput}
         statusFilter={statusFilter}
         onStatusFilterChange={setStatusFilter}
+        loading={isSearching}
       />
       <RecordList
         records={displayRecords}

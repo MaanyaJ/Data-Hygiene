@@ -17,6 +17,7 @@ import StorageIcon from "@mui/icons-material/Storage";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CloseIcon from "@mui/icons-material/Close";
+import { API_URL } from "../config";
 
 // Step 1: Choose between L0 Data or Submit Draft Record
 const OptionCard = ({ icon, title, description, onClick }) => (
@@ -68,7 +69,7 @@ const RejectDialog = ({ open, onClose, row, onL0Data, onDraftSubmit, execID }) =
   // Step 1 → L0 Data chosen
   const handleL0Data = async () => {
     try {
-      await fetch("http://10.222.237.123:8001/reject-record", {
+      await fetch(`${API_URL}/reject-record`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -88,7 +89,7 @@ const RejectDialog = ({ open, onClose, row, onL0Data, onDraftSubmit, execID }) =
     setStep(STEPS.DRAFT_FORM);
     setLoadingFields(true);
     try {
-      const res = await fetch(`http://10.222.237.123:8001/draft-records/fields?type=${encodeURIComponent(row.fieldName)}`);
+      const res = await fetch(`${API_URL}/draft-records/fields?type=${encodeURIComponent(row.fieldName)}`);
       const data = await res.json();
       setDetailFields(data.fields);
     } catch (error) {
@@ -107,7 +108,7 @@ const RejectDialog = ({ open, onClose, row, onL0Data, onDraftSubmit, execID }) =
         execution_id: execID,
         ...formValues,
       };
-      await fetch(`http://10.222.237.123:8001/draft-records/${encodeURIComponent(row.fieldName)}`, {
+      await fetch(`${API_URL}/draft-records/${encodeURIComponent(row.fieldName)}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
