@@ -1,32 +1,41 @@
-import {
-  Box,
-  Typography,
-  TextField,
-  Stack,
-  FormControlLabel,
-  Checkbox,
-  CircularProgress,
-  InputAdornment,
-} from "@mui/material";
-
+import { Box, Typography, TextField, Stack, Tooltip } from "@mui/material";
+ 
 const STATUS_FILTERS = [
-  { label: "Accepted", value: "accepted" },
-  { label: "Rejected", value: "rejected" },
+  {
+    label: "Accepted",
+    value: "accepted",
+    color: "#2e7d32",
+    activeColor: "#1b5e20",
+    bg: "#e8f5e9",
+    activeBg: "#43a047",
+    dot: "#66bb6a",
+    hoverLabel: "Show accepted",
+  },
+  {
+    label: "Rejected",
+    value: "rejected",
+    color: "#b71c1c",
+    activeColor: "#7f0000",
+    bg: "#ffebee",
+    activeBg: "#e53935",
+    dot: "#ef9a9a",
+    hoverLabel: "Show rejected",
+  },
 ];
-
-const MyCompletedListHeader = ({ search, onSearchChange, statusFilter, onStatusFilterChange, loading }) => {
+ 
+const MyCompletedListHeader = ({ search, onSearchChange, statusFilter, onStatusFilterChange }) => {
   return (
     <Box>
       <Typography variant="h3" align="center" sx={{ my: 3, mt: -4 }}>
         My Completed List
       </Typography>
-
+ 
       <Stack
         direction="column"
         alignItems="center"
         justifyContent="center"
         gap={4}
-        sx={{ px: 2, mb: 2, flexWrap: "wrap" }}
+        sx={{ px: 2, mb: 2 }}
       >
         <TextField
           label="Search (Execution Id, Benchmark Type, Benchmark Category)"
@@ -34,24 +43,59 @@ const MyCompletedListHeader = ({ search, onSearchChange, statusFilter, onStatusF
           onChange={(e) => onSearchChange(e.target.value)}
           sx={{ width: 500 }}
         />
-
-        <Stack direction="row" alignItems="center" sx={{ mt: -2 }}>
-          {STATUS_FILTERS.map(({ label, value }) => (
-            <FormControlLabel
-              key={value}
-              label={label}
-              control={
-                <Checkbox
-                  checked={statusFilter === value}
-                  onChange={() => onStatusFilterChange(statusFilter === value ? null : value)}
-                />
-              }
-            />
-          ))}
+ 
+        <Stack direction="row" gap={1.5} sx={{ flexWrap: "wrap" }}>
+          {STATUS_FILTERS.map(({ label, hoverLabel, value, bg, activeBg, color, activeColor, dot }) => {
+            const isActive = statusFilter === value;
+            return (
+              // <Tooltip title={hoverLabel} arrow key={value}>
+                <Box  key={value}
+                  onClick={() => onStatusFilterChange(isActive ? null : value)}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                    px: 2,
+                    py: 1.2,
+                    borderRadius: "10px",
+                    cursor: "pointer",
+                    userSelect: "none",
+                    background: isActive ? activeBg : bg,
+                    border: `2px solid ${isActive ? activeColor : color}`,
+                    color: isActive ? "#fff" : color,
+                    fontWeight: isActive ? 700 : 500,
+                    fontSize: "0.85rem",
+                    transition: "all 0.2s ease",
+                    boxShadow: isActive
+                      ? `0 4px 14px 0 ${activeBg}aa`
+                      : "0 1px 4px rgba(0,0,0,0.08)",
+                    transform: isActive ? "translateY(-2px)" : "none",
+                    "&:hover": {
+                      background: isActive ? activeColor : `${color}18`,
+                      transform: "translateY(-2px)",
+                      boxShadow: `0 4px 14px 0 ${dot}99`,
+                    },
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: 10,
+                      height: 10,
+                      borderRadius: "50%",
+                      background: isActive ? "#fff" : dot,
+                      flexShrink: 0,
+                      transition: "background 0.2s ease",
+                    }}
+                  />
+                  {label}
+                </Box>
+              // </Tooltip>
+            );
+          })}
         </Stack>
       </Stack>
     </Box>
   );
 };
-
+ 
 export default MyCompletedListHeader;

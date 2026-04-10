@@ -4,7 +4,7 @@ import { Stack, Typography, Chip } from "@mui/material";
 const Errors = ({ invalidFields = []}) => {
     const errors = invalidFields
 
-    const MAX_VISIBLE = 7;
+    const MAX_VISIBLE = 8;
 
     const visibleErrors = errors.slice(0, MAX_VISIBLE);
     const remaining = errors.length - MAX_VISIBLE;
@@ -26,11 +26,9 @@ const Errors = ({ invalidFields = []}) => {
                     ))}
 
                     {remaining > 0 && (
-                        <Chip
-                            label={`+${remaining} more`}
-                            size="small"
-                            sx={{ bgcolor: "grey.200" }}
-                        />
+                        <Typography sx={{
+                            fontSize: "small"
+                        }}>{`+${remaining} more`}</Typography>
                     )}
                 </Stack>
             </Stack>

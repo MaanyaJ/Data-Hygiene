@@ -21,7 +21,7 @@ const ChooseValueCell = ({ fieldName, value, onChange }) => {
     setLoadingOptions(true);
     try {
       const res = await fetch(
-        `http://127.0.0.1:8001/unique-values?parameterName=${encodeURIComponent(fieldName)}`
+        `http://192.168.0.82:8001/unique-values?parameterName=${encodeURIComponent(fieldName)}`
       );
       const data = await res.json();
       setOptions(data?.data ?? []);
@@ -30,8 +30,8 @@ const ChooseValueCell = ({ fieldName, value, onChange }) => {
     } finally {
       setLoadingOptions(false);
     }
-  };
-
+  };                                              
+  
   if (isCpuField(fieldName)) {
     return (
       <TextField

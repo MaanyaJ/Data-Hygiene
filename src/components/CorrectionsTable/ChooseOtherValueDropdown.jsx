@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, Autocomplete, TextField, CircularProgress } from "@mui/material";
+import { Box, Typography, Autocomplete, TextField, CircularProgress, Radio, Stack } from "@mui/material";
 import { SELECTED } from "./constants";
 import { API_URL } from "../../config";
 
@@ -20,9 +20,7 @@ const ChooseOtherValueDropdown = ({
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(null);
 
-  useEffect(() => {
-    if (!isSelected) setValue(null);
-  }, [isSelected]);
+
 
   const primaryField = invalidField?.split(",")[0].trim() || "";
 
@@ -80,7 +78,7 @@ const ChooseOtherValueDropdown = ({
         meta = json.metadata;
       }
 
-      onCustomMetadataFetch(meta);
+      onCustomMetadataFetch({ [primaryField]: newVal, ...meta });
     } catch (err) {
       console.error("metadata-values fetch error:", err);
     } finally {
@@ -106,12 +104,14 @@ const ChooseOtherValueDropdown = ({
         boxShadow: isSelected ? `0 0 0 3px ${p.accent}20` : "none",
         transition: "all 0.15s ease",
         opacity: isPending ? 1 : 0.5,
-        pointerEvents: isPending ? "auto" : "none",  // blocks all interaction
+        pointerEvents: isPending ? "auto" : "none",
       }}
     >
-      <Box sx={{ flex: 1 }}>
+      {/* Main Content */}
+
+      <Box sx={{ flex: 1, px: 1.5, py: 0.5 }}>
         <Typography sx={{ fontSize: 13, fontWeight: 600, color: "#64748b", mb: 0.5 }}>
-          Choose from other values:
+          Choose other {invalidField}:
         </Typography>
         <Autocomplete
           size="small"

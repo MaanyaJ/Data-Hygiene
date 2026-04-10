@@ -6,43 +6,171 @@ import {
   Button,
   Paper,
   Stack,
-  Divider,
   IconButton,
-  Collapse,
   Radio,
-  TextField,
-  CircularProgress,
-  Snackbar,
-  Alert,
+  Collapse,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Divider,
 } from "@mui/material";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import CheckOutlinedIcon from "@mui/icons-material/CheckOutlined";
-import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
+import CloseIcon from "@mui/icons-material/Close";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import RejectDialog from "./RejectDialog";
-import { capitalize, SELECTED } from "./CorrectionsTable/constants";
+import { SELECTED, ACCEPTED } from "./CorrectionsTable/constants";
 import ExistingDataRow from "./CorrectionsTable/ExistingDataRow";
 import EditableField from "./CorrectionsTable/EditableField";
 import ChooseOtherValueDropdown from "./CorrectionsTable/ChooseOtherValueDropdown";
 import SuggestionRow from "./CorrectionsTable/SuggestionRow";
 import { API_URL } from "../config";
-
+import CircularProgress from '@mui/material/CircularProgress';
+ 
+/* ─── Accept Confirmation Dialog ──────────────────────────────── */
+const AcceptConfirmDialog = ({ open, onClose, onConfirm, fieldName, isAccepting }) => (
+  <Dialog
+    open={open}
+    onClose={onClose}
+    maxWidth="xs"
+    fullWidth
+    PaperProps={{ sx: { borderRadius: 3 } }}
+  >
+    <DialogTitle sx={{ pb: 1 }}>
+      <Stack direction="row" alignItems="center" justifyContent="space-between">
+        <Typography fontWeight={700} fontSize="1rem">Confirm Accept</Typography>
+        <IconButton size="small" onClick={onClose} disabled={isAccepting}>
+          <CloseIcon fontSize="small" />
+        </IconButton>
+      </Stack>
+    </DialogTitle>
+ 
+    <Divider />
+ 
+    <DialogContent sx={{ pt: 2.5 }}>
+      <Stack alignItems="center" gap={2} py={1}>
+        <Box
+          sx={{
+            width: 52,
+            height: 52,
+            borderRadius: "50%",
+            backgroundColor: "#f0fdf4",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <CheckCircleIcon sx={{ color: "#16a34a", fontSize: 28 }} />
+        </Box>
+        <Box textAlign="center">
+          <Typography fontWeight={600} fontSize="0.95rem" gutterBottom>
+            Are you sure?
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            This will accept the selected data for{" "}
+            <strong>{fieldName}</strong> and apply the correction.
+          </Typography>
+        </Box>
+      </Stack>
+    </DialogContent>
+ 
+    <Divider />
+ 
+    <DialogActions sx={{ px: 3, py: 2 }}>
+      <Button variant="outlined" onClick={onClose} disabled={isAccepting}>
+        Cancel
+      </Button>
+      <Button
+        variant="contained"
+        onClick={onConfirm}
+        disabled={isAccepting}
+        startIcon={
+          isAccepting ? (
+            <CircularProgress size={14} color="inherit" />
+          ) : (
+            <CheckCircleOutlineIcon />
+          )
+        }
+        sx={{
+          backgroundColor: "#16a34a",
+          "&:hover": { backgroundColor: "#15803d" },
+          ...(isAccepting && {
+            "&.Mui-disabled": { backgroundColor: "#15803d", color: "white" },
+          }),
+        }}
+      >
+        {isAccepting ? "Accepting..." : "Yes, Accept"}
+      </Button>
+    </DialogActions>
+  </Dialog>
+);
+ 
 /* ─── Main Component ────────────────────────────────────────── */
-
-const CorrectionsTableAlt = ({ data, execID, sutType, standardizationStatus, reason, fetchData, showNotification }) => {
+ 
+const CorrectionsTableAlt = ({ data, history, execID, sutType, standardizationStatus, reason, fetchData, showNotification }) => {
   const [selectedSuggestions, setSelectedSuggestions] = useState({});
   const [editedSuggestions, setEditedSuggestions] = useState({});
   const [customSuggestions, setCustomSuggestions] = useState({});
+  const [isAccepting, setIsAccepting] = useState(false)
   const [expandedGroups, setExpandedGroups] = useState(() =>
     Object.fromEntries((data ?? []).map((_, i) => [i, false]))
   );
   const [rejectDialogRow, setRejectDialogRow] = useState(null);
+  // null when closed, { group, groupIdx } when open
+  const [acceptConfirm, setAcceptConfirm] = useState(null);
   const isPending = standardizationStatus?.toLowerCase() === "pending";
-
+ 
+  // Initial auto-selection logic based on provided status & history
+  useEffect(() => {
+    if (!data || data.length === 0) return;
+ 
+    // Only run if selectedSuggestions is currently empty to avoid overwriting user interactions
+    if (Object.keys(selectedSuggestions).length > 0) return;
+ 
+    const initialSelections = {};
+    const initialCustom = {};
+ 
+    data.forEach((group, groupIdx) => {
+      const gStatus = group.currentStatus?.toLowerCase();
+      if (gStatus === "accepted" || gStatus === "approved") {
+        // Find index of suggestion with "Accepted" status
+        const acceptedIdx = group.suggestions?.findIndex(
+          (s) => s.status?.toLowerCase() === "accepted"
+        );
+ 
+        if (acceptedIdx !== -1 && acceptedIdx !== undefined) {
+          initialSelections[groupIdx] = acceptedIdx;
+        } else {
+          // Fallback to history fallback (custom option)
+          initialSelections[groupIdx] = "custom";
+          
+          // Build custom object from history changes
+          const changes = history?.changes || [];
+          const customObj = {};
+          changes.forEach(c => {
+            if (c.field && Array.isArray(c.to) && c.to.length > 0) {
+              customObj[c.field] = c.to[0];
+            }
+          });
+          
+          if (Object.keys(customObj).length > 0) {
+            initialCustom[groupIdx] = customObj;
+          }
+        }
+      }
+    });
+ 
+    if (Object.keys(initialSelections).length > 0) {
+      setSelectedSuggestions(initialSelections);
+    }
+    if (Object.keys(initialCustom).length > 0) {
+      setCustomSuggestions(initialCustom);
+    }
+  }, [data, history]);
+ 
   const handleSelect = (groupIdx, suggIdx) => {
     setSelectedSuggestions((prev) => {
       if (prev[groupIdx] === suggIdx) {
@@ -58,7 +186,7 @@ const CorrectionsTableAlt = ({ data, execID, sutType, standardizationStatus, rea
       return next;
     });
   };
-
+ 
   const handleSelectCustom = (groupIdx) => {
     setSelectedSuggestions((prev) => ({ ...prev, [groupIdx]: "custom" }));
     setEditedSuggestions((prev) => {
@@ -67,7 +195,7 @@ const CorrectionsTableAlt = ({ data, execID, sutType, standardizationStatus, rea
       return next;
     });
   };
-
+ 
   const handleClearCustom = (groupIdx) => {
     setSelectedSuggestions((prev) => {
       const next = { ...prev };
@@ -82,11 +210,11 @@ const CorrectionsTableAlt = ({ data, execID, sutType, standardizationStatus, rea
       return next;
     });
   };
-
+ 
   const handleCustomMetadataFetch = (groupIdx, meta) => {
     setCustomSuggestions((prev) => ({ ...prev, [groupIdx]: meta }));
   };
-
+ 
   const handleEditField = (groupIdx, key, newValue) => {
     setEditedSuggestions(prev => ({
       ...prev,
@@ -96,75 +224,88 @@ const CorrectionsTableAlt = ({ data, execID, sutType, standardizationStatus, rea
       }
     }));
   };
-
+ 
   const toggleGroup = (idx) =>
     setExpandedGroups((prev) => ({ ...prev, [idx]: !prev[idx] }));
-
-  const handleAccept = async (group, groupIdx) => {
+ 
+  // Opens the confirmation dialog instead of calling API directly
+  const handleAcceptClick = (group, groupIdx) => {
+    setAcceptConfirm({ group, groupIdx });
+  };
+ 
+  // Called when user clicks "Yes, Accept" in the confirm dialog
+  const handleAcceptConfirm = async () => {
+    const { group, groupIdx } = acceptConfirm;
     const suggIdx = selectedSuggestions[groupIdx];
     if (suggIdx === undefined) return;
-
+ 
     // 1. Get base suggestion
     const baseChosen =
       suggIdx === "custom"
         ? customSuggestions[groupIdx] || {}
         : group.suggestions[suggIdx];
-
+ 
     // 2. Apply edits
     const customEdits = editedSuggestions[groupIdx] || {};
     const merged = { ...baseChosen, ...customEdits };
-
+ 
     // 3. Extract main field value
     const primaryField = group.invalid_field;
-
+ 
     const value =
       merged?.[primaryField] ||
       merged?.[primaryField?.toLowerCase()];
-
+ 
     if (!value) return;
-
+ 
     // 4. Build payload
     const payload = {
       execution_id: execID,
       field_name: primaryField,
       accepted_value: value,
     };
-
+ 
     // 5. Add corecount ONLY for VM
     if (sutType?.toLowerCase() === "vm") {
       const coreCountVal =
         merged?.coreCount || merged?.CoreCount;
-
+ 
       if (coreCountVal !== undefined) {
         payload.coreCount = coreCountVal;
       }
     }
-
+ 
+    payload.currentStatus = "Accepted"
+ 
     try {
+      setIsAccepting(true);
       await fetch(`${API_URL}/approve-suggestion`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-
+ 
       // reset selection
       setSelectedSuggestions((prev) => {
         const next = { ...prev };
         delete next[groupIdx];
         return next;
       });
-
-      showNotification("Record accepted successfully", "success");
-      setTimeout(() => fetchData(), 500);
+ 
+      setAcceptConfirm(null);
+      fetchData();
+      showNotification("Data accepted successfully", "success");
     } catch (err) {
       console.error(err);
-      showNotification("Failed to accept record", "error");
+      showNotification("Failed to accept data", "error");
+    } finally {
+      setIsAccepting(false);
     }
   };
   const handleReject = (group, groupIdx) => {
     setRejectDialogRow({ ...group, id: groupIdx, fieldName: group.invalid_field });
   };
-
+ 
   if (!data || data.length === 0) {
     return (
       <Box sx={{ py: 6, textAlign: "center" }}>
@@ -172,7 +313,7 @@ const CorrectionsTableAlt = ({ data, execID, sutType, standardizationStatus, rea
       </Box>
     );
   }
-
+ 
   return (
     <>
       <Stack gap={0.5}>
@@ -203,12 +344,12 @@ const CorrectionsTableAlt = ({ data, execID, sutType, standardizationStatus, rea
               />
             )}
         </Stack>
-
+ 
         {data.map((group, groupIdx) => {
           const isExpanded = expandedGroups[groupIdx] ?? true;
           const selectedIdx = selectedSuggestions[groupIdx];
           const canAccept = selectedIdx !== undefined;
-
+ 
           return (
             <Paper
               key={groupIdx}
@@ -240,10 +381,10 @@ const CorrectionsTableAlt = ({ data, execID, sutType, standardizationStatus, rea
                   <Typography sx={{ fontWeight: 700, fontSize: 14, color: "#0f172a" }}>
                     {group.invalid_field}
                   </Typography>
-
+ 
                   {canAccept && (
                     <Chip
-                      label="Suggestion selected"
+                      label={selectedIdx === "custom" ? "Custom value chosen" : "Suggestion selected"}
                       size="small"
                       sx={{
                         height: 20,
@@ -256,7 +397,7 @@ const CorrectionsTableAlt = ({ data, execID, sutType, standardizationStatus, rea
                       }}
                     />
                   )}
-
+ 
                   {standardizationStatus?.toLowerCase() === "rejected" && (
                     <>
                       <Chip
@@ -287,7 +428,7 @@ const CorrectionsTableAlt = ({ data, execID, sutType, standardizationStatus, rea
                       />
                     </>
                   )}
-
+ 
                   {standardizationStatus?.toLowerCase() === "on hold" && (
                     <Chip
                       label="On Hold"
@@ -303,7 +444,7 @@ const CorrectionsTableAlt = ({ data, execID, sutType, standardizationStatus, rea
                       }}
                     />
                   )}
-
+ 
                   {standardizationStatus?.toLowerCase() === "accepted" && (
                     <Chip
                       label="Accepted"
@@ -328,12 +469,12 @@ const CorrectionsTableAlt = ({ data, execID, sutType, standardizationStatus, rea
                   )}
                 </IconButton>
               </Stack>
-
+ 
               {/* ── Collapsible Body ── */}
               <Collapse in={isExpanded}>
                 {/* Existing data bar */}
                 <ExistingDataRow existingData={group.existing_data ?? []} />
-
+ 
                 {/* Suggestion rows */}
                 <Stack gap={0.5} sx={{ p: 1.5 }}>
                   <Typography
@@ -349,22 +490,37 @@ const CorrectionsTableAlt = ({ data, execID, sutType, standardizationStatus, rea
                     Suggestions
                   </Typography>
                   {group.suggestions?.length > 0 ? (
-                    group.suggestions.map((sugg, si) => (
-                      <SuggestionRow
-                        key={si}
-                        suggestion={sugg}
-                        isSelected={selectedIdx === si}
-                        onSelect={() => handleSelect(groupIdx, si)}
-                        isPending={isPending}
-                      />
-                    ))
+                    group.suggestions.map((sugg, si) => {
+                      const isSelected = selectedIdx === si;
+                      const gStatus = group.currentStatus?.toLowerCase();
+                      const isAccepted = gStatus === "accepted" || gStatus === "approved";
+                      const activeTheme = isAccepted ? ACCEPTED : SELECTED;
+                      
+                      // Merge edits if selected
+                      const baseSugg = sugg;
+                      const editedSugg = isSelected ? (editedSuggestions[groupIdx] || {}) : {};
+                      const mergedSugg = { ...baseSugg, ...editedSugg };
+
+                      return (
+                        <SuggestionRow
+                          key={si}
+                          suggestion={mergedSugg}
+                          isSelected={isSelected}
+                          theme={activeTheme}
+                          onSelect={() => handleSelect(groupIdx, si)}
+                          onEditField={(key, newVal) => handleEditField(groupIdx, key, newVal)}
+                          sutType={sutType}
+                          isPending={isPending}
+                        />
+                      );
+                    })
                   ) : (
                     <Typography sx={{ color: "#94a3b8", fontSize: 13, py: 2, textAlign: "center" }}>
                       No suggestions available
                     </Typography>
                   )}
                 </Stack>
-
+ 
                 {/* Custom Option Dropdown */}
                 <ChooseOtherValueDropdown
                   invalidField={group.invalid_field}
@@ -374,80 +530,34 @@ const CorrectionsTableAlt = ({ data, execID, sutType, standardizationStatus, rea
                   onCustomMetadataFetch={(meta) => handleCustomMetadataFetch(groupIdx, meta)}
                   isPending={isPending}
                 />
+ 
+                {/* Persistent Custom Selection row (styled exactly like SuggestionRow) */}
+                {customSuggestions[groupIdx] &&
+                  Object.keys(customSuggestions[groupIdx]).length > 0 && (() => {
+                    const isSelected = selectedIdx === "custom";
+                    const gStatus = group.currentStatus?.toLowerCase();
+                    const isAccepted = gStatus === "accepted" || gStatus === "approved";
+                    const activeTheme = isAccepted ? ACCEPTED : SELECTED;
 
-                {/* Selected Value section */}
-                {canAccept && (() => {
-                  const sp = SELECTED;
-                  let baseSugg = {};
-                  if (selectedIdx === "custom") {
-                    baseSugg = customSuggestions[groupIdx] || {};
-                  } else {
-                    baseSugg = group.suggestions[selectedIdx] || {};
-                  }
+                    const baseSugg = customSuggestions[groupIdx];
+                    const editedSugg = isSelected ? (editedSuggestions[groupIdx] || {}) : {};
+                    const mergedSugg = { ...baseSugg, ...editedSugg };
 
-                  const editedSugg = editedSuggestions[groupIdx] || {};
-                  const mergedSugg = { ...baseSugg, ...editedSugg };
-
-                  // If custom value is selected but meta is completely empty/fetching
-                  if (selectedIdx === "custom" && Object.keys(baseSugg).length === 0) {
-                    return null;
-                  }
-
-                  return (
-                    <Box
-                      sx={{
-                        mx: 2,
-                        mb: 1.5,
-                        border: `1.5px solid ${sp.border}`,
-                        borderRadius: 2,
-                        backgroundColor: sp.light,
-                        overflow: "hidden",
-                      }}
-                    >
-                      {/* Header */}
-                      <Box
-                        sx={{
-                          px: 1.5,
-                          py: 0.5,
-                          borderBottom: `1px solid ${sp.border}`,
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 1,
-                        }}
-                      >
-                        <CheckCircleOutlineIcon sx={{ fontSize: 13, color: sp.text }} />
-                        <Typography
-                          sx={{
-                            fontSize: 10,
-                            fontWeight: 700,
-                            color: sp.text,
-                            textTransform: "uppercase",
-                            letterSpacing: 0.8,
-                          }}
-                        >
-                          Selected Value
-                        </Typography>
+                    return (
+                      <Box sx={{ mt: 1, px: 1.5 }}>
+                        <SuggestionRow
+                          suggestion={mergedSugg}
+                          isSelected={isSelected}
+                          theme={activeTheme}
+                          onSelect={() => handleSelectCustom(groupIdx)}
+                          onEditField={(key, newVal) => handleEditField(groupIdx, key, newVal)}
+                          sutType={sutType}
+                          isPending={isPending}
+                        />
                       </Box>
-
-                      {/* Fields — horizontal */}
-                      <Stack direction="row" flexWrap="wrap" divider={
-                        <Box sx={{ width: "1px", alignSelf: "stretch", backgroundColor: sp.border }} />
-                      }>
-                        {Object.entries(mergedSugg).map(([key, val]) => (
-                          <EditableField
-                            key={key}
-                            label={capitalize(key)}
-                            value={val}
-                            color={sp.text}
-                            isEditable={key.toLowerCase() === "corecount" && sutType === "vm"}
-                            onSave={(newVal) => handleEditField(groupIdx, key, newVal)}
-                          />
-                        ))}
-                      </Stack>
-                    </Box>
-                  );
-                })()}
-
+                    );
+                  })()}
+ 
                 {isPending && (
                   <Stack
                     direction="row"
@@ -461,36 +571,35 @@ const CorrectionsTableAlt = ({ data, execID, sutType, standardizationStatus, rea
                       size="small"
                       disabled={!canAccept}
                       startIcon={<CheckCircleOutlineIcon />}
-                      onClick={() => handleAccept(group, groupIdx)}
+                      onClick={() => handleAcceptClick(group, groupIdx)}
                       sx={{
                         textTransform: "none",
                         fontWeight: 700,
                         borderRadius: 1.5,
                         backgroundColor: "#16a34a",
                         "&:hover": { backgroundColor: "#15803d" },
-                        "&.Mui-disabled": { backgroundColor: "#d1fae5", color: "#6ee7b7" },
                       }}
                     >
                       Accept
                     </Button>
-                    {!canAccept && (
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        startIcon={<CancelOutlinedIcon />}
-                        onClick={() => handleReject(group, groupIdx)}
-                        sx={{
-                          textTransform: "none",
-                          fontWeight: 700,
-                          borderRadius: 1.5,
-                          borderColor: "#fca5a5",
-                          color: "#dc2626",
-                          "&:hover": { backgroundColor: "#fff5f5", borderColor: "#ef4444" },
-                        }}
-                      >
-                        Reject All
-                      </Button>
-                    )}
+                    <Button
+                      disabled={canAccept}
+                      variant="contained"
+                      size="small"
+                      startIcon={<CancelOutlinedIcon />}
+                      onClick={() => handleReject(group, groupIdx)}
+                      sx={{
+                        textTransform: "none",
+                        fontWeight: 700,
+                        borderRadius: 1.5,
+                        backgroundColor: "#dc2626",
+                        "&:hover": {
+                          backgroundColor: "#b91c1c",
+                        }
+                      }}
+                    >
+                      Reject All
+                    </Button>
                   </Stack>
                 )}
               </Collapse>
@@ -498,25 +607,35 @@ const CorrectionsTableAlt = ({ data, execID, sutType, standardizationStatus, rea
           );
         })}
       </Stack>
-
+ 
+      {/* Accept Confirmation Dialog */}
+      <AcceptConfirmDialog
+        open={!!acceptConfirm}
+        onClose={() => !isAccepting && setAcceptConfirm(null)}
+        onConfirm={handleAcceptConfirm}
+        fieldName={acceptConfirm?.group?.invalid_field}
+        isAccepting={isAccepting}
+      />
+ 
       <RejectDialog
         open={!!rejectDialogRow}
         onClose={() => setRejectDialogRow(null)}
         row={rejectDialogRow}
         onL0Data={() => {
-          showNotification("Rejected due to L0 data", "success");
           setRejectDialogRow(null);
-          setTimeout(() => fetchData(), 500);
+          fetchData();
+          showNotification("Rejected due to L0 data", "success");
         }}
         onDraftSubmit={() => {
-          showNotification("Draft record submitted", "success");
           setRejectDialogRow(null);
-          setTimeout(() => fetchData(), 500);
+          fetchData();
+          showNotification("Draft record submitted", "success");
         }}
         execID={execID}
       />
     </>
   );
 };
-
+ 
 export default CorrectionsTableAlt;
+ 

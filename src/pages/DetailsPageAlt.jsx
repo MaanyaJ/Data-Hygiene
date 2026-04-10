@@ -65,6 +65,7 @@ const DetailsPageAlt = () => {
   const [loading, setLoading] = useState(true); // ← true so Loader shows on first paint
   const [standardizationStatus, setStandardizationStatus] = useState("");
   const [reason, setReason] = useState("");
+  const [history, setHistory] = useState(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
 
   const showNotification = (message, severity = "success") => {
@@ -84,6 +85,7 @@ const DetailsPageAlt = () => {
         setData(mockData.data);
         setStandardizationStatus(mockData.standardization_status);
         setReason(mockData.reason || "");
+        setHistory(mockData.history || null);
         return;
       }
 
@@ -96,6 +98,7 @@ const DetailsPageAlt = () => {
       setExecutionData(json.execution_details);
       setStandardizationStatus(json.standardization_status);
       setReason(json.reason || "");
+      setHistory(json.history || null);
 
       if (
         Array.isArray(json.data) &&
@@ -132,6 +135,7 @@ const DetailsPageAlt = () => {
         <Box sx={{ mt: -2 }}>
           <CorrectionsTableAlt
             data={data}
+            history={history}
             execID={executionData.execution_id}
             sutType={executionData.sutType}
             standardizationStatus={standardizationStatus}
