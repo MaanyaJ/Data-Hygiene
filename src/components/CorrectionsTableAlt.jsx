@@ -110,7 +110,7 @@ const AcceptConfirmDialog = ({ open, onClose, onConfirm, fieldName, isAccepting 
  
 /* ─── Main Component ────────────────────────────────────────── */
  
-const CorrectionsTableAlt = ({ data, history, execID, sutType, standardizationStatus, reason, fetchData, showNotification }) => {
+const CorrectionsTableAlt = ({ data, execID, sutType, fetchData, showNotification }) => {
   const [selectedSuggestions, setSelectedSuggestions] = useState({});
   const [editedSuggestions, setEditedSuggestions] = useState({});
   const [customSuggestions, setCustomSuggestions] = useState({});
@@ -121,7 +121,6 @@ const CorrectionsTableAlt = ({ data, history, execID, sutType, standardizationSt
   const [rejectDialogRow, setRejectDialogRow] = useState(null);
   // null when closed, { group, groupIdx } when open
   const [acceptConfirm, setAcceptConfirm] = useState(null);
-  const isPending = standardizationStatus?.toLowerCase() === "pending";
  
   // Initial auto-selection logic based on provided status & history
   useEffect(() => {
@@ -147,13 +146,12 @@ const CorrectionsTableAlt = ({ data, history, execID, sutType, standardizationSt
           // Fallback to history fallback (custom option)
           initialSelections[groupIdx] = "custom";
           
-          // Build custom object from history changes
-          const changes = history?.changes || [];
+          // Build custom object from nested history in existing_data
           const customObj = {};
-          changes.forEach(c => {
-            if (c.field && Array.isArray(c.to) && c.to.length > 0) {
-              customObj[c.field] = c.to[0];
-            }
+          group.existing_data?.forEach(item => {
+            const histEntry = item.history?.[0]; // Pick the latest correction
+            // If no history exists, it wasn't part of the correction, so it should be null/empty
+            customObj[item.field] = histEntry ? histEntry.to : null;
           });
           
           if (Object.keys(customObj).length > 0) {
@@ -169,7 +167,7 @@ const CorrectionsTableAlt = ({ data, history, execID, sutType, standardizationSt
     if (Object.keys(initialCustom).length > 0) {
       setCustomSuggestions(initialCustom);
     }
-  }, [data, history]);
+  }, [data]);
  
   const handleSelect = (groupIdx, suggIdx) => {
     setSelectedSuggestions((prev) => {
@@ -267,8 +265,9 @@ const CorrectionsTableAlt = ({ data, history, execID, sutType, standardizationSt
  
     // 5. Add corecount ONLY for VM
     if (sutType?.toLowerCase() === "vm") {
+      // Find corecount value with case-insensitivity
       const coreCountVal =
-        merged?.coreCount || merged?.CoreCount;
+        merged?.coreCount || merged?.CoreCount || merged?.corecount;
  
       if (coreCountVal !== undefined) {
         payload.coreCount = coreCountVal;
@@ -284,6 +283,7 @@ const CorrectionsTableAlt = ({ data, history, execID, sutType, standardizationSt
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+      console.log("payload", payload);
  
       // reset selection
       setSelectedSuggestions((prev) => {
@@ -321,34 +321,18 @@ const CorrectionsTableAlt = ({ data, history, execID, sutType, standardizationSt
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Box>
             <Typography variant="h6" sx={{ fontWeight: 700, color: "#0f172a", mb: 0.25 }}>
-              {(() => {
-                const status = standardizationStatus?.toLowerCase();
-                if (status === "accepted") return "Corrected Fields";
-                if (status === "on hold") return "Fields for Review";
-                if (status === "rejected") return "Rejected Fields";
-                return "Inconsistent Fields"; // Default for pending/rejected
-              })()}
+              Inconsistent Fields
             </Typography>
           </Box>
-          {standardizationStatus?.toLowerCase() !== "accepted" &&
-            standardizationStatus?.toLowerCase() !== "rejected" && (
-              <Chip
-                label={`${data.length} issue${data.length !== 1 ? "s" : ""}`}
-                size="small"
-                sx={{
-                  backgroundColor: "#fef2f2",
-                  color: "#dc2626",
-                  fontWeight: 700,
-                  border: "1px solid #fca5a5",
-                }}
-              />
-            )}
         </Stack>
  
         {data.map((group, groupIdx) => {
           const isExpanded = expandedGroups[groupIdx] ?? true;
           const selectedIdx = selectedSuggestions[groupIdx];
           const canAccept = selectedIdx !== undefined;
+          const fieldStatus = group.currentStatus
+          const isPending = (fieldStatus === null) || (fieldStatus === "invalid")
+          
  
           return (
             <Paper
@@ -382,39 +366,10 @@ const CorrectionsTableAlt = ({ data, history, execID, sutType, standardizationSt
                     {group.invalid_field}
                   </Typography>
  
-                  {canAccept && (
-                    <Chip
-                      label={selectedIdx === "custom" ? "Custom value chosen" : "Suggestion selected"}
-                      size="small"
-                      sx={{
-                        height: 20,
-                        fontSize: 11,
-                        fontWeight: 700,
-                        backgroundColor: "#eff6ff",
-                        color: "#2563eb",
-                        border: "1px solid #bfdbfe",
-                        "& .MuiChip-label": { px: 1 },
-                      }}
-                    />
-                  )}
- 
-                  {standardizationStatus?.toLowerCase() === "rejected" && (
+                  {fieldStatus === "L0 Data" && (
                     <>
                       <Chip
-                        label="Rejected"
-                        size="small"
-                        sx={{
-                          height: 20,
-                          fontSize: 11,
-                          fontWeight: 700,
-                          backgroundColor: "#fef2f2",
-                          color: "#dc2626",
-                          border: "1px solid #fca5a5",
-                          "& .MuiChip-label": { px: 1 },
-                        }}
-                      />
-                      <Chip
-                        label={reason || "No reason provided"}
+                        label="L0 Data"
                         size="small"
                         sx={{
                           height: 20,
@@ -429,7 +384,7 @@ const CorrectionsTableAlt = ({ data, history, execID, sutType, standardizationSt
                     </>
                   )}
  
-                  {standardizationStatus?.toLowerCase() === "on hold" && (
+                  {fieldStatus === "On Hold" && (
                     <Chip
                       label="On Hold"
                       size="small"
@@ -445,20 +400,39 @@ const CorrectionsTableAlt = ({ data, history, execID, sutType, standardizationSt
                     />
                   )}
  
-                  {standardizationStatus?.toLowerCase() === "accepted" && (
-                    <Chip
-                      label="Accepted"
-                      size="small"
-                      sx={{
-                        height: 20,
-                        fontSize: 11,
-                        fontWeight: 700,
-                        backgroundColor: "#f0fdf4",
-                        color: "#16a34a",
-                        border: "1px solid #bbf7d0",
-                        "& .MuiChip-label": { px: 1 },
-                      }}
-                    />
+                  {fieldStatus === "Accepted" && (
+                    <>
+                      <Chip
+                        label="Accepted"
+                        size="small"
+                        sx={{
+                          height: 20,
+                          fontSize: 11,
+                          fontWeight: 700,
+                          backgroundColor: "#f0fdf4",
+                          color: "#16a34a",
+                          border: "1px solid #bbf7d0",
+                          "& .MuiChip-label": { px: 1 },
+                        }}
+                      />
+                      <Chip
+                        label={
+                          group.suggestions?.some(s => s.status?.toLowerCase() === "accepted")
+                            ? "Suggestion Selected"
+                            : "Custom Masterlist Dropdown Value Selected"
+                        }
+                        size="small"
+                        sx={{
+                          height: 20,
+                          fontSize: 11,
+                          fontWeight: 700,
+                          backgroundColor: "#f0fdf4",
+                          color: "#16a34a",
+                          border: "1px solid #bbf7d0",
+                          "& .MuiChip-label": { px: 1 },
+                        }}
+                      />
+                    </>
                   )}
                 </Stack>
                 <IconButton size="small" disableRipple>
@@ -477,18 +451,20 @@ const CorrectionsTableAlt = ({ data, history, execID, sutType, standardizationSt
  
                 {/* Suggestion rows */}
                 <Stack gap={0.5} sx={{ p: 1.5 }}>
-                  <Typography
-                    sx={{
-                      fontSize: 10,
-                      fontWeight: 700,
-                      color: "#64748b",
-                      textTransform: "uppercase",
-                      letterSpacing: 0.5,
-                      mb: 0,
-                    }}
-                  >
-                    Suggestions
-                  </Typography>
+                  {!canAccept && (
+                    <Typography
+                      sx={{
+                        fontSize: 10,
+                        fontWeight: 700,
+                        color: "#64748b",
+                        textTransform: "uppercase",
+                        letterSpacing: 0.5,
+                        mb: 0,
+                      }}
+                    >
+                      Suggestions
+                    </Typography>
+                  )}
                   {group.suggestions?.length > 0 ? (
                     group.suggestions.map((sugg, si) => {
                       const isSelected = selectedIdx === si;
@@ -531,7 +507,6 @@ const CorrectionsTableAlt = ({ data, history, execID, sutType, standardizationSt
                   isPending={isPending}
                 />
  
-                {/* Persistent Custom Selection row (styled exactly like SuggestionRow) */}
                 {customSuggestions[groupIdx] &&
                   Object.keys(customSuggestions[groupIdx]).length > 0 && (() => {
                     const isSelected = selectedIdx === "custom";
@@ -556,7 +531,8 @@ const CorrectionsTableAlt = ({ data, history, execID, sutType, standardizationSt
                         />
                       </Box>
                     );
-                  })()}
+                  })()
+                }
  
                 {isPending && (
                   <Stack

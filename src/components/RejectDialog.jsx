@@ -83,6 +83,7 @@ const RejectDialog = ({ open, onClose, row, onL0Data, onDraftSubmit, execID }) =
       });
       onL0Data?.(row);
       resetAndClose();
+      console.log({ execution_id: execID, currentStatus: "L0 Data" })
     } catch (error) {
       console.error("Reject L0 API failed:", error);
     } finally {
@@ -108,14 +109,15 @@ const RejectDialog = ({ open, onClose, row, onL0Data, onDraftSubmit, execID }) =
   const handleSubmit = async () => {
     setSubmitting(true);
     try {
-      const payload = { execution_id: execID, ...formValues, currentStatus: "On hold" };
+      const payload = { execution_id: execID, ...formValues, currentStatus: "On Hold" };
       await fetch(`http://192.168.0.82:8001/draft-records/${encodeURIComponent(row.fieldName)}`, {
-        method: "POST",
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
       onDraftSubmit?.(row);
       resetAndClose();
+      console.log(payload)
     } catch (error) {
       console.log(error);
     } finally {

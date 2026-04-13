@@ -8,12 +8,14 @@ const EditableField = ({ label, value, color, onSave, isEditable = true }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [tempValue, setTempValue] = useState(value || "");
 
-  const handleSave = () => {
+  const handleSave = (e) => {
+    e?.stopPropagation();
     onSave(tempValue);
     setIsEditing(false);
   };
   
-  const handleCancel = () => {
+  const handleCancel = (e) => {
+    e?.stopPropagation();
     setTempValue(value || "");
     setIsEditing(false);
   };
@@ -30,10 +32,11 @@ const EditableField = ({ label, value, color, onSave, isEditable = true }) => {
               autoFocus
               size="small"
               value={tempValue}
+              onClick={(e) => e.stopPropagation()}
               onChange={(e) => setTempValue(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === "Enter") handleSave();
-                if (e.key === "Escape") handleCancel();
+                if (e.key === "Enter") handleSave(e);
+                if (e.key === "Escape") handleCancel(e);
               }}
               sx={{ fontSize: 14, fontWeight: 700, color, borderBottom: `1px solid ${color}`, pb: 0.25, flex: 1 }}
             />
@@ -57,7 +60,11 @@ const EditableField = ({ label, value, color, onSave, isEditable = true }) => {
             {isEditable && (
               <IconButton
                 size="small"
-                onClick={() => { setTempValue(value || ""); setIsEditing(true); }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setTempValue(value || "");
+                  setIsEditing(true);
+                }}
                 sx={{ p: 0.25, color, opacity: 0.5, "&:hover": { opacity: 1 } }}
               >
                 <EditOutlinedIcon sx={{ fontSize: 14 }} />

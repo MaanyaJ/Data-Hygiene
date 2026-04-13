@@ -45,7 +45,13 @@ const ExistingDataRow = ({ existingData }) => (
                 color: item.validation_status === "invalid" ? "#ef4444" : item.value ? "#0f172a" : "#94a3b8",
               }}
             >
-              {item.value || "—"}
+              {(() => {
+                // If history exists, the 'from' value of the oldest entry is the original value
+                if (item.history && Array.isArray(item.history) && item.history.length > 0) {
+                  return item.history[item.history.length - 1].from || "—";
+                }
+                return item.value || "—";
+              })()}
             </Typography>
           </Box>
         </Stack>

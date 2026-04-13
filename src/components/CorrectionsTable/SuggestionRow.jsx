@@ -15,7 +15,7 @@ const SuggestionRow = ({
   const p = theme || SELECTED;
  
   // Extract and exclude score/status from visible columns
-  const { score, ...suggestionData } = suggestion;
+  const { score, status, ...suggestionData } = suggestion;
   const entries = Object.entries(suggestionData);
  
   const [primaryKey, primaryVal] = entries[0] ?? [];

@@ -63,9 +63,6 @@ const DetailsPageAlt = () => {
   const [executionData, setExecutionData] = useState(null);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true); // ← true so Loader shows on first paint
-  const [standardizationStatus, setStandardizationStatus] = useState("");
-  const [reason, setReason] = useState("");
-  const [history, setHistory] = useState(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
 
   const showNotification = (message, severity = "success") => {
@@ -80,12 +77,9 @@ const DetailsPageAlt = () => {
 
     try {
       if (USE_MOCK_ALT_DETAILS) {
-        await new Promise((r) => setTimeout(r, 300));
+        setLoading(false);
         setExecutionData(mockData.execution_details);
         setData(mockData.data);
-        setStandardizationStatus(mockData.standardization_status);
-        setReason(mockData.reason || "");
-        setHistory(mockData.history || null);
         return;
       }
 
@@ -96,9 +90,6 @@ const DetailsPageAlt = () => {
       console.log("API response:", json);
 
       setExecutionData(json.execution_details);
-      setStandardizationStatus(json.standardization_status);
-      setReason(json.reason || "");
-      setHistory(json.history || null);
 
       if (
         Array.isArray(json.data) &&
@@ -135,11 +126,8 @@ const DetailsPageAlt = () => {
         <Box sx={{ mt: -2 }}>
           <CorrectionsTableAlt
             data={data}
-            history={history}
             execID={executionData.execution_id}
             sutType={executionData.sutType}
-            standardizationStatus={standardizationStatus}
-            reason={reason}
             fetchData={fetchData}
             showNotification={showNotification}
           />
