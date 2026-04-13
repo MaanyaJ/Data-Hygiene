@@ -95,7 +95,7 @@ const RejectDialog = ({ open, onClose, row, onL0Data, onDraftSubmit, execID }) =
     setStep(STEPS.DRAFT_FORM);
     setLoadingFields(true);
     try {
-      const res = await fetch(`http://192.168.0.82:8001/draft-records/fields?type=${encodeURIComponent(row.fieldName)}`);
+      const res = await fetch(`http://192.168.0.81:8001/draft-records/fields?type=${encodeURIComponent(row.fieldName)}`);
       const data = await res.json();
       setDetailFields(data.fields);
     } catch (error) {
@@ -110,7 +110,7 @@ const RejectDialog = ({ open, onClose, row, onL0Data, onDraftSubmit, execID }) =
     setSubmitting(true);
     try {
       const payload = { execution_id: execID, ...formValues, currentStatus: "On Hold" };
-      await fetch(`http://192.168.0.82:8001/draft-records/${encodeURIComponent(row.fieldName)}`, {
+      await fetch(`http://192.168.0.81:8001/draft-records/${encodeURIComponent(row.fieldName)}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
