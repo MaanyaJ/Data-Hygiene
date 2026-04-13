@@ -7,10 +7,10 @@ import Navbar from "../components/Navbar";
 import { usePaginatedRecords } from "../hooks/usePaginatedRecords";
 
 export const FILTERS = [
-  { label: "All",      value: "" },
   { label: "Pending",  value: "pending" },
-  { label: "Approved", value: "approved" },
+  { label: "Accepted", value: "accepted" },
   { label: "Rejected", value: "rejected" },
+  { label: "On Hold",  value: "On Hold" },
 ];
 
 const LandingPage = () => {
@@ -49,9 +49,10 @@ const LandingPage = () => {
   }
 
   return (
-    <Box>
+    <Box >
       <Navbar />
 
+      <Box sx={{mt: 15}}>
       <LandingPageHeader
         search={searchInput}
         onSearchChange={setSearchInput}
@@ -68,6 +69,7 @@ const LandingPage = () => {
         onLoadMore={loadMore}
         showCount
       />
+    </Box>
     </Box>
   );
 };

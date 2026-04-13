@@ -1,54 +1,49 @@
 import React from "react";
-import { Box, Typography, TextField, Stack, Tooltip } from "@mui/material";
+import { Box, Typography, TextField, Stack } from "@mui/material";
  
-export const STATUS_FILTERS = [
-  {
-    label: "Pending",
-    value: "pending",
-    color: "#e65100",
-    activeColor: "#bf360c",
-    bg: "#fff8e1",
-    activeBg: "#ffa000",
-    dot: "#ffd54f",
-    hoverLabel: "Pending records",
-  },
-  {
-    label: "Accepted",
-    value: "accepted",
-    color: "#2e7d32",
-    activeColor: "#1b5e20",
-    bg: "#e8f5e9",
-    activeBg: "#43a047",
-    dot: "#66bb6a",
-    hoverLabel: "Accepted records",
-  },
-  {
-    label: "Rejected",
-    value: "rejected",
-    color: "#b71c1c",
-    activeColor: "#7f0000",
-    bg: "#ffebee",
-    activeBg: "#e53935",
-    dot: "#ef9a9a",
-    hoverLabel: "Rejected records",
-  },
-  {
-    label: "On Hold",
-    value: "on hold",
-    color: "#5b21b6",
-    activeColor: "#3b0764",
-    bg: "#ede9fe",
-    activeBg: "#7c3aed",
-    dot: "#a78bfa",
-    hoverLabel: "On hold records",
-  },
-];
+const OnHoldListHeader = ({
+  search,
+  onSearchChange,
+  filter,
+  onFilterChange,
+  green,
+  yellow,
+  red,
+}) => {
+  const PATCH_FILTERS = [
+    {
+      label: `< 3 Days Old : ${green}`,
+      value: "<3",
+      color: "#2e7d32",
+      activeColor: "#1b5e20",
+      bg: "#e8f5e9",
+      activeBg: "#43a047",
+      dot: "#66bb6a",
+    },
+    {
+      label: `3 - 6 Days Old : ${yellow}`,
+      value: "3-6",
+      color: "#f57f17",
+      activeColor: "#e65100",
+      bg: "#fff8e1",
+      activeBg: "#ffa000",
+      dot: "#ffd54f",
+    },
+    {
+      label: `> 6 Days Old : ${red}`,
+      value: ">6",
+      color: "#b71c1c",
+      activeColor: "#7f0000",
+      bg: "#ffebee",
+      activeBg: "#e53935",
+      dot: "#ef9a9a",
+    },
+  ];
  
-const LandingPageHeader = ({ search, onSearchChange, filter, onFilterChange }) => {
   return (
     <Box>
       <Typography variant="h3" align="center" sx={{ my: 3, mt: -4 }}>
-        Data Hygiene
+        On Hold List
       </Typography>
  
       <Stack
@@ -56,7 +51,7 @@ const LandingPageHeader = ({ search, onSearchChange, filter, onFilterChange }) =
         alignItems="center"
         justifyContent="center"
         gap={4}
-        sx={{ px: 2, mb: 2 }}
+        sx={{ px: 2, mb: 3 }}
       >
         <TextField
           label="Search (Execution Id, Benchmark Type, Benchmark Category)"
@@ -66,12 +61,14 @@ const LandingPageHeader = ({ search, onSearchChange, filter, onFilterChange }) =
         />
  
         <Stack direction="row" gap={1.5} sx={{ flexWrap: "wrap" }}>
-          {STATUS_FILTERS.map(({ label, hoverLabel, value, bg, activeBg, color, activeColor, dot }) => {
-            const isActive = filter === value;
-            return (
-              // <Tooltip title={hoverLabel} arrow key={value}>
-                <Box key={value}
-                  onClick={() => onFilterChange(isActive ? null : value)}
+          {PATCH_FILTERS.map(
+            ({ label, value, bg, activeBg, color, activeColor, dot }) => {
+              const isActive = filter === value;
+ 
+              return (
+                <Box
+                  key={value}
+                  onClick={() => onFilterChange(value)}
                   sx={{
                     display: "flex",
                     alignItems: "center",
@@ -104,19 +101,17 @@ const LandingPageHeader = ({ search, onSearchChange, filter, onFilterChange }) =
                       height: 10,
                       borderRadius: "50%",
                       background: isActive ? "#fff" : dot,
-                      flexShrink: 0,
-                      transition: "background 0.2s ease",
                     }}
                   />
                   {label}
                 </Box>
-              // </Tooltip>
-            );
-          })}
+              );
+            }
+          )}
         </Stack>
       </Stack>
     </Box>
   );
 };
  
-export default LandingPageHeader;
+export default OnHoldListHeader;

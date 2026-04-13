@@ -17,8 +17,9 @@ import StorageIcon from "@mui/icons-material/Storage";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CloseIcon from "@mui/icons-material/Close";
-
-// Step 1: Choose between L0 Data or Submit Draft Record
+import WarningAmberIcon from "@mui/icons-material/WarningAmber";
+import { API_URL } from "../config";
+ 
 const OptionCard = ({ icon, title, description, onClick }) => (
   <Box
     onClick={onClick}
@@ -45,72 +46,100 @@ const OptionCard = ({ icon, title, description, onClick }) => (
     </Stack>
   </Box>
 );
-
+ 
 const STEPS = {
   CHOOSE: "CHOOSE",
+  L0_CONFIRM: "L0_CONFIRM",
   DRAFT_FORM: "DRAFT_FORM",
 };
-
-const RejectDialog = ({ open, onClose, row, onL0Data, onDraftSubmit }) => {
+ 
+const RejectDialog = ({ open, onClose, row, onL0Data, onDraftSubmit, execID }) => {
   const [step, setStep] = useState(STEPS.CHOOSE);
-  const [detailFields, setDetailFields] = useState([]); // fields returned by API
+  const [detailFields, setDetailFields] = useState([]);
   const [formValues, setFormValues] = useState({});
   const [loadingFields, setLoadingFields] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-
+ 
   const resetAndClose = () => {
     setStep(STEPS.CHOOSE);
     setDetailFields([]);
     setFormValues({});
     onClose();
   };
-
-  // Step 1 → L0 Data chosen
-  const handleL0Data = () => {
-    onL0Data?.(row);
-    resetAndClose();
+ 
+  // Step 1 → L0 Data chosen — now just goes to confirm step
+  const handleL0DataClick = () => {
+    setStep(STEPS.L0_CONFIRM);
   };
-
-  // Step 1 → Submit Draft Record chosen
-  const handleDraftOptionClick = async () => {
-    setStep(STEPS.DRAFT_FORM);
-    setLoadingFields(true);
-    try {
-      const res = await fetch(`http://192.168.0.182:8003/draft-records/fields?type=${encodeURIComponent(row.fieldName)}`);
-      const data = await res.json();
-      setDetailFields(data.fields);
-    } catch (error) {
-      setDetailFields([]);
-      console.log(error)
-    } finally {
-      setLoadingFields(false);
-    }
-  };
-
-  // Step 2 → Submit form
-  const handleSubmit = async () => {
+ 
+  // Confirmation → Yes → call API
+  const handleL0Confirm = async () => {
     setSubmitting(true);
     try {
-      await fetch(`http://192.168.0.182:8003/draft-records/fields?type=${encodeURIComponent(row.fieldName)}`, {
-        method: "POST",
+      await fetch(`${API_URL}/reject-record`, {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formValues),
+        body: JSON.stringify({ execution_id: execID, currentStatus: "L0 Data" }),
       });
-
-      onDraftSubmit?.(row);
+      onL0Data?.(row);
       resetAndClose();
+      console.log({ execution_id: execID, currentStatus: "L0 Data" })
     } catch (error) {
-        console.log(error)
+      console.error("Reject L0 API failed:", error);
     } finally {
       setSubmitting(false);
     }
   };
-
+ 
+  const handleDraftOptionClick = async () => {
+    setStep(STEPS.DRAFT_FORM);
+    setLoadingFields(true);
+    try {
+      const res = await fetch(`http://192.168.0.81:8001/draft-records/fields?type=${encodeURIComponent(row.fieldName)}`);
+      const data = await res.json();
+      setDetailFields(data.fields);
+    } catch (error) {
+      setDetailFields([]);
+      console.log(error);
+    } finally {
+      setLoadingFields(false);
+    }
+  };
+ 
+  const handleSubmit = async () => {
+    setSubmitting(true);
+    try {
+      const payload = { execution_id: execID, ...formValues, currentStatus: "On Hold" };
+      await fetch(`http://192.168.0.81:8001/draft-records/${encodeURIComponent(row.fieldName)}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      onDraftSubmit?.(row);
+      resetAndClose();
+      console.log(payload)
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+ 
   const handleFieldChange = (name, value) => {
     setFormValues((prev) => ({ ...prev, [name]: value }));
   };
-
-const allFilled = detailFields.every((f) => !!formValues[f]?.trim());
+ 
+  const allFilled = detailFields.every((f) => !!formValues[f]?.trim());
+ 
+  const getTitle = () => {
+    if (step === STEPS.DRAFT_FORM) return "Submit Draft Record";
+    if (step === STEPS.L0_CONFIRM) return "Confirm L0 Data";
+    return "Reject All Suggestions";
+  };
+ 
+  const showBackButton = step === STEPS.DRAFT_FORM || step === STEPS.L0_CONFIRM;
+  const backTarget = STEPS.CHOOSE;
+ 
   return (
     <Dialog
       open={open}
@@ -123,15 +152,13 @@ const allFilled = detailFields.every((f) => !!formValues[f]?.trim());
       <DialogTitle sx={{ pb: 1 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Stack direction="row" alignItems="center" gap={1}>
-            {step === STEPS.DRAFT_FORM && (
-              <IconButton size="small" onClick={() => setStep(STEPS.CHOOSE)} sx={{ mr: 0.5 }}>
+            {showBackButton && (
+              <IconButton size="small" onClick={() => setStep(backTarget)} sx={{ mr: 0.5 }}>
                 <ArrowBackIcon fontSize="small" />
               </IconButton>
             )}
             <Box>
-              <Typography fontWeight={700} fontSize="1rem">
-                {step === STEPS.CHOOSE ? "Reject All Suggestions" : "Submit Draft Record"}
-              </Typography>
+              <Typography fontWeight={700} fontSize="1rem">{getTitle()}</Typography>
               {row && (
                 <Typography variant="caption" color="text.secondary">
                   Field: {row.fieldName}
@@ -144,9 +171,9 @@ const allFilled = detailFields.every((f) => !!formValues[f]?.trim());
           </IconButton>
         </Stack>
       </DialogTitle>
-
+ 
       <Divider />
-
+ 
       <DialogContent sx={{ pt: 2.5 }}>
         {/* Step 1 — Choose option */}
         {step === STEPS.CHOOSE && (
@@ -158,7 +185,7 @@ const allFilled = detailFields.every((f) => !!formValues[f]?.trim());
               icon={<StorageIcon />}
               title="L0 Data"
               description="Send this data to L0 dataset without applying any corrections"
-              onClick={handleL0Data}
+              onClick={handleL0DataClick}
             />
             <OptionCard
               icon={<EditNoteIcon />}
@@ -168,7 +195,34 @@ const allFilled = detailFields.every((f) => !!formValues[f]?.trim());
             />
           </Stack>
         )}
-
+ 
+        {/* Step 1.5 — L0 Confirmation */}
+        {step === STEPS.L0_CONFIRM && (
+          <Stack alignItems="center" gap={2} py={1}>
+            <Box
+              sx={{
+                width: 52,
+                height: 52,
+                borderRadius: "50%",
+                backgroundColor: "#fff3e0",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <WarningAmberIcon sx={{ color: "#f57c00", fontSize: 28 }} />
+            </Box>
+            <Box textAlign="center">
+              <Typography fontWeight={600} fontSize="0.95rem" gutterBottom>
+                Are you sure?
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                This will send the entire execution record to the L0 dataset.
+              </Typography>
+            </Box>
+          </Stack>
+        )}
+ 
         {/* Step 2 — Draft form */}
         {step === STEPS.DRAFT_FORM && (
           <>
@@ -196,8 +250,29 @@ const allFilled = detailFields.every((f) => !!formValues[f]?.trim());
           </>
         )}
       </DialogContent>
-
-      {/* Footer — only shown on draft form step */}
+ 
+      {/* Footer — L0 confirm step */}
+      {step === STEPS.L0_CONFIRM && (
+        <>
+          <Divider />
+          <DialogActions sx={{ px: 3, py: 2 }}>
+            <Button variant="outlined" onClick={() => setStep(STEPS.CHOOSE)} disabled={submitting}>
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              color="warning"
+              onClick={handleL0Confirm}
+              disabled={submitting}
+              startIcon={submitting ? <CircularProgress size={14} color="inherit" /> : null}
+            >
+              {submitting ? "Submitting..." : "Yes, Confirm"}
+            </Button>
+          </DialogActions>
+        </>
+      )}
+ 
+      {/* Footer — Draft form step */}
       {step === STEPS.DRAFT_FORM && !loadingFields && (
         <>
           <Divider />
@@ -219,5 +294,5 @@ const allFilled = detailFields.every((f) => !!formValues[f]?.trim());
     </Dialog>
   );
 };
-
+ 
 export default RejectDialog;
