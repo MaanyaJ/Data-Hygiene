@@ -26,70 +26,38 @@ const STATUS_STYLES = {
  
 
 const RecordCard = ({ record, ageColor }) => {
+  const invalidFields = record["InvalidFields"];
+  const navigate = useNavigate();
 
-  const invalidFields = record["InvalidFields"];
+  const status = record.Status?.toLowerCase();
+  const statusStyle = STATUS_STYLES[status];
+  const statusColor = statusStyle?.color ?? "text.primary";
+  const isCompleted = status === "accepted" || status === "approved";
 
-  const navigate = useNavigate();
+  const cardBg     = ageColor ? ageColor.bg     : statusStyle?.bg      ?? "#f9f9f9";
+  const cardBorder = ageColor ? ageColor.border  : statusStyle?.border ?? "transparent";
 
- 
+  const handleClick = () => navigate(`/${record.ExecutionId}`);
 
-  const status = record.Status?.toLowerCase();
-
-  const statusStyle = STATUS_STYLES[status];
-
-  const statusColor = statusStyle?.color ?? "text.primary";
-
-  const isCompleted = status === "accepted" || status === "approved";
-
- 
-
-  const cardBg    = ageColor ? ageColor.bg     : statusStyle?.bg     ?? "#f9f9f9";
-
-  const cardBorder= ageColor ? ageColor.border  : statusStyle?.border ?? "transparent";
-
- 
-
-  const handleClick = () => navigate(`/alt/${record.ExecutionId}`);
-
- 
-
-  return (
-
-    <Stack justifyContent="center" alignItems="center">
-
-      <Card
-
-        onClick={handleClick}
-
-        sx={{
-
-          width: "65vw",
-
-          backgroundColor: cardBg,
-
-          borderLeft: `5px solid ${cardBorder}`,
-
-          boxShadow: `0px 2px 8px ${cardBorder}33`,
-
-          transition: "all 0.25s ease",
-
-          "&:hover": {
-
-            transform: "scale(1.02)",
-
-            boxShadow: `0px 6px 20px ${cardBorder}55`,
-
-            cursor: "pointer",
-
-          },
-
-        }}
-
-      >
-
-        <CardContent>
-
-          <Stack direction="row" gap={8} alignItems="flex-start">
+  return (
+    <Stack justifyContent="center" alignItems="center">
+      <Card
+        onClick={handleClick}
+        sx={{
+          width: "65vw",
+          backgroundColor: cardBg,
+          borderLeft: `5px solid ${cardBorder}`,
+          boxShadow: `0px 2px 8px ${cardBorder}33`,
+          transition: "all 0.25s ease",
+          "&:hover": {
+            transform: "scale(1.02)",
+            boxShadow: `0px 6px 20px ${cardBorder}55`,
+            cursor: "pointer",
+          },
+        }}
+      >
+        <CardContent>
+          <Stack direction="row" gap={8} alignItems="flex-start">
 
             <Stack>
 

@@ -4,11 +4,11 @@
 // ─────────────────────────────────────────────────────────────────────────────
 export const USE_MOCK = false;
 
-// ─── Alt Details Page Mock Toggle ────────────────────────────────────────────
-// Set to `true`  → DetailsPageAlt uses recordDetails.json (new format mock)
-// Set to `false` → DetailsPageAlt fetches from the real API (old format, auto-transformed)
+// ─── Details Page Mock Toggle ────────────────────────────────────────────
+// Set to `true`  → DetailsPage uses recordDetails.json (new format mock)
+// Set to `false` → DetailsPage fetches from the real API (old format, auto-transformed)
 // ─────────────────────────────────────────────────────────────────────────────
-export const USE_MOCK_ALT_DETAILS = false;
+export const USE_MOCK_DETAILS = false;
 
 // ─── API Base URL ─────────────────────────────────────────────────────────────
 // Fetched from .env (VITE_API_URL)

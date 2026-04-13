@@ -42,7 +42,7 @@ const ChooseValueCell = ({ fieldName, value, onChange }) => {
           const val = e.target.value;
           if (val === "" || /^\d+$/.test(val)) onChange(val || null);
         }}
-        inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+        slotProps={{ htmlInput: { inputMode: "numeric", pattern: "[0-9]*" } }}
         sx={{
           minWidth: 160,
           "& .MuiOutlinedInput-root": hasValue
@@ -79,16 +79,18 @@ const ChooseValueCell = ({ fieldName, value, onChange }) => {
         <TextField
           {...params}
           placeholder="Choose other value"
-          InputProps={{
-            ...params.InputProps,
-            endAdornment: (
-              <>
-                {loadingOptions ? (
-                  <CircularProgress color="inherit" size={16} />
-                ) : null}
-                {params.InputProps.endAdornment}
-              </>
-            ),
+          slotProps={{
+            input: {
+              ...params.InputProps,
+              endAdornment: (
+                <>
+                  {loadingOptions ? (
+                    <CircularProgress color="inherit" size={16} />
+                  ) : null}
+                  {params.InputProps.endAdornment}
+                </>
+              ),
+            },
           }}
         />
       )}

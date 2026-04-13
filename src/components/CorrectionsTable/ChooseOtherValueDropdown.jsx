@@ -128,14 +128,16 @@ const ChooseOtherValueDropdown = ({
             <TextField
               {...params}
               placeholder="Search or select..."
-              InputProps={{
-                ...params.InputProps,
-                endAdornment: (
-                  <React.Fragment>
-                    {loading || fetchingMeta ? <CircularProgress color="inherit" size={16} /> : null}
-                    {params.InputProps.endAdornment}
-                  </React.Fragment>
-                ),
+              slotProps={{
+                input: {
+                  ...params.InputProps,
+                  endAdornment: (
+                    <React.Fragment>
+                      {loading || fetchingMeta ? <CircularProgress color="inherit" size={16} /> : null}
+                      {params.InputProps.endAdornment}
+                    </React.Fragment>
+                  ),
+                },
               }}
             />
           )}

@@ -129,7 +129,10 @@ const RejectDialog = ({ open, onClose, row, onL0Data, onDraftSubmit, execID }) =
     setFormValues((prev) => ({ ...prev, [name]: value }));
   };
  
-  const allFilled = detailFields.every((f) => !!formValues[f]?.trim());
+  const allFilled = React.useMemo(() => 
+    detailFields.every((f) => !!formValues[f]?.trim()),
+    [detailFields, formValues]
+  );
  
   const getTitle = () => {
     if (step === STEPS.DRAFT_FORM) return "Submit Draft Record";
@@ -146,7 +149,7 @@ const RejectDialog = ({ open, onClose, row, onL0Data, onDraftSubmit, execID }) =
       onClose={resetAndClose}
       maxWidth="xs"
       fullWidth
-      PaperProps={{ sx: { borderRadius: 3 } }}
+      slotProps={{ paper: { sx: { borderRadius: 3 } } }}
     >
       {/* Header */}
       <DialogTitle sx={{ pb: 1 }}>
