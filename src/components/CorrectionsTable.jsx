@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   Box,
   Typography,
@@ -21,12 +21,12 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import CloseIcon from "@mui/icons-material/Close";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import RejectDialog from "./RejectDialog";
-import { SELECTED, ACCEPTED, STATUS } from "./CorrectionsTable/constants";
-import ExistingDataRow from "./CorrectionsTable/ExistingDataRow";
-import EditableField from "./CorrectionsTable/EditableField";
-import ChooseOtherValueDropdown from "./CorrectionsTable/ChooseOtherValueDropdown";
-import SuggestionRow from "./CorrectionsTable/SuggestionRow";
+import RejectDialog from "./CorrectionsTableComponents/RejectDialog";
+import { SELECTED, ACCEPTED, STATUS } from "../utils/correctionsTableConstants";
+import ExistingDataRow from "./CorrectionsTableComponents/ExistingDataRow";
+import EditableField from "./CorrectionsTableComponents/EditableField";
+import ChooseOtherValueDropdown from "./CorrectionsTableComponents/ChooseOtherValueDropdown";
+import SuggestionRow from "./CorrectionsTableComponents/SuggestionRow";
 import { API_URL } from "../config";
 import CircularProgress from '@mui/material/CircularProgress';
  
@@ -110,200 +110,43 @@ const AcceptConfirmDialog = ({ open, onClose, onConfirm, fieldName, isAccepting 
  
 /* ─── Main Component ────────────────────────────────────────── */
  
-const CorrectionsTable = ({ data, execID, sutType, fetchData, showNotification }) => {
-  const [selectedSuggestions, setSelectedSuggestions] = useState({});
-  const [editedSuggestions, setEditedSuggestions] = useState({});
-  const [customSuggestions, setCustomSuggestions] = useState({});
-  const [isAccepting, setIsAccepting] = useState(false)
-  const [expandedGroups, setExpandedGroups] = useState(() =>
-    Object.fromEntries((data ?? []).map((_, i) => [i, true]))
-  );
-  const [rejectDialogRow, setRejectDialogRow] = useState(null);
-  // null when closed, { group, groupIdx } when open
-  const [acceptConfirm, setAcceptConfirm] = useState(null);
- 
-  // Initial auto-selection logic based on provided status & history
-  useEffect(() => {
-    if (!data || data.length === 0) return;
- 
-    if (Object.keys(selectedSuggestions).length > 0) return;
- 
-    const initialSelections = {};
-    const initialCustom = {};
- 
-    data.forEach((group, groupIdx) => {
-      const gStatus = group.currentStatus;
-      if (gStatus === STATUS.ACCEPTED || gStatus === STATUS.APPROVED) {
-        // Find index of suggestion with "Accepted" status
-        const acceptedIdx = group.suggestions?.findIndex(
-          (s) => s.status === STATUS.ACCEPTED
-        );
- 
-        if (acceptedIdx !== -1 && acceptedIdx !== undefined) {
-          initialSelections[groupIdx] = acceptedIdx;
-        } else {
-          // Fallback to history fallback (custom option)
-          initialSelections[groupIdx] = "custom";
-          
-          // Build custom object from nested history in existing_data
-          const customObj = {};
-          group.existing_data?.forEach(item => {
-            const histEntry = item.history?.[0]; // Pick the latest correction
-            // If no history exists, it wasn't part of the correction, so it should be null/empty
-            customObj[item.field] = histEntry ? histEntry.to : null;
-          });
-          
-          if (Object.keys(customObj).length > 0) {
-            initialCustom[groupIdx] = customObj;
-          }
-        }
-      }
-    });
- 
-    if (Object.keys(initialSelections).length > 0) {
-      setSelectedSuggestions(initialSelections);
-    }
-    if (Object.keys(initialCustom).length > 0) {
-      setCustomSuggestions(initialCustom);
-    }
-  }, [data, selectedSuggestions]);
- 
-  const handleSelect = React.useCallback((groupIdx, suggIdx) => {
-    setSelectedSuggestions((prev) => {
-      if (prev[groupIdx] === suggIdx) {
-        const next = { ...prev };
-        delete next[groupIdx];
-        return next;
-      }
-      return { ...prev, [groupIdx]: suggIdx };
-    });
-    setEditedSuggestions((prev) => {
-      const next = { ...prev };
-      delete next[groupIdx];
-      return next;
-    });
-  }, []);
- 
-  const handleSelectCustom = React.useCallback((groupIdx) => {
-    setSelectedSuggestions((prev) => ({ ...prev, [groupIdx]: "custom" }));
-    setEditedSuggestions((prev) => {
-      const next = { ...prev };
-      delete next[groupIdx];
-      return next;
-    });
-  }, []);
- 
-  const handleClearCustom = React.useCallback((groupIdx) => {
-    setSelectedSuggestions((prev) => {
-      const next = { ...prev };
-      if (next[groupIdx] === "custom") {
-        delete next[groupIdx];
-      }
-      return next;
-    });
-    setCustomSuggestions((prev) => {
-      const next = { ...prev };
-      delete next[groupIdx];
-      return next;
-    });
-  }, []);
- 
-  const handleCustomMetadataFetch = React.useCallback((groupIdx, meta) => {
-    setCustomSuggestions((prev) => ({ ...prev, [groupIdx]: meta }));
-  }, []);
- 
-  const handleEditField = React.useCallback((groupIdx, key, newValue) => {
-    setEditedSuggestions(prev => ({
-      ...prev,
-      [groupIdx]: {
-        ...(prev[groupIdx] || {}),
-        [key]: newValue,
-      }
-    }));
-  }, []);
- 
-  const toggleGroup = React.useCallback((idx) =>
-    setExpandedGroups((prev) => ({ ...prev, [idx]: !prev[idx] })), []);
- 
-  // Opens the confirmation dialog instead of calling API directly
+import { useCorrectionsTable } from "../hooks/useCorrectionsTable";
+
+const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotification }) => {
+  const {
+    selectedSuggestions,
+    editedSuggestions,
+    customSuggestions,
+    isAccepting,
+    expandedGroups,
+    rejectDialogRow,
+    acceptConfirm,
+    setRejectDialogRow,
+    setAcceptConfirm,
+    handleSelect,
+    handleSelectCustom,
+    handleClearCustom,
+    handleCustomMetadataFetch,
+    handleEditField,
+    toggleGroup,
+    handleAcceptConfirm,
+  } = useCorrectionsTable(data, history, execID, sutType, fetchData, showNotification);
+
+  if (!data || data.length === 0) {
+    return (
+      <Box sx={{ py: 6, textAlign: "center" }}>
+        <Typography color="text.secondary">No invalid fields found.</Typography>
+      </Box>
+    );
+  }
+
   const handleAcceptClick = React.useCallback((group, groupIdx) => {
     setAcceptConfirm({ group, groupIdx });
-  }, []);
- 
-  // Called when user clicks "Yes, Accept" in the confirm dialog
-  const handleAcceptConfirm = async () => {
-    const { group, groupIdx } = acceptConfirm;
-    const suggIdx = selectedSuggestions[groupIdx];
-    if (suggIdx === undefined) return;
- 
-    // 1. Get base suggestion
-    const baseChosen =
-      suggIdx === "custom"
-        ? customSuggestions[groupIdx] || {}
-        : group.suggestions[suggIdx];
- 
-    // 2. Apply edits
-    const customEdits = editedSuggestions[groupIdx] || {};
-    const merged = { ...baseChosen, ...customEdits };
- 
-    // 3. Extract main field value
-    const primaryField = group.invalid_field;
- 
-    const value =
-      merged?.[primaryField] ||
-      merged?.[primaryField?.toLowerCase()];
- 
-    if (!value) return;
- 
-    // 4. Build payload
-    const payload = {
-      execution_id: execID,
-      field_name: primaryField,
-      accepted_value: value,
-    };
- 
-    // 5. Add corecount ONLY for VM
-    if (sutType?.toLowerCase() === "vm") {
-      // Find corecount value with case-insensitivity
-      const coreCountVal =
-        merged?.coreCount || merged?.CoreCount || merged?.corecount;
- 
-      if (coreCountVal !== undefined) {
-        payload.coreCount = coreCountVal;
-      }
-    }
- 
-    payload.currentStatus = STATUS.ACCEPTED
- 
-    try {
-      setIsAccepting(true);
-      await fetch(`${API_URL}/approve-suggestion`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      console.log("payload", payload);
- 
-      // reset selection
-      setSelectedSuggestions((prev) => {
-        const next = { ...prev };
-        delete next[groupIdx];
-        return next;
-      });
- 
-      setAcceptConfirm(null);
-      fetchData();
-      showNotification("Data accepted successfully", "success");
-    } catch (err) {
-      console.error(err);
-      showNotification("Failed to accept data", "error");
-    } finally {
-      setIsAccepting(false);
-    }
-  };
+  }, [setAcceptConfirm]);
+
   const handleReject = React.useCallback((group, groupIdx) => {
     setRejectDialogRow({ ...group, id: groupIdx, fieldName: group.invalid_field });
-  }, []);
+  }, [setRejectDialogRow]);
  
   if (!data || data.length === 0) {
     return (
@@ -329,7 +172,7 @@ const CorrectionsTable = ({ data, execID, sutType, fetchData, showNotification }
           const isExpanded = expandedGroups[groupIdx] ?? true;
           const selectedIdx = selectedSuggestions[groupIdx];
           const canAccept = selectedIdx !== undefined;
-          const fieldStatus = group.currentStatus;
+          const fieldStatus = group.currentStatus?.toLowerCase();
           const isPending = !fieldStatus || fieldStatus === STATUS.INVALID;
           
  
@@ -416,7 +259,7 @@ const CorrectionsTable = ({ data, execID, sutType, fetchData, showNotification }
                       />
                       <Chip
                         label={
-                          group.suggestions?.some(s => s.status === STATUS.ACCEPTED)
+                          typeof selectedIdx === "number"
                             ? "Suggestion Selected"
                             : "Custom Masterlist Dropdown Value Selected"
                         }
@@ -450,7 +293,7 @@ const CorrectionsTable = ({ data, execID, sutType, fetchData, showNotification }
  
                 {/* Suggestion rows */}
                 <Stack gap={0.5} sx={{ p: 1.5 }}>
-                  {!canAccept && (
+                 
                     <Typography
                       sx={{
                         fontSize: 10,
@@ -463,7 +306,7 @@ const CorrectionsTable = ({ data, execID, sutType, fetchData, showNotification }
                     >
                       Suggestions
                     </Typography>
-                  )}
+                  
                   {group.suggestions?.length > 0 ? (
                     group.suggestions.map((sugg, si) => {
                       const isSelected = selectedIdx === si;
@@ -495,7 +338,22 @@ const CorrectionsTable = ({ data, execID, sutType, fetchData, showNotification }
                     </Typography>
                   )}
                 </Stack>
- 
+               
+               {selectedIdx === "custom" && (
+                <Typography
+                      sx={{
+                        fontSize: 10,
+                        fontWeight: 700,
+                        color: "#64748b",
+                        textTransform: "uppercase",
+                        letterSpacing: 0.5,
+                        mb: 0,
+                        ml:1.5
+                      }}
+                    >
+                      Custom Value
+                    </Typography>
+                    )}
                 {/* Custom Option Dropdown */}
                 <ChooseOtherValueDropdown
                   invalidField={group.invalid_field}
@@ -604,9 +462,9 @@ const CorrectionsTable = ({ data, execID, sutType, fetchData, showNotification }
         onDraftSubmit={() => {
           setRejectDialogRow(null);
           fetchData();
-          showNotification("Draft record submitted", "success");
         }}
         execID={execID}
+        showNotification={showNotification}
       />
     </>
   );

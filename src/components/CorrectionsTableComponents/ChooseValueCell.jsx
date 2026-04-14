@@ -5,32 +5,20 @@ import {
   CircularProgress,
 } from '@mui/material';
 
+import { useUniqueValues } from '../../hooks/useUniqueValues';
+
 const isCpuField = (fieldName) => fieldName === "coreCount";
 
 const ChooseValueCell = ({ fieldName, value, onChange }) => {
-  const [options, setOptions] = useState([]);
-  const [loadingOptions, setLoadingOptions] = useState(false);
+  const { options, loading: loadingOptions, fetchOptions } = useUniqueValues(fieldName);
   const [open, setOpen] = useState(false);
 
   const hasValue = !!value;
 
-  const handleOpen = async () => {
+  const handleOpen = () => {
     setOpen(true);
-    if (options.length > 0) return;
-
-    setLoadingOptions(true);
-    try {
-      const res = await fetch(
-        `http://192.168.0.82:8001/unique-values?parameterName=${encodeURIComponent(fieldName)}`
-      );
-      const data = await res.json();
-      setOptions(data?.data ?? []);
-    } catch {
-      setOptions([]);
-    } finally {
-      setLoadingOptions(false);
-    }
-  };                                              
+    fetchOptions();
+  };
   
   if (isCpuField(fieldName)) {
     return (

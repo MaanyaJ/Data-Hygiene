@@ -5,9 +5,7 @@ import ErrorPage from "../components/ErrorPage";
 import Loader from "../components/Loader";
 import ExecutionInfoBox from "../components/ExecutionInfoBox";
 import CorrectionsTable from "../components/CorrectionsTable";
-import Navbar from "../components/Navbar";
-import { USE_MOCK_DETAILS, API_URL } from "../config";
-import mockData from "../mock/recordDetails.json";
+import { API_URL } from "../config";
 
 const transformOldApiData = (rawData) => {
   if (!Array.isArray(rawData)) return [];
@@ -62,6 +60,7 @@ const DetailsPage = () => {
   const [error, setError] = useState(null);
   const [executionData, setExecutionData] = useState(null);
   const [data, setData] = useState(null);
+  const [history, setHistory] = useState(null);
   const [loading, setLoading] = useState(true); // ← true so Loader shows on first paint
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
 
@@ -76,18 +75,12 @@ const DetailsPage = () => {
     setError(null);
 
     try {
-      if (USE_MOCK_DETAILS) {
-        setLoading(false);
-        setExecutionData(mockData.execution_details);
-        setData(mockData.data);
-        return;
-      }
-
       const res = await fetch(`${API_URL}/snapshot-records/${id}`);
       if (!res.ok) throw new Error("Failed to fetch record details");
 
       const json = await res.json();
       setExecutionData(json.execution_details);
+      setHistory(json.history);
 
       if (
         Array.isArray(json.data) &&
@@ -118,12 +111,12 @@ const DetailsPage = () => {
 
   return (
     <Box>
-      <Navbar />
       <Box sx={{ p: 4, mt: 5 }}>
         <ExecutionInfoBox executionInfo={executionData} />
         <Box sx={{ mt: -2 }}>
           <CorrectionsTable
             data={data}
+            history={history}
             execID={executionData.execution_id}
             sutType={executionData.sutType}
             fetchData={fetchData}
@@ -134,7 +127,7 @@ const DetailsPage = () => {
 
       <Snackbar 
         open={snackbar.open} 
-        autoHideDuration={4000} 
+        autoHideDuration={3000} 
         onClose={handleSnackbarClose}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >

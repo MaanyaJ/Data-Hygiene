@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { Box, Typography, Autocomplete, TextField, CircularProgress, Radio, Stack } from "@mui/material";
-import { SELECTED } from "./constants";
+import React, { useState } from "react";
+import { Box, Typography, Autocomplete, TextField, CircularProgress } from "@mui/material";
+import { SELECTED } from "../../utils/correctionsTableConstants";
 import { API_URL } from "../../config";
+import { useUniqueValues } from "../../hooks/useUniqueValues";
 
 const ChooseOtherValueDropdown = ({
   invalidField,
@@ -11,48 +12,18 @@ const ChooseOtherValueDropdown = ({
   onClearCustom,
   isPending = true,
 }) => {
-
-  if(!isPending) return;
-
-  const [options, setOptions] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const primaryField = invalidField?.split(",")[0].trim() || "";
+  const { options, loading, fetchOptions } = useUniqueValues(primaryField);
   const [fetchingMeta, setFetchingMeta] = useState(false);
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(null);
 
+  if(!isPending) return;
 
-
-  const primaryField = invalidField?.split(",")[0].trim() || "";
-
-  const handleOpen = async () => {
+  const handleOpen = () => {
     if (!isPending) return;
     setOpen(true);
-    if (options.length > 0) return;
-
-    setLoading(true);
-    try {
-      const res = await fetch(`${API_URL}/unique-values?parameterName=${encodeURIComponent(primaryField)}`);
-      const json = await res.json();
-
-      let parsedOptions = [];
-      if (json?.unique_values) {
-        const objVals = Object.values(json.unique_values);
-        if (objVals.length > 0 && Array.isArray(objVals[0])) {
-          parsedOptions = objVals[0];
-        }
-      } else if (Array.isArray(json?.data)) {
-        parsedOptions = json.data;
-      } else if (Array.isArray(json)) {
-        parsedOptions = json;
-      }
-
-      setOptions(parsedOptions);
-    } catch (err) {
-      console.error("unique-values API fetch error:", err);
-      setOptions([]);
-    } finally {
-      setLoading(false);
-    }
+    fetchOptions();
   };
 
   const handleChange = async (newVal) => {
