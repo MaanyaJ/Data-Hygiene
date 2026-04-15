@@ -167,12 +167,18 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
 
     try {
       setIsAccepting(true);
-      await fetch(`${API_URL}/approve-suggestion`, {
+     const res = await fetch(`${API_URL}/approve-suggestion`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      
+      const data = await res.json(); 
+      if (!res.ok || data.status === "error") {
+        showNotification(data?.message, "error");
+        setAcceptConfirm(null);
+        return;
+      }
+    
       setSelectedSuggestions((prev) => {
         const next = { ...prev };
         delete next[groupIdx];

@@ -4,18 +4,21 @@ import ListHeader from "../components/ListHeader";
 import RecordList from "../components/RecordList";
 import ErrorPage from "../components/ErrorPage";
 import { usePaginatedRecords } from "../hooks/usePaginatedRecords";
-import { getAgeColor, matchesAgeFilter } from "../utils/recordHelpers";
+import { getAgeColor } from "../utils/recordHelpers";
 
 /**
  * Modes and their default parameters for usePaginatedRecords
  */
 const MODE_CONFIG = {
-  landing:   { title: "Data Hygiene Dashboard", showStatusFilters: true },
-  active:    { title: "My Active List",    defaultStatus: "pending", showAgeFilters: true },
+  landing: { title: "Data Hygiene Dashboard", showStatusFilters: true },
+  active: { title: "My Active List", defaultStatus: "pending", showAgeFilters: true },
   completed: { title: "My Completed List", defaultStatus: "accepted,rejected", showStatusFilters: true, allowedFilters: ["accepted", "rejected"] },
-  onhold:    { title: "On Hold Records",   defaultStatus: "On Hold", showAgeFilters: true },
-  all:       { title: "All Records",       showStatusFilters: true },
+  onhold: { title: "On Hold Records", defaultStatus: "On Hold", showAgeFilters: true },
+  all: { title: "All Records", showStatusFilters: true },
 };
+
+// Map age filter button values → API age param values (module-level constant)
+const AGE_TO_SERVER = { "<3": "green", "3-6": "yellow", ">6": "red" };
 
 const RecordsListPage = ({ mode = "landing" }) => {
   const config = MODE_CONFIG[mode] || MODE_CONFIG.landing;
@@ -26,12 +29,14 @@ const RecordsListPage = ({ mode = "landing" }) => {
   const handleFilterChange = (value) =>
     setFilter((prev) => (prev === value ? "" : value));
 
+
   // Determine which parameters to send to the API based on mode and filter
   const extraParams = useMemo(() => {
-    
-    // Age-based filter modes (active, onhold) — status is always fixed
+    // Age-based filter modes (active, onhold) — status always fixed; age sent when selected
     if (!config.showStatusFilters) {
-      return { status: config.defaultStatus };
+      const params = { status: config.defaultStatus };
+      if (filter) params.age = AGE_TO_SERVER[filter];
+      return params;
     }
     // Status-based filter modes — a clicked filter always wins
     if (filter) return { status: filter };
@@ -57,28 +62,12 @@ const RecordsListPage = ({ mode = "landing" }) => {
     meta,
   } = usePaginatedRecords({ extraParams });
 
-  // Apply client-side age filter if applicable
-  const displayRecords = useMemo(() => {
-    if (!config.showAgeFilters || !filter) return records;
-    return records.filter((r) => matchesAgeFilter(r, filter));
-  }, [records, filter, config.showAgeFilters]);
+  // Server now handles age filtering — no client-side filtering needed
+  const displayRecords = records;
 
-  // Map each age filter value to the backend count field in meta
-  const AGE_COUNT_KEY = { "<3": "green", "3-6": "yellow", ">6": "red" };
+  // countLabel: server always returns the correct filtered total
+  const countLabel = String(totalRecords);
 
-  // Use the exact server-side count when an age filter is active (accurate regardless
-  // of how many pages have been loaded). Fall back to string totalRecords otherwise.
-  const countLabel = useMemo(() => {
-    if (config.showAgeFilters && filter) {
-      const key = AGE_COUNT_KEY[filter];
-      const serverCount = key != null ? meta[key] : null;
-      if (serverCount != null) return serverCount.toLocaleString();
-      // Fallback: client-side count with '+' if more pages remain
-      const hasMore = page < totalPages;
-      return `${displayRecords.length}${hasMore ? "+" : ""}`;
-    }
-    return String(totalRecords);
-  }, [config.showAgeFilters, filter, meta, displayRecords.length, page, totalPages, totalRecords]);
 
   // UI state for search/loading
   const isSearching = loading && searchInput !== search;
