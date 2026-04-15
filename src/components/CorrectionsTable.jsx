@@ -24,7 +24,7 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import CloseIcon from "@mui/icons-material/Close";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
-import { SELECTED, ACCEPTED, ON_HOLD_THEME, STATUS } from "../utils/correctionsTableConstants";
+import { SELECTED, ACCEPTED, ON_HOLD_THEME, PENDING_THEME, REJECTED_THEME, STATUS } from "../utils/correctionsTableConstants";
 import ExistingDataRow from "./CorrectionsTableComponents/ExistingDataRow";
 import EditableField from "./CorrectionsTableComponents/EditableField";
 import ChooseOtherValueDropdown from "./CorrectionsTableComponents/ChooseOtherValueDropdown";
@@ -313,6 +313,16 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
           const canAccept = selectedIdx !== undefined;
           const fieldStatus = group.currentStatus?.toLowerCase();
           const isPending = !fieldStatus || fieldStatus === STATUS.INVALID;
+          const isOnHold = fieldStatus === STATUS.ON_HOLD;
+          const isAccepted = fieldStatus === STATUS.ACCEPTED || fieldStatus === STATUS.APPROVED;
+          const isL0 = fieldStatus === STATUS.L0_DATA;
+
+          // Determine the theme for this entire group card
+          let groupTheme = SELECTED;
+          if (isAccepted) groupTheme = ACCEPTED;
+          else if (isOnHold) groupTheme = ON_HOLD_THEME;
+          else if (isL0) groupTheme = REJECTED_THEME;
+          // Pending fields will use the default blue SELECTED theme as requested
  
           return (
             <Paper
@@ -370,9 +380,9 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                         height: 20,
                         fontSize: 11,
                         fontWeight: 700,
-                        backgroundColor: "#f5f3ff",
-                        color: "#7c3aed",
-                        border: "1px solid #ddd6fe",
+                        backgroundColor: "#fef9c3",
+                        color: "#ca8a04",
+                        border: "1px solid #fde047",
                         "& .MuiChip-label": { px: 1 },
                       }}
                     />
@@ -424,7 +434,7 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
  
               {/* ── Collapsible Body ── */}
               <Collapse in={isExpanded}>
-                <ExistingDataRow existingData={group.existing_data ?? []} />
+                <ExistingDataRow existingData={group.existing_data ?? []} theme={groupTheme} />
  
                 <Stack gap={0.5} sx={{ p: 1.5 }}>
                   <Typography
@@ -446,7 +456,7 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                       const gStatus = group.currentStatus;
                       const isAccepted =
                         gStatus === STATUS.ACCEPTED || gStatus === STATUS.APPROVED;
-                      const activeTheme = isAccepted ? ACCEPTED : SELECTED;
+                      const activeTheme = groupTheme;
  
                       const baseSugg = sugg;
                       const editedSugg = isSelected ? editedSuggestions[groupIdx] || {} : {};
@@ -528,6 +538,7 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                   onClearCustom={() => handleClearCustom(groupIdx)}
                   onCustomMetadataFetch={(meta) => handleCustomMetadataFetch(groupIdx, meta)}
                   isPending={isPending}
+                  theme={groupTheme}
                 />
  
                 {customSuggestions[groupIdx] &&
@@ -537,7 +548,7 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                     const gStatus = group.currentStatus;
                     const isAccepted =
                       gStatus === STATUS.ACCEPTED || gStatus === STATUS.APPROVED;
-                    const activeTheme = isAccepted ? ACCEPTED : SELECTED;
+                    const activeTheme = groupTheme;
  
                     const baseSugg = customSuggestions[groupIdx];
                     const editedSugg = isSelected ? editedSuggestions[groupIdx] || {} : {};

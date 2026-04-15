@@ -10,20 +10,12 @@ import { Card, CardContent, Typography, Divider, Stack } from "@mui/material";
 
 
 const STATUS_STYLES = {
-
-    pending: { color: "#e65100", bg: "#fff8e1", border: "#ffa000", dot: "#ffd54f" },
-
-    approved: { color: "#2e7d32", bg: "#e8f5e9", border: "#43a047", dot: "#66bb6a" },
-
-    accepted: { color: "#2e7d32", bg: "#e8f5e9", border: "#43a047", dot: "#66bb6a" },
-
-    rejected: { color: "#b71c1c", bg: "#ffebee", border: "#e53935", dot: "#ef9a9a" },
-
-    "on hold": { color: "#5b21b6", bg: "#ede9fe", border: "#7c3aed", dot: "#a78bfa" },
-
+    pending: { color: "#9a3412", bg: "#ffffff", border: "#f97316", dot: "#fdba74" },
+    approved: { color: "#065f46", bg: "#ffffff", border: "#10b981", dot: "#34d399" },
+    accepted: { color: "#065f46", bg: "#ffffff", border: "#10b981", dot: "#34d399" },
+    rejected: { color: "#991b1b", bg: "#ffffff", border: "#ef4444", dot: "#f87171" },
+    "on hold": { color: "#854d0e", bg: "#ffffff", border: "#ca8a04", dot: "#facc15" },
 };
-
-
 
 const RecordCard = ({ record, ageColor }) => {
     const invalidFields = record["InvalidFields"];
@@ -34,25 +26,29 @@ const RecordCard = ({ record, ageColor }) => {
     const statusColor = statusStyle?.color ?? "text.primary";
     const isCompleted = status === "accepted" || status === "approved";
 
-    const cardBg = ageColor ? ageColor.bg : statusStyle?.bg ?? "#f9f9f9";
-    const cardBorder = ageColor ? ageColor.border : statusStyle?.border ?? "transparent";
+    const cardBg = "#ffffff";
+    const cardBorder = ageColor ? ageColor.border : statusStyle?.border ?? "#475569";
 
     const handleClick = () => navigate(`/${record.ExecutionId}`);
 
     return (
-        <Stack justifyContent="center" alignItems="center" sx={{ mb: 2 }}>
+        <Stack justifyContent="center" alignItems="center" sx={{ mb: 3 }}>
             <Card
                 onClick={handleClick}
                 sx={{
                     width: "65vw",
                     backgroundColor: cardBg,
-                    borderLeft: `5px solid ${cardBorder}`,
-                    boxShadow: `0px 2px 8px ${cardBorder}33`,
-                    transition: "all 0.25s ease",
+                    border: `1.3px solid ${cardBorder}`,
+                    borderLeft: `6px solid ${cardBorder}`,
+                    borderRadius: "8px",
+                    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)",
+                    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                    position: "relative",
                     "&:hover": {
-                        transform: "scale(1.02)",
-                        boxShadow: `0px 6px 20px ${cardBorder}55`,
+                        transform: "translateY(-4px)",
+                        boxShadow: `0 20px 25px -5px ${cardBorder}22, 0 10px 10px -5px ${cardBorder}11`,
                         cursor: "pointer",
+                        borderColor: cardBorder,
                     },
                 }}
             >

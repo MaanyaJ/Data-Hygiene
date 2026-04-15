@@ -9,7 +9,8 @@ const ExecutionInfoBox = ({ executionInfo }) => {
   return (
     <Box
       sx={{
-        border: "1px solid #e5eaf2",
+        border: "1px solid #a9acafff",
+        background:"#f8fafc",
         borderRadius: 2,
         p: 3,
         mb: 5,
@@ -22,9 +23,9 @@ const ExecutionInfoBox = ({ executionInfo }) => {
       <Paper
         elevation={0}
         sx={{
-          border: "1px solid #e5eaf2",
+          border: "1px solid #c8cacdff",
           borderRadius: 2,
-          bgcolor: "#f8fafc",
+          bgcolor: "#e7e5e5ff",
           overflow: "hidden",
         }}
       >
@@ -43,8 +44,8 @@ const ExecutionInfoBox = ({ executionInfo }) => {
                 key={key}
                 sx={{
                   p: 2,
-                  borderRight: { md: isLastInRow ? "none" : "1px solid #e5eaf2" },
-                  borderBottom: isLastRow ? "none" : "1px solid #e5eaf2",
+                  borderRight: { md: isLastInRow ? "none" : "1px solid #b9b5b5ff" },
+                  borderBottom: isLastRow ? "none" : "1px solid #b9b5b5ff",
                 }}
               >
                 <Typography sx={{ fontSize: 13, color: "#5b6b82", fontWeight: 600, mb: 0.5 }}>
