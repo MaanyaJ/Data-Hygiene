@@ -87,10 +87,10 @@ const ListHeader = ({
   ];
 
   const STATUS_FILTERS = [
-    { label: "Pending",  value: "pending", color: "#e65100", activeColor: "#ef6c00", bg: "#fff8e1", activeBg: "#ffa000", dot: "#ffd54f" },
+    { label: "Pending", value: "pending", color: "#e65100", activeColor: "#ef6c00", bg: "#fff8e1", activeBg: "#ffa000", dot: "#ffd54f" },
     { label: "Accepted", value: "accepted", color: "#2e7d32", activeColor: "#1b5e20", bg: "#e8f5e9", activeBg: "#43a047", dot: "#66bb6a" },
     { label: "Rejected", value: "rejected", color: "#b71c1c", activeColor: "#c62828", bg: "#ffebee", activeBg: "#e53935", dot: "#ef9a9a" },
-    { label: "On Hold",  value: "On Hold",  color: "#5b21b6", activeColor: "#6d28d9", bg: "#ede9fe", activeBg: "#7c3aed", dot: "#a78bfa" },
+    { label: "On Hold", value: "On Hold", color: "#ca8a04", activeColor: "#a16207", bg: "#fffef2", activeBg: "#fadd03", dot: "#fde047" },
   ];
 
   return (
@@ -112,7 +112,7 @@ const ListHeader = ({
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
           variant="outlined"
-          sx={{ 
+          sx={{
             width: { xs: "90%", md: 500 },
             "& .MuiOutlinedInput-root": {
               borderRadius: "12px",
@@ -142,7 +142,7 @@ const ListHeader = ({
             const isActive = filter === f.value;
             const count = counts[f.countKey];
             return (
-              <Box 
+              <Box
                 key={f.value}
                 onClick={() => onFilterChange(f.value)}
                 sx={patchSx(isActive, f.activeBg, f.bg, f.activeColor, f.color, f.dot)}
@@ -160,7 +160,7 @@ const ListHeader = ({
             .map((f) => {
               const isActive = filter === f.value;
               return (
-                <Box 
+                <Box
                   key={f.value}
                   onClick={() => onFilterChange(f.value)}
                   sx={patchSx(isActive, f.activeBg, f.bg, f.activeColor, f.color, f.dot)}

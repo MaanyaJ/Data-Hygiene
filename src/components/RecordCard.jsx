@@ -19,8 +19,7 @@ const STATUS_STYLES = {
 
     rejected: { color: "#b71c1c", bg: "#ffebee", border: "#e53935", dot: "#ef9a9a" },
 
-    "on hold": { color: "#5b21b6", bg: "#ede9fe", border: "#7c3aed", dot: "#a78bfa" },
-
+    "on hold": { color: "#ca8a04", bg: "#fffef2", border: "#fef08a", dot: "#fde047" },
 };
 
 
@@ -90,7 +89,7 @@ const RecordCard = ({ record, ageColor }) => {
                     {!isCompleted && (
                         <>
                             <Divider sx={{ my: 1 }} />
-                            <InconsistentFieldsList invalidFields={invalidFields} />
+                            <InconsistentFieldsList invalidFields={invalidFields} SuggestionsCount = {record.SuggestionsCount}/>
                         </>
                     )}
                 </CardContent>
