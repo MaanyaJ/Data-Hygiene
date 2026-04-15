@@ -64,7 +64,7 @@ export const useRejectDialog = (row, execID, onClose, onL0Data, onDraftSubmit, s
       });
       const data = await res.json();
       if (!res.ok || data.status === "error") {
-        showNotification(data.message || "Failed to submit draft record", "error");
+        showNotification(data?.message, "error");
         return;
       }
       showNotification("Draft record submitted successfully", "success");

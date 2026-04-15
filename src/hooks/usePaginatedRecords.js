@@ -94,60 +94,24 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
       try {
         const parsed = JSON.parse(extraParamsKey);
         const baseParams = { page: pageNum, size: PAGE_SIZE, search: search || "", ...parsed };
+        const qs = new URLSearchParams();
+        Object.entries(baseParams).forEach(([k, v]) => qs.set(k, v));
+        const res = await fetch(`${BASE_URL}?${qs}`, { signal: controller.signal });
+        if (!res.ok) throw new Error(`Failed to fetch data: ${res.status}`);
+        const data = await res.json();
 
-        // ── Multi-status: fire one request per status value in parallel ──────
-        if (Array.isArray(parsed.status)) {
-          const { status: statuses, ...rest } = baseParams;
-          const results = await Promise.all(
-            statuses.map((s) => fetchOnePage({ ...rest, status: s }, controller.signal))
-          );
+        if (fetchId !== fetchIdRef.current) return;
 
-          if (fetchId !== fetchIdRef.current) return;
+        const incoming = Array.isArray(data?.data) ? data.data : [];
+        const total = data?.total_invalid_records ?? incoming.length;
 
-          // Combine records from all responses
-          const allIncoming = results.flatMap((d) =>
-            Array.isArray(d?.data) ? d.data : []
-          );
-          const total = results.reduce(
-            (sum, d) => sum + (d?.total_invalid_records ?? 0), 0
-          );
-          const maxPages = Math.max(
-            ...results.map((d) =>
-              Math.ceil((d?.total_invalid_records ?? 0) / PAGE_SIZE)
-            )
-          );
+        setTotalPages(Math.ceil(total / PAGE_SIZE));
+        setRecords((prev) => (isNew ? incoming : [...prev, ...incoming]));
+        setTotalRecords(total);
 
-          setTotalPages(maxPages);
-          setRecords((prev) => (isNew ? allIncoming : [...prev, ...allIncoming]));
-          setTotalRecords(total);
+        const { data: _d, total_invalid_records: _t, ...rest } = data;
+        setMeta(rest);
 
-          // Merge meta fields (last-write wins for duplicates like red/green/yellow)
-          const mergedMeta = results.reduce((acc, d) => {
-            const { data: _d, total_invalid_records: _t, ...rest2 } = d;
-            return { ...acc, ...rest2 };
-          }, {});
-          setMeta(mergedMeta);
-
-        // ── Single-status: existing behaviour ────────────────────────────────
-        } else {
-          const qs = new URLSearchParams();
-          Object.entries(baseParams).forEach(([k, v]) => qs.set(k, v));
-          const res = await fetch(`${BASE_URL}?${qs}`, { signal: controller.signal });
-          if (!res.ok) throw new Error(`Failed to fetch data: ${res.status}`);
-          const data = await res.json();
-
-          if (fetchId !== fetchIdRef.current) return;
-
-          const incoming = Array.isArray(data?.data) ? data.data : [];
-          const total = data?.total_invalid_records ?? incoming.length;
-
-          setTotalPages(Math.ceil(total / PAGE_SIZE));
-          setRecords((prev) => (isNew ? incoming : [...prev, ...incoming]));
-          setTotalRecords(total);
-
-          const { data: _d, total_invalid_records: _t, ...rest } = data;
-          setMeta(rest);
-        }
       } catch (err) {
         if (fetchId !== fetchIdRef.current) return;
         if (err.name !== "AbortError") {

@@ -11,9 +11,9 @@ import { getAgeColor, matchesAgeFilter } from "../utils/recordHelpers";
  */
 const MODE_CONFIG = {
   landing:   { title: "Data Hygiene Dashboard", showStatusFilters: true },
-  active:    { title: "My Active List",    defaultStatus: "pending",                          showAgeFilters: true },
-  completed: { title: "My Completed List", defaultStatuses: ["accepted", "rejected"],          showStatusFilters: true, allowedFilters: ["accepted", "rejected"] },
-  onhold:    { title: "On Hold Records",   defaultStatus: "On Hold",                          showAgeFilters: true },
+  active:    { title: "My Active List",    defaultStatus: "pending", showAgeFilters: true },
+  completed: { title: "My Completed List", defaultStatus: "accepted,rejected", showStatusFilters: true, allowedFilters: ["accepted", "rejected"] },
+  onhold:    { title: "On Hold Records",   defaultStatus: "On Hold", showAgeFilters: true },
   all:       { title: "All Records",       showStatusFilters: true },
 };
 
@@ -28,18 +28,19 @@ const RecordsListPage = ({ mode = "landing" }) => {
 
   // Determine which parameters to send to the API based on mode and filter
   const extraParams = useMemo(() => {
+    
     // Age-based filter modes (active, onhold) — status is always fixed
     if (!config.showStatusFilters) {
       return { status: config.defaultStatus };
     }
     // Status-based filter modes — a clicked filter always wins
     if (filter) return { status: filter };
-    // Multi-status default (e.g. completed = accepted + rejected)
-    if (config.defaultStatuses) return { status: config.defaultStatuses };
+    
     // Single-status default
     if (config.defaultStatus) return { status: config.defaultStatus };
+
     return {};
-  }, [mode, filter, config.showStatusFilters, config.defaultStatus, config.defaultStatuses]);
+  }, [mode, filter, config.showStatusFilters, config.defaultStatus]);
 
   const {
     records,
