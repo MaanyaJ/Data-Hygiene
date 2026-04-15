@@ -11,14 +11,20 @@ const SuggestionRow = ({
   onEditField,
   sutType,
   isPending = true,
+  showRadio = true,
 }) => {
   const p = theme || SELECTED;
  
   // Extract and exclude score/status from visible columns
-  const { score, status, ...suggestionData } = suggestion;
-  // Deduplicate entries by lowercase key so merged keys like
-  // coreCount (suggestion) and corecount (history edit) collapse into one.
-  // Last value wins — editedSugg is spread last so the history value is retained.
+  const { score, status, ...rawSuggestionData } = suggestion;
+  
+  // Filter out internal fields
+  const internalKeys = ["_id", "execution_id", "snapshot_id", "search_key"];
+  const suggestionData = Object.fromEntries(
+    Object.entries(rawSuggestionData).filter(([k]) => !internalKeys.includes(k.toLowerCase()))
+  );
+
+  // Deduplicate entries by lowercase key
   const seen = new Map();
   for (const [k, v] of Object.entries(suggestionData)) {
     seen.set(k.toLowerCase(), [k, v]);
@@ -55,31 +61,33 @@ const SuggestionRow = ({
         }}
       >
         {/* Left — Radio (remains same) */}
-        <Box
-          sx={{
-            width: 44,
-            alignSelf: "stretch",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexShrink: 0,
-            backgroundColor: isSelected ? p.light : "#f1f5f9",
-            borderRight: `1.5px solid ${isSelected ? p.accent : "#e2e8f0"}`,
-            borderLeft: `3px solid ${isSelected ? p.accent : "transparent"}`,
-            transition: "background-color 0.15s ease",
-          }}
-        >
-          <Radio
-            checked={isSelected}
-            disabled={!isPending}
-            size="small"
+        {showRadio && (
+          <Box
             sx={{
-              color: "#cbd5e1",
-              "&.Mui-checked": { color: p.accent },
-              p: 0.5,
+              width: 44,
+              alignSelf: "stretch",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+              backgroundColor: isSelected ? p.light : "#f1f5f9",
+              borderRight: `1.5px solid ${isSelected ? p.accent : "#e2e8f0"}`,
+              borderLeft: `3px solid ${isSelected ? p.accent : "transparent"}`,
+              transition: "background-color 0.15s ease",
             }}
-          />
-        </Box>
+          >
+            <Radio
+              checked={isSelected}
+              disabled={!isPending}
+              size="small"
+              sx={{
+                color: "#cbd5e1",
+                "&.Mui-checked": { color: p.accent },
+                p: 0.5,
+              }}
+            />
+          </Box>
+        )}
  
         {/* Primary value with EditableField */}
         <Box sx={{ minWidth: 140, flexShrink: 0 }}>

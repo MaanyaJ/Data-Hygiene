@@ -90,7 +90,7 @@ const ListHeader = ({
     { label: "Pending",  value: "pending", color: "#e65100", activeColor: "#ef6c00", bg: "#fff8e1", activeBg: "#ffa000", dot: "#ffd54f" },
     { label: "Accepted", value: "accepted", color: "#2e7d32", activeColor: "#1b5e20", bg: "#e8f5e9", activeBg: "#43a047", dot: "#66bb6a" },
     { label: "Rejected", value: "rejected", color: "#b71c1c", activeColor: "#c62828", bg: "#ffebee", activeBg: "#e53935", dot: "#ef9a9a" },
-    { label: "On Hold",  value: "On Hold",  color: "#5b21b6", activeColor: "#6d28d9", bg: "#ede9fe", activeBg: "#7c3aed", dot: "#a78bfa" },
+    { label: "On Hold",  value: "On Hold",  color: "#9e860dff", activeColor: "#6d28d9", bg: "#f1f0e9ff", activeBg: "#ffd600", dot: "#ffde33" },
   ];
 
   return (
