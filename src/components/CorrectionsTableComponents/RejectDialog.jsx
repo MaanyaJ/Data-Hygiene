@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Dialog,
   DialogTitle,
@@ -18,7 +18,7 @@ import EditNoteIcon from "@mui/icons-material/EditNote";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CloseIcon from "@mui/icons-material/Close";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
-import { API_URL } from "../config";
+import { useRejectDialog, STEPS } from "../../hooks/useRejectDialog";
  
 const OptionCard = ({ icon, title, description, onClick }) => (
   <Box
@@ -47,89 +47,21 @@ const OptionCard = ({ icon, title, description, onClick }) => (
   </Box>
 );
  
-const STEPS = {
-  CHOOSE: "CHOOSE",
-  L0_CONFIRM: "L0_CONFIRM",
-  DRAFT_FORM: "DRAFT_FORM",
-};
- 
-const RejectDialog = ({ open, onClose, row, onL0Data, onDraftSubmit, execID }) => {
-  const [step, setStep] = useState(STEPS.CHOOSE);
-  const [detailFields, setDetailFields] = useState([]);
-  const [formValues, setFormValues] = useState({});
-  const [loadingFields, setLoadingFields] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
- 
-  const resetAndClose = () => {
-    setStep(STEPS.CHOOSE);
-    setDetailFields([]);
-    setFormValues({});
-    onClose();
-  };
- 
-  // Step 1 → L0 Data chosen — now just goes to confirm step
-  const handleL0DataClick = () => {
-    setStep(STEPS.L0_CONFIRM);
-  };
- 
-  // Confirmation → Yes → call API
-  const handleL0Confirm = async () => {
-    setSubmitting(true);
-    try {
-      await fetch(`${API_URL}/reject-record`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ execution_id: execID, currentStatus: "L0 Data" }),
-      });
-      onL0Data?.(row);
-      resetAndClose();
-      console.log({ execution_id: execID, currentStatus: "L0 Data" })
-    } catch (error) {
-      console.error("Reject L0 API failed:", error);
-    } finally {
-      setSubmitting(false);
-    }
-  };
- 
-  const handleDraftOptionClick = async () => {
-    setStep(STEPS.DRAFT_FORM);
-    setLoadingFields(true);
-    try {
-      const res = await fetch(`http://192.168.0.81:8001/draft-records/fields?type=${encodeURIComponent(row.fieldName)}`);
-      const data = await res.json();
-      setDetailFields(data.fields);
-    } catch (error) {
-      setDetailFields([]);
-      console.log(error);
-    } finally {
-      setLoadingFields(false);
-    }
-  };
- 
-  const handleSubmit = async () => {
-    setSubmitting(true);
-    try {
-      const payload = { execution_id: execID, ...formValues, currentStatus: "On Hold" };
-      await fetch(`http://192.168.0.81:8001/draft-records/${encodeURIComponent(row.fieldName)}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      onDraftSubmit?.(row);
-      resetAndClose();
-      console.log(payload)
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setSubmitting(false);
-    }
-  };
- 
-  const handleFieldChange = (name, value) => {
-    setFormValues((prev) => ({ ...prev, [name]: value }));
-  };
- 
-  const allFilled = detailFields.every((f) => !!formValues[f]?.trim());
+const RejectDialog = ({ open, onClose, row, onL0Data, onDraftSubmit, execID, showNotification }) => {
+  const {
+    step,
+    setStep,
+    detailFields,
+    formValues,
+    loadingFields,
+    submitting,
+    allFilled,
+    resetAndClose,
+    handleL0Confirm,
+    handleDraftOptionClick,
+    handleSubmit,
+    handleFieldChange,
+  } = useRejectDialog(row, execID, onClose, onL0Data, onDraftSubmit, showNotification);
  
   const getTitle = () => {
     if (step === STEPS.DRAFT_FORM) return "Submit Draft Record";
@@ -146,7 +78,7 @@ const RejectDialog = ({ open, onClose, row, onL0Data, onDraftSubmit, execID }) =
       onClose={resetAndClose}
       maxWidth="xs"
       fullWidth
-      PaperProps={{ sx: { borderRadius: 3 } }}
+      slotProps={{ paper: { sx: { borderRadius: 3 } } }}
     >
       {/* Header */}
       <DialogTitle sx={{ pb: 1 }}>
@@ -185,7 +117,7 @@ const RejectDialog = ({ open, onClose, row, onL0Data, onDraftSubmit, execID }) =
               icon={<StorageIcon />}
               title="L0 Data"
               description="Send this data to L0 dataset without applying any corrections"
-              onClick={handleL0DataClick}
+              onClick={() => setStep(STEPS.L0_CONFIRM)}
             />
             <OptionCard
               icon={<EditNoteIcon />}

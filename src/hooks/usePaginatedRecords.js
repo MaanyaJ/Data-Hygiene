@@ -61,6 +61,16 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
     return () => clearTimeout(t);
   }, [searchInput]);
 
+  // ── Helper: build a URL and fetch one page ────────────────────────────────
+  const fetchOnePage = (params, signal) => {
+    const qs = new URLSearchParams();
+    Object.entries(params).forEach(([k, v]) => qs.set(k, v));
+    return fetch(`${BASE_URL}?${qs}`, { signal }).then((r) => {
+      if (!r.ok) throw new Error(`Failed to fetch data: ${r.status}`);
+      return r.json();
+    });
+  };
+
   // ── Core fetch ────────────────────────────────────────────────────────────
   const fetchRecords = useCallback(
     async (pageNum, isNew = false) => {
@@ -69,11 +79,8 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
       const controller = new AbortController();
       abortRef.current = controller;
 
-      // Stamp this fetch — any earlier fetch that resolves after this point
-      // will see its ID is stale and bail out without touching state.
       const fetchId = ++fetchIdRef.current;
 
-      // Clear stale data immediately so old results never show under a new query
       if (isNew) {
         setRecords([]);
         setTotalRecords(0);
@@ -85,22 +92,14 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
       setError(null);
 
       try {
-        const queryParams = new URLSearchParams({
-          page: pageNum,
-          size: PAGE_SIZE,
-          search: search || "",
-          ...JSON.parse(extraParamsKey),
-        });
-
-        const res = await fetch(`${BASE_URL}?${queryParams}`, {
-          signal: controller.signal,
-        });
-
+        const parsed = JSON.parse(extraParamsKey);
+        const baseParams = { page: pageNum, size: PAGE_SIZE, search: search || "", ...parsed };
+        const qs = new URLSearchParams();
+        Object.entries(baseParams).forEach(([k, v]) => qs.set(k, v));
+        const res = await fetch(`${BASE_URL}?${qs}`, { signal: controller.signal });
         if (!res.ok) throw new Error(`Failed to fetch data: ${res.status}`);
-
         const data = await res.json();
 
-        // A newer fetch has already started — discard this response entirely
         if (fetchId !== fetchIdRef.current) return;
 
         const incoming = Array.isArray(data?.data) ? data.data : [];
@@ -110,19 +109,16 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
         setRecords((prev) => (isNew ? incoming : [...prev, ...incoming]));
         setTotalRecords(total);
 
-        // Store any extra top-level fields (e.g. red, green, yellow)
         const { data: _d, total_invalid_records: _t, ...rest } = data;
         setMeta(rest);
+
       } catch (err) {
-        if (fetchId !== fetchIdRef.current) return; // superseded — ignore
+        if (fetchId !== fetchIdRef.current) return;
         if (err.name !== "AbortError") {
           console.error("usePaginatedRecords:", err);
           setError(err);
         }
       } finally {
-        // Only the latest fetch clears the loading flag — this is the key fix.
-        // Aborted/superseded fetches skip this because of the ID check above,
-        // so loading stays true until the real response (or error) arrives.
         if (fetchId === fetchIdRef.current) setLoading(false);
       }
     },

@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Stack, Radio, Tooltip } from "@mui/material";
-import { capitalize, SELECTED } from "./constants";
+import { capitalize, SELECTED } from "../../utils/correctionsTableConstants";
 import EditableField from "./EditableField";
  
 const SuggestionRow = ({
@@ -16,7 +16,14 @@ const SuggestionRow = ({
  
   // Extract and exclude score/status from visible columns
   const { score, status, ...suggestionData } = suggestion;
-  const entries = Object.entries(suggestionData);
+  // Deduplicate entries by lowercase key so merged keys like
+  // coreCount (suggestion) and corecount (history edit) collapse into one.
+  // Last value wins — editedSugg is spread last so the history value is retained.
+  const seen = new Map();
+  for (const [k, v] of Object.entries(suggestionData)) {
+    seen.set(k.toLowerCase(), [k, v]);
+  }
+  const entries = [...seen.values()];
  
   const [primaryKey, primaryVal] = entries[0] ?? [];
   const secondaryEntries = entries.slice(1);
@@ -82,6 +89,7 @@ const SuggestionRow = ({
             color={isSelected ? p.text : "#0f172a"}
             isEditable={
               isSelected &&
+              isPending &&
               primaryKey.toLowerCase() === "corecount" &&
               sutType === "vm"
             }
@@ -125,6 +133,7 @@ const SuggestionRow = ({
                 color={isSelected ? p.text : "#334155"}
                 isEditable={
                   isSelected &&
+                  isPending &&
                   key.toLowerCase() === "corecount" &&
                   sutType === "vm"
                 }

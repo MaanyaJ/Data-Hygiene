@@ -5,32 +5,20 @@ import {
   CircularProgress,
 } from '@mui/material';
 
+import { useUniqueValues } from '../../hooks/useUniqueValues';
+
 const isCpuField = (fieldName) => fieldName === "coreCount";
 
 const ChooseValueCell = ({ fieldName, value, onChange }) => {
-  const [options, setOptions] = useState([]);
-  const [loadingOptions, setLoadingOptions] = useState(false);
+  const { options, loading: loadingOptions, fetchOptions } = useUniqueValues(fieldName);
   const [open, setOpen] = useState(false);
 
   const hasValue = !!value;
 
-  const handleOpen = async () => {
+  const handleOpen = () => {
     setOpen(true);
-    if (options.length > 0) return;
-
-    setLoadingOptions(true);
-    try {
-      const res = await fetch(
-        `http://192.168.0.81:8001/unique-values?parameterName=${encodeURIComponent(fieldName)}`
-      );
-      const data = await res.json();
-      setOptions(data?.data ?? []);
-    } catch {
-      setOptions([]);
-    } finally {
-      setLoadingOptions(false);
-    }
-  };                                              
+    fetchOptions();
+  };
   
   if (isCpuField(fieldName)) {
     return (
@@ -42,7 +30,7 @@ const ChooseValueCell = ({ fieldName, value, onChange }) => {
           const val = e.target.value;
           if (val === "" || /^\d+$/.test(val)) onChange(val || null);
         }}
-        inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+        slotProps={{ htmlInput: { inputMode: "numeric", pattern: "[0-9]*" } }}
         sx={{
           minWidth: 160,
           "& .MuiOutlinedInput-root": hasValue
@@ -79,16 +67,18 @@ const ChooseValueCell = ({ fieldName, value, onChange }) => {
         <TextField
           {...params}
           placeholder="Choose other value"
-          InputProps={{
-            ...params.InputProps,
-            endAdornment: (
-              <>
-                {loadingOptions ? (
-                  <CircularProgress color="inherit" size={16} />
-                ) : null}
-                {params.InputProps.endAdornment}
-              </>
-            ),
+          slotProps={{
+            input: {
+              ...params.InputProps,
+              endAdornment: (
+                <>
+                  {loadingOptions ? (
+                    <CircularProgress color="inherit" size={16} />
+                  ) : null}
+                  {params.InputProps.endAdornment}
+                </>
+              ),
+            },
           }}
         />
       )}
