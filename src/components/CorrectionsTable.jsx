@@ -447,7 +447,7 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                 <ExistingDataRow existingData={group.existing_data ?? []} />
 
                 <Stack gap={0.5} sx={{ p: 1.5 }}>
-                  <Typography
+                  { group.suggestions?.length > 0 ? <Typography
                     sx={{
                       fontSize: 10,
                       fontWeight: 700,
@@ -463,7 +463,7 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                       fontStyle: "italic",
                       textTransform: "LowerCase",
                     }}>( Hover over an option to see confidence score )</Typography>
-                  </Typography>
+                  </Typography> : ""}
 
                   {group.suggestions?.length > 0 ? (
                     group.suggestions.map((sugg, si) => {

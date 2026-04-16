@@ -99,7 +99,6 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
         const qs = new URLSearchParams();
         Object.entries(baseParams).forEach(([k, v]) => qs.set(k, v));
         const url = `${BASE_URL}?${qs}`;
-        console.log("[usePaginatedRecords] fetching:", url);
         const res = await fetch(url, { signal: controller.signal });
         if (!res.ok) throw new Error(`Failed to fetch data: ${res.status}`);
         const data = await res.json();
