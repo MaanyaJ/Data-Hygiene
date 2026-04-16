@@ -323,7 +323,7 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
               key={groupIdx}
               elevation={0}
               sx={{
-                border: "1.5px solid #e2e8f0",
+                border: "1.5px solid #c2c2c2a2",
                 borderRadius: 3,
                 overflow: "hidden",
                 transition: "box-shadow 0.2s ease",
