@@ -4,10 +4,10 @@ import { Stack, Typography, Chip, Box } from "@mui/material";
 const InconsistentFieldsList = ({ invalidFields = [], SuggestionsCount }) => {
   const errors = invalidFields;
   const MAX_VISIBLE = 8;
-
+ 
   const visibleErrors = errors.slice(0, MAX_VISIBLE);
   const remaining = errors.length - MAX_VISIBLE;
-
+ 
   return (
     <Box>
       <Stack spacing={0.4} mt={0.25}>
@@ -24,7 +24,7 @@ const InconsistentFieldsList = ({ invalidFields = [], SuggestionsCount }) => {
         >
           Inconsistent Fields
         </Typography>
-
+ 
         <Stack flexDirection={"row"} sx={{justifyContent: "space-between"}}>
           <Stack
             direction="row"
@@ -50,7 +50,7 @@ const InconsistentFieldsList = ({ invalidFields = [], SuggestionsCount }) => {
                 }}
               />
             ))}
-
+ 
             {remaining > 0 && (
               <Typography
                 sx={{
@@ -63,11 +63,11 @@ const InconsistentFieldsList = ({ invalidFields = [], SuggestionsCount }) => {
               </Typography>
             )}
           </Stack>
-          <Typography variant="body2" sx={{fontStyle: "italic"}}>{SuggestionsCount!=0 ? "Suggestions available" : "Suggestions not available"}</Typography>
+          <Typography variant="subtitle2" sx={{fontStyle: "italic"}}>{SuggestionsCount!=0 ? "Suggestions available" : "Suggestions not available"}</Typography>
         </Stack>
       </Stack>
     </Box>
   );
 };
-
+ 
 export default InconsistentFieldsList;

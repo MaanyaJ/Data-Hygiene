@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { API_URL } from "../config";
 import { STATUS } from "../utils/correctionsTableConstants";
-
+ 
 export const useCorrectionsTable = (data, history, execID, sutType, fetchData, showNotification) => {
   const [selectedSuggestions, setSelectedSuggestions] = useState({});
   const [editedSuggestions, setEditedSuggestions] = useState({});
@@ -28,7 +28,7 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
   useEffect(() => {
     if (!data || data.length === 0) return;
     if (Object.keys(selectedSuggestions).length > 0) return;
-
+ 
     const initialSelections = {};
     const initialCustom = {};
     const initialEdited = {};
@@ -37,7 +37,7 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
       const key = Object.keys(obj).find((k) => k.toLowerCase() === "corecount");
       return key && obj[key] != null ? { [key]: obj[key] } : null;
     };
-
+ 
     data.forEach((group, groupIdx) => {
       const gStatus = group.currentStatus;
       if (gStatus === STATUS.ACCEPTED || gStatus === STATUS.APPROVED) {
@@ -51,11 +51,11 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
         }
 
         const coreCountOverride = extractCoreCount(historyObj);
-
+ 
         const acceptedIdx = group.suggestions?.findIndex(
           (s) => s.status === STATUS.ACCEPTED
         );
-
+ 
         if (acceptedIdx !== -1 && acceptedIdx !== undefined) {
           initialSelections[groupIdx] = acceptedIdx;
           if (coreCountOverride) initialEdited[groupIdx] = coreCountOverride;
@@ -86,13 +86,13 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
         }
       }
     });
-
+ 
     if (Object.keys(initialSelections).length > 0) setSelectedSuggestions(initialSelections);
     if (Object.keys(initialCustom).length > 0) setCustomSuggestions(initialCustom);
     if (Object.keys(initialEdited).length > 0) setEditedSuggestions(initialEdited);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, history]);
-
+ 
   const handleSelect = useCallback((groupIdx, suggIdx) => {
     setSelectedSuggestions((prev) => {
       if (prev[groupIdx] === suggIdx) {
@@ -108,7 +108,7 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
       return next;
     });
   }, []);
-
+ 
   const handleSelectCustom = useCallback((groupIdx) => {
     setSelectedSuggestions((prev) => ({ ...prev, [groupIdx]: "custom" }));
     setEditedSuggestions((prev) => {
@@ -117,7 +117,7 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
       return next;
     });
   }, []);
-
+ 
   const handleClearCustom = useCallback((groupIdx) => {
     setSelectedSuggestions((prev) => {
       const next = { ...prev };
@@ -130,11 +130,11 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
       return next;
     });
   }, []);
-
+ 
   const handleCustomMetadataFetch = useCallback((groupIdx, meta) => {
     setCustomSuggestions((prev) => ({ ...prev, [groupIdx]: meta }));
   }, []);
-
+ 
   const handleEditField = useCallback((groupIdx, key, newValue) => {
     setEditedSuggestions((prev) => ({
       ...prev,
@@ -162,16 +162,16 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
     const merged = { ...baseChosen, ...customEdits };
     const primaryField = group.invalid_field;
     const value = merged?.[primaryField] || merged?.[primaryField?.toLowerCase()];
-
+ 
     if (!value) return;
-
+ 
     const payload = {
       execution_id: execID,
       field_name: primaryField,
       accepted_value: value,
       currentStatus: STATUS.ACCEPTED,
     };
-
+ 
     if (sutType?.toLowerCase() === "vm") {
       const coreCountVal =
         merged?.coreCount || merged?.CoreCount || merged?.corecount;

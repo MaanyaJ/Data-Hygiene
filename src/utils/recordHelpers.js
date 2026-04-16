@@ -10,9 +10,9 @@ export const getDiffDays = (record) => {
 };
 
 export const AGE_COLORS = {
-  green:  { bg: "#e8f5e9", border: "#43a047", color: "#2e7d32" },
-  yellow: { bg: "#fff8e1", border: "#ffa000", color: "#e65100" },
-  red:    { bg: "#ffebee", border: "#e53935", color: "#b71c1c" },
+  green:  { bg: "#ffffff", border: "#10b981", color: "#047857" },
+  yellow: { bg: "#ffffff", border: "#f59e0b", color: "#b45309" },
+  red:    { bg: "#ffffff", border: "#ef4444", color: "#b91c1c" },
 };
 
 /**
