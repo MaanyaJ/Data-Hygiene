@@ -89,7 +89,7 @@ const ListHeader = ({
   const STATUS_FILTERS = [
     { label: "Pending",  value: "pending", color: "#ea580c", activeColor: "#9a3412", bg: "#ffffff", activeBg: "#f97316", dot: "#f9972fff" },
     { label: "Accepted", value: "accepted", color: "#059669", activeColor: "#065f46", bg: "#ffffff", activeBg: "#10b981", dot: "#34d399" },
-    { label: "Rejected", value: "rejected", color: "#dc2626", activeColor: "#991b1b", bg: "#ffffff", activeBg: "#ef4444", dot: "#f87171" },
+    { label: "L0 Data", value: "rejected", color: "#dc2626", activeColor: "#991b1b", bg: "#ffffff", activeBg: "#ef4444", dot: "#f87171" },
     { label: "On Hold",  value: "On Hold",  color: "#ca8a04", activeColor: "#854d0e", bg: "#ffffff", activeBg: "#ca8a04", dot: "#facc15" },
   ];
 

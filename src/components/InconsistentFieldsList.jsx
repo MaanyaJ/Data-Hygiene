@@ -1,7 +1,7 @@
 import React from "react";
 import { Stack, Typography, Chip, Box } from "@mui/material";
 
-const InconsistentFieldsList = ({ invalidFields = [], SuggestionsCount }) => {
+const InconsistentFieldsList = ({ invalidFields = [], SuggestionsCount, status }) => {
   const errors = invalidFields;
   const MAX_VISIBLE = 8;
  
@@ -63,7 +63,7 @@ const InconsistentFieldsList = ({ invalidFields = [], SuggestionsCount }) => {
               </Typography>
             )}
           </Stack>
-          <Typography variant="subtitle2" sx={{fontStyle: "italic"}}>{SuggestionsCount!=0 ? "Suggestions available" : "Suggestions not available"}</Typography>
+        <Typography variant="body2" sx={{fontStyle: "italic"}}>{status.toLowerCase() === "pending" && (SuggestionsCount>=0 ? "Suggestions available" : "Suggestions not available")}</Typography>
         </Stack>
       </Stack>
     </Box>

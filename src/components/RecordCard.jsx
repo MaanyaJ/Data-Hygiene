@@ -78,7 +78,7 @@ const RecordCard = ({ record, ageColor }) => {
                         <Stack>
                             <Typography fontWeight={600}>Status:</Typography>
                             <Typography variant="body2" fontWeight="bold" sx={{ color: statusColor }}>
-                                {record.Status}
+                                  {record.Status.toLowerCase() === "rejected" ? "L0 Data" : record. Status}
                             </Typography>
                         </Stack>
                     </Stack>
@@ -86,7 +86,7 @@ const RecordCard = ({ record, ageColor }) => {
                     {!isCompleted && (
                         <>
                             <Divider sx={{ my: 1 }} />
-                            <InconsistentFieldsList invalidFields={invalidFields} SuggestionsCount = {record.SuggestionsCount}/>
+                            <InconsistentFieldsList invalidFields={invalidFields} SuggestionsCount = {record.SuggestionsCount} status = {record.Status}/>
                         </>
                     )}
                 </CardContent>
