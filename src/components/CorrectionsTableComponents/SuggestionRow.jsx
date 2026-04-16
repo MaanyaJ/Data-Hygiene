@@ -1,6 +1,5 @@
 import React from "react";
 import { Box, Stack, Radio, Tooltip } from "@mui/material";
-import { capitalize, SELECTED } from "../../utils/correctionsTableConstants";
 import EditableField from "./EditableField";
  
 const SuggestionRow = ({
@@ -92,7 +91,7 @@ const SuggestionRow = ({
         {/* Primary value with EditableField */}
         <Box sx={{ minWidth: 140, flexShrink: 0 }}>
           <EditableField
-            label={capitalize(primaryKey)}
+            label={primaryKey}
             value={primaryVal}
             color={isSelected ? p.text : "#0f172a"}
             isEditable={
@@ -136,7 +135,7 @@ const SuggestionRow = ({
           {secondaryEntries.map(([key, val], i) => (
             <Box key={i} sx={{ minWidth: 100 }}>
               <EditableField
-                label={capitalize(key)}
+                label={key}
                 value={val}
                 color={isSelected ? p.text : "#334155"}
                 isEditable={

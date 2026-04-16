@@ -308,11 +308,11 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
         </Stack>
 
         {data.map((group, groupIdx) => {
-          const isExpanded = expandedGroups[groupIdx] ?? true;
+          const isExpanded = expandedGroups[groupIdx] ?? isPending;
           const selectedIdx = selectedSuggestions[groupIdx];
           const canAccept = selectedIdx !== undefined;
           const fieldStatus = group.currentStatus?.toLowerCase();
-          const isPending = !fieldStatus || fieldStatus === STATUS.INVALID;
+          const isPending = !fieldStatus || fieldStatus.toLowerCase() === STATUS.INVALID || fieldStatus.toLowerCase() === STATUS.PENDING;
           const isAccepted =
             group.currentStatus === STATUS.ACCEPTED ||
             group.currentStatus === STATUS.APPROVED;
@@ -377,6 +377,22 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                         backgroundColor: "#fef9c3",
                         color: "#ca8a04",
                         border: "1px solid #fde047",
+                        "& .MuiChip-label": { px: 1 },
+                      }}
+                    />
+                  )}
+
+                  {isPending && (
+                    <Chip
+                      label="Pending"
+                      size="small"
+                      sx={{
+                        height: 20,
+                        fontSize: 11,
+                        fontWeight: 700,
+                        backgroundColor: "#fff7ed",
+                        color: "#9a3412",
+                        border: "1px solid #fdba74",
                         "& .MuiChip-label": { px: 1 },
                       }}
                     />
@@ -589,7 +605,6 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                       startIcon={<CheckCircleOutlineIcon />}
                       onClick={() => handleAcceptClick(group, groupIdx)}
                       sx={{
-                        textTransform: "none",
                         fontWeight: 700,
                         borderRadius: 1.5,
                         backgroundColor: "#16a34a",
@@ -607,7 +622,6 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                       startIcon={<EditNoteIcon />}
                       onClick={() => openDraftDialog(group, groupIdx)}
                       sx={{
-                        textTransform: "none",
                         fontWeight: 700,
                         borderRadius: 1.5,
                         backgroundColor: "#ffc400",
@@ -625,7 +639,6 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                       startIcon={<StorageIcon />}
                       onClick={() => openL0Confirm(group, groupIdx)}
                       sx={{
-                        textTransform: "none",
                         fontWeight: 700,
                         borderRadius: 1.5,
                         backgroundColor: "#dc2626",

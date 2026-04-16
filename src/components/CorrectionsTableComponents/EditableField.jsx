@@ -24,7 +24,7 @@ const EditableField = ({ label, value, color, onSave, isEditable = true }) => {
     <Box sx={{ px: 1.5, py: 0.5, display: "flex", flexDirection: "column", minHeight: 48, minWidth: 120 }}>
       {isEditing ? (
         <>
-          <Typography sx={{ fontSize: 10, fontWeight: 600, color, textTransform: "uppercase", letterSpacing: 0.5, mb: 0.25, opacity: 0.7 }}>
+          <Typography sx={{ fontSize: 10, fontWeight: 600, color, letterSpacing: 0.5, mb: 0.25, opacity: 0.7 }}>
             {label}
           </Typography>
           <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
@@ -50,7 +50,7 @@ const EditableField = ({ label, value, color, onSave, isEditable = true }) => {
         </>
       ) : (
         <>
-          <Typography sx={{ fontSize: 10, fontWeight: 600, color, textTransform: "uppercase", letterSpacing: 0.5, mb: 0, opacity: 0.7 }}>
+          <Typography sx={{ fontSize: 10, fontWeight: 600, color, letterSpacing: 0.5, mb: 0, opacity: 0.7 }}>
             {label}
           </Typography>
           <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
