@@ -1,6 +1,5 @@
 import React from "react";
 import { Box, Typography, Stack } from "@mui/material";
-import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import { capitalize } from "../../utils/correctionsTableConstants";
 
 const ExistingDataRow = ({ existingData, theme }) => (

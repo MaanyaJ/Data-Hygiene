@@ -441,7 +441,12 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                       mb: 0,
                     }}
                   >
-                    Suggestions
+                    Suggestions <Typography variant="caption"  sx={{
+                      fontSize: 12,
+                      fontWeight: 300,
+                      fontStyle: "italic",
+                      textTransform: "LowerCase",
+                    }}>( Hover over an option to see confidence score )</Typography>
                   </Typography>
 
                   {group.suggestions?.length > 0 ? (
