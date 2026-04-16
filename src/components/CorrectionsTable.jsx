@@ -308,11 +308,11 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
         </Stack>
 
         {data.map((group, groupIdx) => {
-          const isExpanded = expandedGroups[groupIdx] ?? true;
-          const selectedIdx = selectedSuggestions[groupIdx];
-          const canAccept = selectedIdx !== undefined;
           const fieldStatus = group.currentStatus?.toLowerCase();
           const isPending = !fieldStatus || fieldStatus === STATUS.INVALID;
+          const isExpanded = expandedGroups[groupIdx] ?? isPending;
+          const selectedIdx = selectedSuggestions[groupIdx];
+          const canAccept = selectedIdx !== undefined;
           const isAccepted =
             group.currentStatus === STATUS.ACCEPTED ||
             group.currentStatus === STATUS.APPROVED;
@@ -349,6 +349,22 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                   <Typography sx={{ fontWeight: 700, fontSize: 14, color: "#0f172a" }}>
                     {group.invalid_field}
                   </Typography>
+
+                  {isPending && (
+                    <Chip
+                      label="Pending"
+                      size="small"
+                      sx={{
+                        height: 20,
+                        fontSize: 11,
+                        fontWeight: 700,
+                        backgroundColor: "#fff7ed",
+                        color: "#9a3412",
+                        border: "1px solid #fdba74",
+                        "& .MuiChip-label": { px: 1 },
+                      }}
+                    />
+                  )}
 
                   {fieldStatus === STATUS.L0_DATA && (
                     <Chip

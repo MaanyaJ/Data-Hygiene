@@ -8,7 +8,13 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
   const [customSuggestions, setCustomSuggestions] = useState({});
   const [isAccepting, setIsAccepting] = useState(false);
   const [expandedGroups, setExpandedGroups] = useState(() =>
-    Object.fromEntries((data ?? []).map((_, i) => [i, true]))
+    Object.fromEntries(
+      (data ?? []).map((group, i) => {
+        const status = group.currentStatus?.toLowerCase();
+        const isPending = !status || status === "invalid";
+        return [i, isPending];
+      })
+    )
   );
 
   const [acceptConfirm, setAcceptConfirm] = useState(null);
