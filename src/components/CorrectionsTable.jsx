@@ -462,7 +462,7 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                       fontWeight: 300,
                       fontStyle: "italic",
                       textTransform: "LowerCase",
-                    }}>( Hover over an option to see confidence score )</Typography>
+                    }}>{(group.currentStatus === null || group.currentStatus.toLowerCase() === "pending" || group.currentStatus.toLowerCase() === "invalid") && "( Hover over an option to see confidence score )" }</Typography>
                   </Typography> : ""}
 
                   {group.suggestions?.length > 0 ? (
