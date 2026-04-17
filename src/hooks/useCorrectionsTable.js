@@ -181,9 +181,9 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
     };
  
     if (sutType?.toLowerCase() === "vm") {
-      const coreCountVal =
-        merged?.coreCount || merged?.CoreCount || merged?.corecount;
-      if (coreCountVal !== undefined) payload.coreCount = coreCountVal;
+      const cpusVal =
+        merged?.["cpu(s)"] || merged?.["CPU(s)"] || merged?.["CPU(S)"];
+      if (cpusVal !== undefined) payload["CPU(s)"] = cpusVal;
     }
 
     try {
