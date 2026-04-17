@@ -90,7 +90,7 @@ const SuggestionRow = ({
             isEditable={
               isSelected &&
               isPending &&
-              primaryKey?.toLowerCase() === "corecount" &&
+              primaryKey?.toLowerCase() === "cpu(s)" &&
               sutType === "vm"
             }
             onSave={(newVal) => onEditField(primaryKey, newVal)}
@@ -134,7 +134,7 @@ const SuggestionRow = ({
                 isEditable={
                   isSelected &&
                   isPending &&
-                  key.toLowerCase() === "corecount" &&
+                  key.toLowerCase() === "cpu(s)" &&
                   sutType === "vm"
                 }
                 onSave={(newVal) => onEditField(key, newVal)}
