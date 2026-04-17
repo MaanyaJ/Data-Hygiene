@@ -172,13 +172,26 @@ const DraftRecordDialog = ({
   onClose,
   fieldName,
   fields,
-  formValues,
   loadingFields,
-  allFilled,
   submitting,
-  onFieldChange,
   onSubmit,
-}) => (
+}) => {
+  const [formValues, setFormValues] = React.useState({});
+
+  // Reset form every time the dialog opens
+  React.useEffect(() => {
+    if (open) setFormValues({});
+  }, [open]);
+
+  const handleFieldChange = React.useCallback((name, value) => {
+    setFormValues((prev) => ({ ...prev, [name]: value }));
+  }, []);
+
+  const allFilled =
+    fields.length > 0 &&
+    fields.every((f) => !!formValues[f.fieldname]?.trim());
+
+  return (
   <Dialog
     open={open}
     onClose={() => !submitting && onClose()}
@@ -214,12 +227,20 @@ const DraftRecordDialog = ({
         <Stack gap={2.5} sx={{ mt: 0.5 }}>
           {fields.map((field) => (
             <TextField
-              key={field}
-              label={field === "value" ? fieldName : field}
+              key={field.fieldname}
+              label={
+                field.fieldname === "value"
+                  ? fieldName
+                  : field.datatype === "integer"
+                  ? `${field.fieldname} (integer)`
+                  : field.fieldname
+              }
               size="small"
               fullWidth
-              value={formValues[field] ?? ""}
-              onChange={(e) => onFieldChange(field, e.target.value)}
+              type={field.datatype === "integer" ? "number" : "text"}
+              inputProps={field.datatype === "integer" ? { step: 1, min: 0 } : undefined}
+              value={formValues[field.fieldname] ?? ""}
+              onChange={(e) => handleFieldChange(field.fieldname, e.target.value)}
             />
           ))}
         </Stack>
@@ -234,7 +255,7 @@ const DraftRecordDialog = ({
           </Button>
           <Button
             variant="contained"
-            onClick={onSubmit}
+            onClick={() => onSubmit(formValues)}
             disabled={!allFilled || submitting}
             startIcon={submitting ? <CircularProgress size={14} color="inherit" /> : null}
           >
@@ -244,7 +265,8 @@ const DraftRecordDialog = ({
       </>
     )}
   </Dialog>
-);
+  );
+};
 
 /* ─── Main Component ────────────────────────────────────────────── */
 const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotification }) => {
@@ -273,12 +295,9 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
     draftDialog,
     setDraftDialog,
     draftFields,
-    draftFormValues,
     loadingDraftFields,
     submittingDraft,
-    draftAllFilled,
     openDraftDialog,
-    handleDraftFieldChange,
     handleDraftSubmit,
   } = useCorrectionsTable(data, history, execID, sutType, fetchData, showNotification);
  
@@ -447,25 +466,23 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                 <ExistingDataRow existingData={group.existing_data ?? []} />
 
                 <Stack gap={0.5} sx={{ p: 1.5 }}>
-                  {group.suggestions?.length > 0 && (
-                    <Typography
-                      sx={{
-                        fontSize: 10,
-                        fontWeight: 700,
-                        color: "#64748b",
-                        textTransform: "uppercase",
-                        letterSpacing: 0.5,
-                        mb: 0,
-                      }}
-                    >
-                      Suggestions <Typography variant="caption"  sx={{
-                        fontSize: 12,
-                        fontWeight: 300,
-                        fontStyle: "italic",
-                        textTransform: "LowerCase",
-                      }}>{isPending ? "( Hover over an option to see confidence score)" : ""}</Typography>
-                    </Typography>
-                  )}
+                  { group.suggestions?.length > 0 ? <Typography
+                    sx={{
+                      fontSize: 10,
+                      fontWeight: 700,
+                      color: "#64748b",
+                      textTransform: "uppercase",
+                      letterSpacing: 0.5,
+                      mb: 0,
+                    }}
+                  >
+                    Suggestions <Typography variant="caption"  sx={{
+                      fontSize: 12,
+                      fontWeight: 300,
+                      fontStyle: "italic",
+                      textTransform: "LowerCase",
+                    }}>{( group.currentStatus === null || group.currentStatus.toLowerCase() === "pending" || group.currentStatus.toLowerCase() === "invalid") ? "( Hover over an option to see confidence score )" : ""}</Typography>
+                  </Typography> : ""}
 
                   {group.suggestions?.length > 0 ? (
                     group.suggestions.map((sugg, si) => {
@@ -680,11 +697,8 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
         onClose={() => setDraftDialog(null)}
         fieldName={draftDialog?.group?.invalid_field}
         fields={draftFields}
-        formValues={draftFormValues}
         loadingFields={loadingDraftFields}
-        allFilled={draftAllFilled}
         submitting={submittingDraft}
-        onFieldChange={handleDraftFieldChange}
         onSubmit={handleDraftSubmit}
       />
     </>

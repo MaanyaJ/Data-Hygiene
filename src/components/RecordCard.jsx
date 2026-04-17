@@ -86,7 +86,7 @@ const RecordCard = ({ record, ageColor }) => {
                     {!isCompleted && (
                         <>
                             <Divider sx={{ my: 1 }} />
-                            <InconsistentFieldsList invalidFields={invalidFields} SuggestionsCount = {record.SuggestionsCount} status = {record.Status}/>
+                            <InconsistentFieldsList invalidFields={invalidFields} SuggestionsCount = {record.suggestionsCount} status = {record.Status}/>
                         </>
                     )}
                 </CardContent>

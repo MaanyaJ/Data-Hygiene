@@ -20,82 +20,83 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
   const [acceptConfirm, setAcceptConfirm] = useState(null);
 
   // Draft dialog state
-  const [draftDialog, setDraftDialog] = useState(null); // { group, groupIdx }
+  const [draftDialog, setDraftDialog] = useState(null);
   const [draftFields, setDraftFields] = useState([]);
-  const [draftFormValues, setDraftFormValues] = useState({});
   const [loadingDraftFields, setLoadingDraftFields] = useState(false);
   const [submittingDraft, setSubmittingDraft] = useState(false);
 
   // L0 confirm dialog state
-  const [l0ConfirmDialog, setL0ConfirmDialog] = useState(null); // { group, groupIdx }
+  const [l0ConfirmDialog, setL0ConfirmDialog] = useState(null);
   const [submittingL0, setSubmittingL0] = useState(false);
+
+  // ── History lookup helpers ─────────────────────────────────────
+  // Structure:
+  //   history.changes = [
+  //     {
+  //       field: "instanceType",
+  //       changes: [
+  //         { field: "CPUModel", from: "AMD Genoa", to: "7713" },
+  //         { field: "instanceType", from: "c3d-standard-16", to: "Standard_Dadsv5.256" },
+  //       ]
+  //     }, ...
+  //   ]
+
+  /**
+   * Find the history entry matching primaryField and return its changes array.
+   */
+  const getHistoryChangesForField = useCallback((primaryField) => {
+    const changes = history?.changes;
+    if (!Array.isArray(changes)) return null;
+    const entry = changes.find((e) => e.field === primaryField);
+    if (!entry?.changes?.length) return null;
+    return entry.changes;
+  }, [history]);
+
+  /**
+   * Convert a changes array into a display object { field: to }.
+   * Shows everything as-is, no filtering.
+   */
+  const buildDisplayObjectFromChanges = useCallback((changesArr) => {
+    if (!changesArr?.length) return null;
+    return Object.fromEntries(changesArr.map((c) => [c.field, c.to]));
+  }, []);
 
   // Auto-selection logic
   useEffect(() => {
     if (!data || data.length === 0) return;
     if (Object.keys(selectedSuggestions).length > 0) return;
- 
+
     const initialSelections = {};
     const initialCustom = {};
-    const initialEdited = {};
 
-    const extractCoreCount = (obj) => {
-      const key = Object.keys(obj).find((k) => k.toLowerCase() === "corecount");
-      return key && obj[key] != null ? { [key]: obj[key] } : null;
-    };
- 
     data.forEach((group, groupIdx) => {
       const gStatus = group.currentStatus;
-      if (gStatus === STATUS.ACCEPTED || gStatus === STATUS.APPROVED) {
-        const historyObj = {};
-        if (history?.changes) {
-          group.existing_data?.forEach((item) => {
-            const change = history.changes.find((c) => c.field === item.field);
-            historyObj[item.field] =
-              change && Array.isArray(change.to) ? change.to[0] : null;
-          });
-        }
+      if (gStatus !== STATUS.ACCEPTED && gStatus !== STATUS.APPROVED) return;
 
-        const coreCountOverride = extractCoreCount(historyObj);
- 
-        const acceptedIdx = group.suggestions?.findIndex(
-          (s) => s.status === STATUS.ACCEPTED
-        );
- 
-        if (acceptedIdx !== -1 && acceptedIdx !== undefined) {
-          initialSelections[groupIdx] = acceptedIdx;
-          if (coreCountOverride) initialEdited[groupIdx] = coreCountOverride;
-        } else if (Object.keys(historyObj).length > 0) {
-          const primaryField = group.invalid_field;
-          const acceptedValue = historyObj[primaryField];
-          const matchIdx =
-            acceptedValue != null
-              ? group.suggestions?.findIndex((s) => {
-                  const v =
-                    s[primaryField] ??
-                    s[primaryField?.toLowerCase()] ??
-                    s[primaryField?.toUpperCase()];
-                  return (
-                    String(v ?? "").toLowerCase() ===
-                    String(acceptedValue).toLowerCase()
-                  );
-                })
-              : -1;
+      const primaryField = group.invalid_field;
 
-          if (matchIdx !== undefined && matchIdx !== -1) {
-            initialSelections[groupIdx] = matchIdx;
-            if (coreCountOverride) initialEdited[groupIdx] = coreCountOverride;
-          } else {
-            initialSelections[groupIdx] = "custom";
-            initialCustom[groupIdx] = historyObj;
-          }
-        }
+      // 1. Any suggestion explicitly marked as accepted → highlight it
+      const acceptedIdx = group.suggestions?.findIndex(
+        (s) => s.status?.toLowerCase() === STATUS.ACCEPTED.toLowerCase()
+      );
+      if (acceptedIdx !== undefined && acceptedIdx !== -1) {
+        initialSelections[groupIdx] = acceptedIdx;
+        return;
+      }
+
+      // 2. No accepted suggestion → show history changes as custom
+      const changesArr = getHistoryChangesForField(primaryField);
+      if (!changesArr) return;
+
+      const displayObj = buildDisplayObjectFromChanges(changesArr);
+      if (displayObj && Object.keys(displayObj).length > 0) {
+        initialSelections[groupIdx] = "custom";
+        initialCustom[groupIdx] = displayObj;
       }
     });
- 
+
     if (Object.keys(initialSelections).length > 0) setSelectedSuggestions(initialSelections);
     if (Object.keys(initialCustom).length > 0) setCustomSuggestions(initialCustom);
-    if (Object.keys(initialEdited).length > 0) setEditedSuggestions(initialEdited);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, history]);
  
@@ -241,14 +242,13 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
   const openDraftDialog = useCallback(
     async (group, groupIdx) => {
       setDraftDialog({ group, groupIdx });
-      setDraftFormValues({});
       setLoadingDraftFields(true);
       try {
         const res = await fetch(
           `${API_URL}/draft-records/fields?type=${encodeURIComponent(group.invalid_field)}`
         );
-        const data = await res.json();
-        setDraftFields(data.fields ?? []);
+        const json = await res.json();
+        setDraftFields(json.fields ?? []);
       } catch (error) {
         console.error("Fetch draft fields failed:", error);
         setDraftFields([]);
@@ -259,17 +259,46 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
     []
   );
 
-  const handleDraftFieldChange = useCallback((name, value) => {
-    setDraftFormValues((prev) => ({ ...prev, [name]: value }));
-  }, []);
 
-  const handleDraftSubmit = useCallback(async () => {
+
+  const handleDraftSubmit = useCallback(async (formValues) => {
     const { group } = draftDialog;
+
+    // ── Validate integer fields before submitting ──────────────────
+    const integerErrors = [];
+    for (const field of draftFields) {
+      if (field.datatype === "integer") {
+        const val = formValues[field.fieldname];
+        if (val === undefined || val === "") continue; // let allFilled handle blank
+        if (!Number.isInteger(Number(val)) || isNaN(Number(val)) || String(val).includes(".") || Number(val) < 0) {
+          integerErrors.push(field.fieldname);
+        }
+      }
+    }
+    if (integerErrors.length > 0) {
+      showNotification(
+        `The following fields require whole-number (integer) values: ${integerErrors.join(", ")}`,
+        "error"
+      );
+      return;
+    }
+
+    // ── Build typed payload ────────────────────────────────────────
+    const typedValues = {};
+    for (const field of draftFields) {
+      const raw = formValues[field.fieldname];
+      if (raw !== undefined && raw !== "") {
+        typedValues[field.fieldname] = field.datatype === "integer" ? Number(raw) : raw;
+      } else {
+        typedValues[field.fieldname] = raw ?? "";
+      }
+    }
+
     setSubmittingDraft(true);
     try {
       const payload = {
         execution_id: execID,
-        ...draftFormValues,
+        ...typedValues,
         currentStatus: "On Hold",
       };
       const res = await fetch(
@@ -286,6 +315,7 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
         return;
       }
       showNotification("Draft record submitted successfully", "success");
+      console.log("Draft record submitted successfully", payload);
       setDraftDialog(null);
       fetchData();
     } catch (error) {
@@ -294,11 +324,7 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
     } finally {
       setSubmittingDraft(false);
     }
-  }, [draftDialog, execID, draftFormValues, fetchData, showNotification]);
-
-  const draftAllFilled =
-    draftFields.length > 0 &&
-    draftFields.every((f) => !!draftFormValues[f]?.trim());
+  }, [draftDialog, execID, draftFields, fetchData, showNotification]);
 
   return {
     selectedSuggestions,
@@ -325,12 +351,9 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
     draftDialog,
     setDraftDialog,
     draftFields,
-    draftFormValues,
     loadingDraftFields,
     submittingDraft,
-    draftAllFilled,
     openDraftDialog,
-    handleDraftFieldChange,
     handleDraftSubmit,
   };
 };

@@ -63,7 +63,7 @@ const InconsistentFieldsList = ({ invalidFields = [], SuggestionsCount, status }
               </Typography>
             )}
           </Stack>
-        <Typography variant="body2" sx={{fontStyle: "italic"}}>{status.toLowerCase() === "pending" && (SuggestionsCount>0 ? "Suggestions available" : "")}</Typography>
+        <Typography variant="caption" sx={{fontStyle: "italic"}}>{status.toLowerCase() === "pending" && (SuggestionsCount == true ? "Suggestions available" : "")}</Typography>
         </Stack>
       </Stack>
     </Box>
