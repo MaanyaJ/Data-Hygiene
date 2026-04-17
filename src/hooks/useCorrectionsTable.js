@@ -20,82 +20,84 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
   const [acceptConfirm, setAcceptConfirm] = useState(null);
 
   // Draft dialog state
-  const [draftDialog, setDraftDialog] = useState(null); // { group, groupIdx }
+  const [draftDialog, setDraftDialog] = useState(null);
   const [draftFields, setDraftFields] = useState([]);
   const [draftFormValues, setDraftFormValues] = useState({});
   const [loadingDraftFields, setLoadingDraftFields] = useState(false);
   const [submittingDraft, setSubmittingDraft] = useState(false);
 
   // L0 confirm dialog state
-  const [l0ConfirmDialog, setL0ConfirmDialog] = useState(null); // { group, groupIdx }
+  const [l0ConfirmDialog, setL0ConfirmDialog] = useState(null);
   const [submittingL0, setSubmittingL0] = useState(false);
+
+  // ── History lookup helpers ─────────────────────────────────────
+  // Structure:
+  //   history.changes = [
+  //     {
+  //       field: "instanceType",
+  //       changes: [
+  //         { field: "CPUModel", from: "AMD Genoa", to: "7713" },
+  //         { field: "instanceType", from: "c3d-standard-16", to: "Standard_Dadsv5.256" },
+  //       ]
+  //     }, ...
+  //   ]
+
+  /**
+   * Find the history entry matching primaryField and return its changes array.
+   */
+  const getHistoryChangesForField = useCallback((primaryField) => {
+    const changes = history?.changes;
+    if (!Array.isArray(changes)) return null;
+    const entry = changes.find((e) => e.field === primaryField);
+    if (!entry?.changes?.length) return null;
+    return entry.changes;
+  }, [history]);
+
+  /**
+   * Convert a changes array into a display object { field: to }.
+   * Shows everything as-is, no filtering.
+   */
+  const buildDisplayObjectFromChanges = useCallback((changesArr) => {
+    if (!changesArr?.length) return null;
+    return Object.fromEntries(changesArr.map((c) => [c.field, c.to]));
+  }, []);
 
   // Auto-selection logic
   useEffect(() => {
     if (!data || data.length === 0) return;
     if (Object.keys(selectedSuggestions).length > 0) return;
- 
+
     const initialSelections = {};
     const initialCustom = {};
-    const initialEdited = {};
 
-    const extractCoreCount = (obj) => {
-      const key = Object.keys(obj).find((k) => k.toLowerCase() === "corecount");
-      return key && obj[key] != null ? { [key]: obj[key] } : null;
-    };
- 
     data.forEach((group, groupIdx) => {
       const gStatus = group.currentStatus;
-      if (gStatus === STATUS.ACCEPTED || gStatus === STATUS.APPROVED) {
-        const historyObj = {};
-        if (history?.changes) {
-          group.existing_data?.forEach((item) => {
-            const change = history.changes.find((c) => c.field === item.field);
-            historyObj[item.field] =
-              change && Array.isArray(change.to) ? change.to[0] : null;
-          });
-        }
+      if (gStatus !== STATUS.ACCEPTED && gStatus !== STATUS.APPROVED) return;
 
-        const coreCountOverride = extractCoreCount(historyObj);
- 
-        const acceptedIdx = group.suggestions?.findIndex(
-          (s) => s.status === STATUS.ACCEPTED
-        );
- 
-        if (acceptedIdx !== -1 && acceptedIdx !== undefined) {
-          initialSelections[groupIdx] = acceptedIdx;
-          if (coreCountOverride) initialEdited[groupIdx] = coreCountOverride;
-        } else if (Object.keys(historyObj).length > 0) {
-          const primaryField = group.invalid_field;
-          const acceptedValue = historyObj[primaryField];
-          const matchIdx =
-            acceptedValue != null
-              ? group.suggestions?.findIndex((s) => {
-                  const v =
-                    s[primaryField] ??
-                    s[primaryField?.toLowerCase()] ??
-                    s[primaryField?.toUpperCase()];
-                  return (
-                    String(v ?? "").toLowerCase() ===
-                    String(acceptedValue).toLowerCase()
-                  );
-                })
-              : -1;
+      const primaryField = group.invalid_field;
 
-          if (matchIdx !== undefined && matchIdx !== -1) {
-            initialSelections[groupIdx] = matchIdx;
-            if (coreCountOverride) initialEdited[groupIdx] = coreCountOverride;
-          } else {
-            initialSelections[groupIdx] = "custom";
-            initialCustom[groupIdx] = historyObj;
-          }
-        }
+      // 1. Any suggestion explicitly marked as accepted → highlight it
+      const acceptedIdx = group.suggestions?.findIndex(
+        (s) => s.status?.toLowerCase() === STATUS.ACCEPTED.toLowerCase()
+      );
+      if (acceptedIdx !== undefined && acceptedIdx !== -1) {
+        initialSelections[groupIdx] = acceptedIdx;
+        return;
+      }
+
+      // 2. No accepted suggestion → show history changes as custom
+      const changesArr = getHistoryChangesForField(primaryField);
+      if (!changesArr) return;
+
+      const displayObj = buildDisplayObjectFromChanges(changesArr);
+      if (displayObj && Object.keys(displayObj).length > 0) {
+        initialSelections[groupIdx] = "custom";
+        initialCustom[groupIdx] = displayObj;
       }
     });
- 
+
     if (Object.keys(initialSelections).length > 0) setSelectedSuggestions(initialSelections);
     if (Object.keys(initialCustom).length > 0) setCustomSuggestions(initialCustom);
-    if (Object.keys(initialEdited).length > 0) setEditedSuggestions(initialEdited);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, history]);
  

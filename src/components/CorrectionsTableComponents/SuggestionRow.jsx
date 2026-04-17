@@ -17,19 +17,12 @@ const SuggestionRow = ({
   // Extract and exclude score/status from visible columns
   const { score, status, ...rawSuggestionData } = suggestion;
   
-  // Filter out internal fields
+  // Filter out internal fields — no deduplication, preserve all entries including duplicates
   const internalKeys = ["_id", "execution_id", "snapshot_id", "search_key"];
-  const suggestionData = Object.fromEntries(
-    Object.entries(rawSuggestionData).filter(([k]) => !internalKeys.includes(k.toLowerCase()))
+  const entries = Object.entries(rawSuggestionData).filter(
+    ([k]) => !internalKeys.includes(k.toLowerCase())
   );
 
-  // Deduplicate entries by lowercase key
-  const seen = new Map();
-  for (const [k, v] of Object.entries(suggestionData)) {
-    seen.set(k.toLowerCase(), [k, v]);
-  }
-  const entries = [...seen.values()];
- 
   const [primaryKey, primaryVal] = entries[0] ?? [];
   const secondaryEntries = entries.slice(1);
  
@@ -59,7 +52,7 @@ const SuggestionRow = ({
           }),
         }}
       >
-        {/* Left — Radio (remains same) */}
+        {/* Left — Radio */}
         {showRadio && (
           <Box
             sx={{
@@ -97,7 +90,7 @@ const SuggestionRow = ({
             isEditable={
               isSelected &&
               isPending &&
-              primaryKey.toLowerCase() === "corecount" &&
+              primaryKey?.toLowerCase() === "corecount" &&
               sutType === "vm"
             }
             onSave={(newVal) => onEditField(primaryKey, newVal)}
@@ -116,7 +109,7 @@ const SuggestionRow = ({
           />
         )}
  
-        {/* Secondary fields with EditableField */}
+        {/* Secondary fields */}
         <Stack
           direction="row"
           alignItems="center"
