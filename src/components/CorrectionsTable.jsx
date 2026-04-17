@@ -308,11 +308,11 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
         </Stack>
 
         {data.map((group, groupIdx) => {
-          const fieldStatus = group.currentStatus?.toLowerCase();
-          const isPending = !fieldStatus || fieldStatus === STATUS.INVALID;
           const isExpanded = expandedGroups[groupIdx] ?? isPending;
           const selectedIdx = selectedSuggestions[groupIdx];
           const canAccept = selectedIdx !== undefined;
+          const fieldStatus = group.currentStatus?.toLowerCase();
+          const isPending = !fieldStatus || fieldStatus.toLowerCase() === STATUS.INVALID || fieldStatus.toLowerCase() === STATUS.PENDING;
           const isAccepted =
             group.currentStatus === STATUS.ACCEPTED ||
             group.currentStatus === STATUS.APPROVED;
@@ -323,7 +323,7 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
               key={groupIdx}
               elevation={0}
               sx={{
-                border: "1.5px solid #e2e8f0",
+                border: "1.5px solid #c2c2c2a2",
                 borderRadius: 3,
                 overflow: "hidden",
                 transition: "box-shadow 0.2s ease",
@@ -349,22 +349,6 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                   <Typography sx={{ fontWeight: 700, fontSize: 14, color: "#0f172a" }}>
                     {group.invalid_field}
                   </Typography>
-
-                  {isPending && (
-                    <Chip
-                      label="Pending"
-                      size="small"
-                      sx={{
-                        height: 20,
-                        fontSize: 11,
-                        fontWeight: 700,
-                        backgroundColor: "#fff7ed",
-                        color: "#9a3412",
-                        border: "1px solid #fdba74",
-                        "& .MuiChip-label": { px: 1 },
-                      }}
-                    />
-                  )}
 
                   {fieldStatus === STATUS.L0_DATA && (
                     <Chip
@@ -393,6 +377,22 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                         backgroundColor: "#fef9c3",
                         color: "#ca8a04",
                         border: "1px solid #fde047",
+                        "& .MuiChip-label": { px: 1 },
+                      }}
+                    />
+                  )}
+
+                  {isPending && (
+                    <Chip
+                      label="Pending"
+                      size="small"
+                      sx={{
+                        height: 20,
+                        fontSize: 11,
+                        fontWeight: 700,
+                        backgroundColor: "#fff7ed",
+                        color: "#9a3412",
+                        border: "1px solid #fdba74",
                         "& .MuiChip-label": { px: 1 },
                       }}
                     />
@@ -447,18 +447,25 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                 <ExistingDataRow existingData={group.existing_data ?? []} />
 
                 <Stack gap={0.5} sx={{ p: 1.5 }}>
-                  <Typography
-                    sx={{
-                      fontSize: 10,
-                      fontWeight: 700,
-                      color: "#64748b",
-                      textTransform: "uppercase",
-                      letterSpacing: 0.5,
-                      mb: 0,
-                    }}
-                  >
-                    Suggestions
-                  </Typography>
+                  {group.suggestions?.length > 0 && (
+                    <Typography
+                      sx={{
+                        fontSize: 10,
+                        fontWeight: 700,
+                        color: "#64748b",
+                        textTransform: "uppercase",
+                        letterSpacing: 0.5,
+                        mb: 0,
+                      }}
+                    >
+                      Suggestions <Typography variant="caption"  sx={{
+                        fontSize: 12,
+                        fontWeight: 300,
+                        fontStyle: "italic",
+                        textTransform: "LowerCase",
+                      }}>{isPending ? "( Hover over an option to see confidence score)" : ""}</Typography>
+                    </Typography>
+                  )}
 
                   {group.suggestions?.length > 0 ? (
                     group.suggestions.map((sugg, si) => {
@@ -600,7 +607,6 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                       startIcon={<CheckCircleOutlineIcon />}
                       onClick={() => handleAcceptClick(group, groupIdx)}
                       sx={{
-                        textTransform: "none",
                         fontWeight: 700,
                         borderRadius: 1.5,
                         backgroundColor: "#16a34a",
@@ -618,7 +624,6 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                       startIcon={<EditNoteIcon />}
                       onClick={() => openDraftDialog(group, groupIdx)}
                       sx={{
-                        textTransform: "none",
                         fontWeight: 700,
                         borderRadius: 1.5,
                         backgroundColor: "#ffc400",
@@ -636,7 +641,6 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                       startIcon={<StorageIcon />}
                       onClick={() => openL0Confirm(group, groupIdx)}
                       sx={{
-                        textTransform: "none",
                         fontWeight: 700,
                         borderRadius: 1.5,
                         backgroundColor: "#dc2626",

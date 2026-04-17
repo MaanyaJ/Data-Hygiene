@@ -90,7 +90,7 @@ const ListHeader = ({
     { label: "Pending",  value: "pending", color: "#ea580c", activeColor: "#9a3412", bg: "#ffffff", activeBg: "#f97316", dot: "#f9972fff" },
     { label: "Accepted", value: "accepted", color: "#059669", activeColor: "#065f46", bg: "#ffffff", activeBg: "#10b981", dot: "#34d399" },
     { label: "L0 Data", value: "rejected", color: "#dc2626", activeColor: "#991b1b", bg: "#ffffff", activeBg: "#ef4444", dot: "#f87171" },
-    { label: "On Hold",  value: "On Hold",  color: "#ca8a04", activeColor: "#854d0e", bg: "#ffffff", activeBg: "#ca8a04", dot: "#facc15" },
+    { label: "On Hold",  value: "On Hold",  color: "#ca8a04", activeColor: "#854d0e", bg: "#ffffff", activeBg: "#dbbc23", dot: "#facc15" },
   ];
 
   return (
@@ -116,7 +116,7 @@ const ListHeader = ({
             width: { xs: "90%", md: 500 },
             "& .MuiOutlinedInput-root": {
               border: "1px solid #747d8aff",
-              
+              borderRadius: "8px",
               backgroundColor: "#fff",
               boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
               "&:hover": { boxShadow: "0 4px 15px rgba(0,0,0,0.1)" },

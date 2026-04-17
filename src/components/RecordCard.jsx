@@ -10,11 +10,11 @@ import { Card, CardContent, Typography, Divider, Stack } from "@mui/material";
 
 
 const STATUS_STYLES = {
-    pending: { color: "#9a3412", bg: "#ffffff", border: "#f97316", dot: "#fdba74" },
+    pending: { color: "#ff9500", bg: "#ffffff", border: "#ffae00", dot: "#fdba74" },
     approved: { color: "#065f46", bg: "#ffffff", border: "#10b981", dot: "#34d399" },
     accepted: { color: "#065f46", bg: "#ffffff", border: "#10b981", dot: "#34d399" },
     rejected: { color: "#991b1b", bg: "#ffffff", border: "#ef4444", dot: "#f87171" },
-    "on hold": { color: "#854d0e", bg: "#ffffff", border: "#ca8a04", dot: "#facc15" },
+    "on hold": { color: "#f1cb0b", bg: "#ffffff", border: "#f1e60b", dot: "#facc15" },
 };
 
 const RecordCard = ({ record, ageColor }) => {
