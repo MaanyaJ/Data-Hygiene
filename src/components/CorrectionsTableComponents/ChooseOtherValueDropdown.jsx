@@ -11,6 +11,7 @@ const ChooseOtherValueDropdown = ({
   onSelectCustom,
   onClearCustom,
   isPending = true,
+  theme,
 }) => {
   const primaryField = invalidField?.split(",")[0].trim() || "";
   const { options, loading, fetchOptions } = useUniqueValues(primaryField);
@@ -57,7 +58,7 @@ const ChooseOtherValueDropdown = ({
     }
   };
 
-  const p = SELECTED;
+  const p = theme || SELECTED;
 
   return (
     <Box
