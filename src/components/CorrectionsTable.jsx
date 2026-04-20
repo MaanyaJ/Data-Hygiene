@@ -174,14 +174,17 @@ const DraftRecordDialog = ({
   fields,
   loadingFields,
   submitting,
+  initialValues,
   onSubmit,
 }) => {
   const [formValues, setFormValues] = React.useState({});
 
-  // Reset form every time the dialog opens
+  // Reset form and pre-fill with initialValues every time the dialog opens
   React.useEffect(() => {
-    if (open) setFormValues({});
-  }, [open]);
+    if (open) {
+      setFormValues(initialValues || {});
+    }
+  }, [open, initialValues]);
 
   const handleFieldChange = React.useCallback((name, value) => {
     setFormValues((prev) => ({ ...prev, [name]: value }));
@@ -297,6 +300,8 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
     draftFields,
     loadingDraftFields,
     submittingDraft,
+    draftInitialValues,
+    getHistoryChangesForField,
     openDraftDialog,
     handleDraftSubmit,
   } = useCorrectionsTable(data, history, execID, sutType, fetchData, showNotification);
@@ -495,6 +500,17 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                       const baseSugg = sugg;
                       const editedSugg = isSelected ? editedSuggestions[groupIdx] || {} : {};
                       const mergedSugg = { ...baseSugg, ...editedSugg };
+                      
+                      // UI Override: Always show History CPU(s) value if it exists for VM
+                      if (isSelected && sutType?.toLowerCase() === "vm") {
+                        const historyArr = getHistoryChangesForField(group.invalid_field);
+                        const historyCpu = historyArr?.find(c => c.field?.toLowerCase() === "cpu(s)");
+                        if (historyCpu?.to !== undefined) {
+                          // Match the key casing used in suggestions (often lowercase in suggestions JSON)
+                          const cpuKey = Object.keys(mergedSugg).find(k => k.toLowerCase() === "cpu(s)") || "cpu(s)";
+                          mergedSugg[cpuKey] = historyCpu.to;
+                        }
+                      }
  
                       return (
                         <SuggestionRow
@@ -519,35 +535,47 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                 </Stack>
 
                 {/* ── Draft Record (populated when status is ON HOLD) ── */}
-                {group.draft_records && (
-                  <>
-                    <Typography
-                      sx={{
-                        fontSize: 10,
-                        fontWeight: 700,
-                        color: "#64748b",
-                        textTransform: "uppercase",
-                        letterSpacing: 0.5,
-                        mt: 2,
-                        ml: 1.5,
-                      }}
-                    >
-                      Draft Record
-                    </Typography>
-                    <Box sx={{ mt: 1, px: 1.5 }}>
-                      <SuggestionRow
-                        suggestion={group.draft_records}
-                        isSelected={fieldStatus === STATUS.ON_HOLD}
-                        theme={ON_HOLD_THEME}
-                        onSelect={() => {}}
-                        onEditField={() => {}}
-                        sutType={sutType}
-                        isPending={false}
-                        showRadio={false}
-                      />
-                    </Box>
-                  </>
-                )}
+                {group.draft_records && (() => {
+                  const draftSugg = { ...group.draft_records };
+                  if (sutType?.toLowerCase() === "vm") {
+                    const historyArr = getHistoryChangesForField(group.invalid_field);
+                    const historyCpu = historyArr?.find(c => c.field?.toLowerCase() === "cpu(s)");
+                    if (historyCpu?.to !== undefined) {
+                      const cpuKey = Object.keys(draftSugg).find(k => k.toLowerCase() === "cpu(s)") || "cpu(s)";
+                      draftSugg[cpuKey] = historyCpu.to;
+                    }
+                  }
+
+                  return (
+                    <>
+                      <Typography
+                        sx={{
+                          fontSize: 10,
+                          fontWeight: 700,
+                          color: "#64748b",
+                          textTransform: "uppercase",
+                          letterSpacing: 0.5,
+                          mt: 2,
+                          ml: 1.5,
+                        }}
+                      >
+                        Draft Record
+                      </Typography>
+                      <Box sx={{ mt: 1, px: 1.5 }}>
+                        <SuggestionRow
+                          suggestion={draftSugg}
+                          isSelected={fieldStatus === STATUS.ON_HOLD}
+                          theme={ON_HOLD_THEME}
+                          onSelect={() => {}}
+                          onEditField={() => {}}
+                          sutType={sutType}
+                          isPending={false}
+                          showRadio={false}
+                        />
+                      </Box>
+                    </>
+                  );
+                })()}
  
                 {selectedIdx === "custom" && (
                   <Typography
@@ -586,6 +614,16 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                     const baseSugg = customSuggestions[groupIdx];
                     const editedSugg = isSelected ? editedSuggestions[groupIdx] || {} : {};
                     const mergedSugg = { ...baseSugg, ...editedSugg };
+
+                    // UI Override: Always show History CPU(s) value if it exists for VM
+                    if (isSelected && sutType?.toLowerCase() === "vm") {
+                      const historyArr = getHistoryChangesForField(group.invalid_field);
+                      const historyCpu = historyArr?.find(c => c.field?.toLowerCase() === "cpu(s)");
+                      if (historyCpu?.to !== undefined) {
+                        const cpuKey = Object.keys(mergedSugg).find(k => k.toLowerCase() === "cpu(s)") || "cpu(s)";
+                        mergedSugg[cpuKey] = historyCpu.to;
+                      }
+                    }
  
                     return (
                       <Box sx={{ mt: 1, px: 1.5 }}>
@@ -699,6 +737,7 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
         fields={draftFields}
         loadingFields={loadingDraftFields}
         submitting={submittingDraft}
+        initialValues={draftInitialValues}
         onSubmit={handleDraftSubmit}
       />
     </>
