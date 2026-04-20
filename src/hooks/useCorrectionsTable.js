@@ -22,7 +22,6 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
   // Draft dialog state
   const [draftDialog, setDraftDialog] = useState(null);
   const [draftFields, setDraftFields] = useState([]);
-  const [draftFormValues, setDraftFormValues] = useState({});
   const [loadingDraftFields, setLoadingDraftFields] = useState(false);
   const [submittingDraft, setSubmittingDraft] = useState(false);
 
@@ -46,9 +45,11 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
    * Find the history entry matching primaryField and return its changes array.
    */
   const getHistoryChangesForField = useCallback((primaryField) => {
-    const changes = history?.changes;
-    if (!Array.isArray(changes)) return null;
-    const entry = changes.find((e) => e.field === primaryField);
+    // Handle both { changes: [...] } and simply [...]
+    const changesArr = Array.isArray(history) ? history : history?.changes;
+    if (!Array.isArray(changesArr)) return null;
+    
+    const entry = changesArr.find((e) => e.field?.toLowerCase() === primaryField?.toLowerCase());
     if (!entry?.changes?.length) return null;
     return entry.changes;
   }, [history]);
@@ -76,7 +77,7 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
 
       const primaryField = group.invalid_field;
 
-      // 1. Any suggestion explicitly marked as accepted → highlight it
+      // 1. First choice: Any suggestion explicitly marked as accepted
       const acceptedIdx = group.suggestions?.findIndex(
         (s) => s.status?.toLowerCase() === STATUS.ACCEPTED.toLowerCase()
       );
@@ -85,14 +86,15 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
         return;
       }
 
-      // 2. No accepted suggestion → show history changes as custom
+      // 2. Second choice: History changes as custom selection
       const changesArr = getHistoryChangesForField(primaryField);
-      if (!changesArr) return;
-
-      const displayObj = buildDisplayObjectFromChanges(changesArr);
-      if (displayObj && Object.keys(displayObj).length > 0) {
-        initialSelections[groupIdx] = "custom";
-        initialCustom[groupIdx] = displayObj;
+      if (changesArr) {
+        const displayObj = buildDisplayObjectFromChanges(changesArr);
+        if (displayObj && Object.keys(displayObj).length > 0) {
+          initialSelections[groupIdx] = "custom";
+          initialCustom[groupIdx] = displayObj;
+          return;
+        }
       }
     });
 
@@ -118,7 +120,15 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
   }, []);
  
   const handleSelectCustom = useCallback((groupIdx) => {
-    setSelectedSuggestions((prev) => ({ ...prev, [groupIdx]: "custom" }));
+    setSelectedSuggestions((prev) => {
+      const next = { ...prev };
+      if (next[groupIdx] === "custom") {
+        delete next[groupIdx];
+      } else {
+        next[groupIdx] = "custom";
+      }
+      return next;
+    });
     setEditedSuggestions((prev) => {
       const next = { ...prev };
       delete next[groupIdx];
@@ -181,9 +191,21 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
     };
  
     if (sutType?.toLowerCase() === "vm") {
-      const cpusVal =
-        merged?.["cpu(s)"] || merged?.["CPU(s)"] || merged?.["CPU(S)"];
-      if (cpusVal !== undefined) payload["CPU(s)"] = cpusVal;
+      // Prioritize CPU(s) from history
+      const historyChanges = getHistoryChangesForField(primaryField);
+      const historyCpu = historyChanges?.find((c) => c.field?.toLowerCase() === "cpu(s)");
+      
+      let cpusVal = historyCpu?.to;
+      
+      // Fallback to merged suggestion/custom value if not in history
+      if (cpusVal === undefined) {
+        cpusVal = merged?.["cpu(s)"] || merged?.["CPU(s)"] || merged?.["CPU(S)"];
+      }
+
+      if (cpusVal !== undefined) {
+        // CPU(s) is an integer field, cast to number
+        payload["CPU(s)"] = isNaN(Number(cpusVal)) ? cpusVal : Number(cpusVal);
+      }
     }
 
     try {
@@ -204,6 +226,7 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
         delete next[groupIdx];
         return next;
       });
+      console.log(payload)
       setAcceptConfirm(null);
       fetchData();
       showNotification("Data accepted successfully", "success");
@@ -240,17 +263,24 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
   }, [execID, fetchData, showNotification]);
 
   // ── Draft ─────────────────────────────────────────────────────
+  const [draftInitialValues, setDraftInitialValues] = useState({});
+
   const openDraftDialog = useCallback(
     async (group, groupIdx) => {
       setDraftDialog({ group, groupIdx });
-      setDraftFormValues({});
       setLoadingDraftFields(true);
+      
+      // Pre-fill from history
+      const historyArr = getHistoryChangesForField(group.invalid_field);
+      const historyObj = buildDisplayObjectFromChanges(historyArr) || {};
+      setDraftInitialValues(historyObj);
+
       try {
         const res = await fetch(
           `${API_URL}/draft-records/fields?type=${encodeURIComponent(group.invalid_field)}`
         );
-        const data = await res.json();
-        setDraftFields(data.fields ?? []);
+        const json = await res.json();
+        setDraftFields(json.fields ?? []);
       } catch (error) {
         console.error("Fetch draft fields failed:", error);
         setDraftFields([]);
@@ -258,22 +288,59 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
         setLoadingDraftFields(false);
       }
     },
-    []
+    [getHistoryChangesForField, buildDisplayObjectFromChanges]
   );
 
-  const handleDraftFieldChange = useCallback((name, value) => {
-    setDraftFormValues((prev) => ({ ...prev, [name]: value }));
-  }, []);
 
-  const handleDraftSubmit = useCallback(async () => {
+
+  const handleDraftSubmit = useCallback(async (formValues) => {
     const { group } = draftDialog;
+
+    // ── Validate integer fields before submitting ──────────────────
+    const integerErrors = [];
+    for (const field of draftFields) {
+      if (field.datatype === "integer") {
+        const val = formValues[field.fieldname];
+        if (val === undefined || val === "") continue; // let allFilled handle blank
+        if (!Number.isInteger(Number(val)) || isNaN(Number(val)) || String(val).includes(".") || Number(val) < 0) {
+          integerErrors.push(field.fieldname);
+        }
+      }
+    }
+    if (integerErrors.length > 0) {
+      showNotification(
+        `The following fields require whole-number (integer) values: ${integerErrors.join(", ")}`,
+        "error"
+      );
+      return;
+    }
+
+    // ── Build typed payload ────────────────────────────────────────
+    const typedValues = {};
+    for (const field of draftFields) {
+      const raw = formValues[field.fieldname];
+      if (raw !== undefined && raw !== "") {
+        typedValues[field.fieldname] = field.datatype === "integer" ? Number(raw) : raw;
+      } else {
+        typedValues[field.fieldname] = raw ?? "";
+      }
+    }
+
     setSubmittingDraft(true);
     try {
       const payload = {
         execution_id: execID,
-        ...draftFormValues,
+        ...typedValues,
         currentStatus: "On Hold",
       };
+
+      if (sutType?.toLowerCase() === "vm") {
+        const historyChanges = getHistoryChangesForField(group.invalid_field);
+        const historyCpu = historyChanges?.find((c) => c.field?.toLowerCase() === "cpu(s)");
+        if (historyCpu?.to !== undefined) {
+          payload["CPU(s)"] = isNaN(Number(historyCpu.to)) ? historyCpu.to : Number(historyCpu.to);
+        }
+      }
       const res = await fetch(
         `${API_URL}/draft-records/${encodeURIComponent(group.invalid_field)}`,
         {
@@ -288,6 +355,7 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
         return;
       }
       showNotification("Draft record submitted successfully", "success");
+      console.log("Draft record submitted successfully", payload);
       setDraftDialog(null);
       fetchData();
     } catch (error) {
@@ -296,11 +364,7 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
     } finally {
       setSubmittingDraft(false);
     }
-  }, [draftDialog, execID, draftFormValues, fetchData, showNotification]);
-
-  const draftAllFilled =
-    draftFields.length > 0 &&
-    draftFields.every((f) => !!draftFormValues[f]?.trim());
+  }, [draftDialog, execID, draftFields, fetchData, showNotification]);
 
   return {
     selectedSuggestions,
@@ -327,12 +391,11 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
     draftDialog,
     setDraftDialog,
     draftFields,
-    draftFormValues,
     loadingDraftFields,
     submittingDraft,
-    draftAllFilled,
+    draftInitialValues,
+    getHistoryChangesForField,
     openDraftDialog,
-    handleDraftFieldChange,
     handleDraftSubmit,
   };
 };
