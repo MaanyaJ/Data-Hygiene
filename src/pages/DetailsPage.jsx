@@ -38,7 +38,7 @@ const transformOldApiData = (rawData) => {
 
       sugg[item.field.toLowerCase()] =
         entry && entry[suggKey] !== undefined ? entry[suggKey] : "—";
-      
+
       if (entry && entry[scoreKey] !== undefined && firstScore === null) {
         firstScore = entry[scoreKey];
       }
@@ -79,6 +79,8 @@ const DetailsPage = () => {
       if (!res.ok) throw new Error("Failed to fetch record details");
 
       const json = await res.json();
+      if (json.status === "error") throw new Error(json.message)
+      
       setExecutionData(json.execution_details);
       setHistory(json.history);
 
@@ -107,7 +109,7 @@ const DetailsPage = () => {
   if (loading) return <Loader />;
   if (error) return <ErrorPage message={error?.message} onRetry={fetchData} />;
   if (!executionData) return "No execution data to show";
-  // if (!data || data.length === 0) return "No invalid data in the response to show";
+  if (!data || data.length === 0) return "No invalid data in the response to show";
 
   return (
     <Box>
@@ -125,9 +127,9 @@ const DetailsPage = () => {
         </Box>
       </Box>
 
-      <Snackbar 
-        open={snackbar.open} 
-        autoHideDuration={3000} 
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
         onClose={handleSnackbarClose}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
