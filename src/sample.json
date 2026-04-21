@@ -1,0 +1,1014 @@
+[
+    {
+  "users": [
+    {
+      "id": 1,
+      "name": "User One",
+      "email": "user1@example.com",
+      "address": {
+        "street": "123 Main Street",
+        "city": "Bangalore",
+        "state": "Karnataka",
+        "zip": "560001"
+      },
+      "orders": [
+        {
+          "orderId": "ORD-1001",
+          "amount": 2500,
+          "items": [
+            { "productId": "P1", "name": "Laptop", "price": 2000 },
+            { "productId": "P2", "name": "Mouse", "price": 500 }
+          ]
+        },
+        {
+          "orderId": "ORD-1002",
+          "amount": 1500,
+          "items": [
+            { "productId": "P3", "name": "Keyboard", "price": 1500 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "User Two",
+      "email": "user2@example.com",
+      "address": {
+        "street": "456 Second Street",
+        "city": "Hyderabad",
+        "state": "Telangana",
+        "zip": "500001"
+      },
+      "orders": [
+        {
+          "orderId": "ORD-2001",
+          "amount": 3000,
+          "items": [
+            { "productId": "P4", "name": "Monitor", "price": 3000 }
+          ]
+        }
+      ]
+    }
+  ],
+  "products": [
+    {
+      "id": "P1",
+      "name": "Laptop",
+      "category": "Electronics",
+      "price": 2000,
+      "stock": 50,
+      "ratings": [5, 4, 5, 3, 4]
+    },
+    {
+      "id": "P2",
+      "name": "Mouse",
+      "category": "Accessories",
+      "price": 500,
+      "stock": 150,
+      "ratings": [4, 4, 5, 3]
+    },
+    {
+      "id": "P3",
+      "name": "Keyboard",
+      "category": "Accessories",
+      "price": 1500,
+      "stock": 75,
+      "ratings": [5, 5, 4]
+    },
+    {
+      "id": "P4",
+      "name": "Monitor",
+      "category": "Electronics",
+      "price": 3000,
+      "stock": 30,
+      "ratings": [4, 4, 4, 5]
+    }
+  ],
+  "metadata": {
+    "generatedAt": "2026-04-21T10:00:00Z",
+    "totalUsers": 2,
+    "totalProducts": 4,
+    "notes": "This is a fake large dataset for testing file uploads and API performance."
+  }
+},
+    {
+  "users": [
+    {
+      "id": 1,
+      "name": "User One",
+      "email": "user1@example.com",
+      "address": {
+        "street": "123 Main Street",
+        "city": "Bangalore",
+        "state": "Karnataka",
+        "zip": "560001"
+      },
+      "orders": [
+        {
+          "orderId": "ORD-1001",
+          "amount": 2500,
+          "items": [
+            { "productId": "P1", "name": "Laptop", "price": 2000 },
+            { "productId": "P2", "name": "Mouse", "price": 500 }
+          ]
+        },
+        {
+          "orderId": "ORD-1002",
+          "amount": 1500,
+          "items": [
+            { "productId": "P3", "name": "Keyboard", "price": 1500 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "User Two",
+      "email": "user2@example.com",
+      "address": {
+        "street": "456 Second Street",
+        "city": "Hyderabad",
+        "state": "Telangana",
+        "zip": "500001"
+      },
+      "orders": [
+        {
+          "orderId": "ORD-2001",
+          "amount": 3000,
+          "items": [
+            { "productId": "P4", "name": "Monitor", "price": 3000 }
+          ]
+        }
+      ]
+    }
+  ],
+  "products": [
+    {
+      "id": "P1",
+      "name": "Laptop",
+      "category": "Electronics",
+      "price": 2000,
+      "stock": 50,
+      "ratings": [5, 4, 5, 3, 4]
+    },
+    {
+      "id": "P2",
+      "name": "Mouse",
+      "category": "Accessories",
+      "price": 500,
+      "stock": 150,
+      "ratings": [4, 4, 5, 3]
+    },
+    {
+      "id": "P3",
+      "name": "Keyboard",
+      "category": "Accessories",
+      "price": 1500,
+      "stock": 75,
+      "ratings": [5, 5, 4]
+    },
+    {
+      "id": "P4",
+      "name": "Monitor",
+      "category": "Electronics",
+      "price": 3000,
+      "stock": 30,
+      "ratings": [4, 4, 4, 5]
+    }
+  ],
+  "metadata": {
+    "generatedAt": "2026-04-21T10:00:00Z",
+    "totalUsers": 2,
+    "totalProducts": 4,
+    "notes": "This is a fake large dataset for testing file uploads and API performance."
+  }
+},
+    {
+  "users": [
+    {
+      "id": 1,
+      "name": "User One",
+      "email": "user1@example.com",
+      "address": {
+        "street": "123 Main Street",
+        "city": "Bangalore",
+        "state": "Karnataka",
+        "zip": "560001"
+      },
+      "orders": [
+        {
+          "orderId": "ORD-1001",
+          "amount": 2500,
+          "items": [
+            { "productId": "P1", "name": "Laptop", "price": 2000 },
+            { "productId": "P2", "name": "Mouse", "price": 500 }
+          ]
+        },
+        {
+          "orderId": "ORD-1002",
+          "amount": 1500,
+          "items": [
+            { "productId": "P3", "name": "Keyboard", "price": 1500 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "User Two",
+      "email": "user2@example.com",
+      "address": {
+        "street": "456 Second Street",
+        "city": "Hyderabad",
+        "state": "Telangana",
+        "zip": "500001"
+      },
+      "orders": [
+        {
+          "orderId": "ORD-2001",
+          "amount": 3000,
+          "items": [
+            { "productId": "P4", "name": "Monitor", "price": 3000 }
+          ]
+        }
+      ]
+    }
+  ],
+  "products": [
+    {
+      "id": "P1",
+      "name": "Laptop",
+      "category": "Electronics",
+      "price": 2000,
+      "stock": 50,
+      "ratings": [5, 4, 5, 3, 4]
+    },
+    {
+      "id": "P2",
+      "name": "Mouse",
+      "category": "Accessories",
+      "price": 500,
+      "stock": 150,
+      "ratings": [4, 4, 5, 3]
+    },
+    {
+      "id": "P3",
+      "name": "Keyboard",
+      "category": "Accessories",
+      "price": 1500,
+      "stock": 75,
+      "ratings": [5, 5, 4]
+    },
+    {
+      "id": "P4",
+      "name": "Monitor",
+      "category": "Electronics",
+      "price": 3000,
+      "stock": 30,
+      "ratings": [4, 4, 4, 5]
+    }
+  ],
+  "metadata": {
+    "generatedAt": "2026-04-21T10:00:00Z",
+    "totalUsers": 2,
+    "totalProducts": 4,
+    "notes": "This is a fake large dataset for testing file uploads and API performance."
+  }
+},
+    {
+  "users": [
+    {
+      "id": 1,
+      "name": "User One",
+      "email": "user1@example.com",
+      "address": {
+        "street": "123 Main Street",
+        "city": "Bangalore",
+        "state": "Karnataka",
+        "zip": "560001"
+      },
+      "orders": [
+        {
+          "orderId": "ORD-1001",
+          "amount": 2500,
+          "items": [
+            { "productId": "P1", "name": "Laptop", "price": 2000 },
+            { "productId": "P2", "name": "Mouse", "price": 500 }
+          ]
+        },
+        {
+          "orderId": "ORD-1002",
+          "amount": 1500,
+          "items": [
+            { "productId": "P3", "name": "Keyboard", "price": 1500 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "User Two",
+      "email": "user2@example.com",
+      "address": {
+        "street": "456 Second Street",
+        "city": "Hyderabad",
+        "state": "Telangana",
+        "zip": "500001"
+      },
+      "orders": [
+        {
+          "orderId": "ORD-2001",
+          "amount": 3000,
+          "items": [
+            { "productId": "P4", "name": "Monitor", "price": 3000 }
+          ]
+        }
+      ]
+    }
+  ],
+  "products": [
+    {
+      "id": "P1",
+      "name": "Laptop",
+      "category": "Electronics",
+      "price": 2000,
+      "stock": 50,
+      "ratings": [5, 4, 5, 3, 4]
+    },
+    {
+      "id": "P2",
+      "name": "Mouse",
+      "category": "Accessories",
+      "price": 500,
+      "stock": 150,
+      "ratings": [4, 4, 5, 3]
+    },
+    {
+      "id": "P3",
+      "name": "Keyboard",
+      "category": "Accessories",
+      "price": 1500,
+      "stock": 75,
+      "ratings": [5, 5, 4]
+    },
+    {
+      "id": "P4",
+      "name": "Monitor",
+      "category": "Electronics",
+      "price": 3000,
+      "stock": 30,
+      "ratings": [4, 4, 4, 5]
+    }
+  ],
+  "metadata": {
+    "generatedAt": "2026-04-21T10:00:00Z",
+    "totalUsers": 2,
+    "totalProducts": 4,
+    "notes": "This is a fake large dataset for testing file uploads and API performance."
+  }
+},
+    {
+  "users": [
+    {
+      "id": 1,
+      "name": "User One",
+      "email": "user1@example.com",
+      "address": {
+        "street": "123 Main Street",
+        "city": "Bangalore",
+        "state": "Karnataka",
+        "zip": "560001"
+      },
+      "orders": [
+        {
+          "orderId": "ORD-1001",
+          "amount": 2500,
+          "items": [
+            { "productId": "P1", "name": "Laptop", "price": 2000 },
+            { "productId": "P2", "name": "Mouse", "price": 500 }
+          ]
+        },
+        {
+          "orderId": "ORD-1002",
+          "amount": 1500,
+          "items": [
+            { "productId": "P3", "name": "Keyboard", "price": 1500 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "User Two",
+      "email": "user2@example.com",
+      "address": {
+        "street": "456 Second Street",
+        "city": "Hyderabad",
+        "state": "Telangana",
+        "zip": "500001"
+      },
+      "orders": [
+        {
+          "orderId": "ORD-2001",
+          "amount": 3000,
+          "items": [
+            { "productId": "P4", "name": "Monitor", "price": 3000 }
+          ]
+        }
+      ]
+    }
+  ],
+  "products": [
+    {
+      "id": "P1",
+      "name": "Laptop",
+      "category": "Electronics",
+      "price": 2000,
+      "stock": 50,
+      "ratings": [5, 4, 5, 3, 4]
+    },
+    {
+      "id": "P2",
+      "name": "Mouse",
+      "category": "Accessories",
+      "price": 500,
+      "stock": 150,
+      "ratings": [4, 4, 5, 3]
+    },
+    {
+      "id": "P3",
+      "name": "Keyboard",
+      "category": "Accessories",
+      "price": 1500,
+      "stock": 75,
+      "ratings": [5, 5, 4]
+    },
+    {
+      "id": "P4",
+      "name": "Monitor",
+      "category": "Electronics",
+      "price": 3000,
+      "stock": 30,
+      "ratings": [4, 4, 4, 5]
+    }
+  ],
+  "metadata": {
+    "generatedAt": "2026-04-21T10:00:00Z",
+    "totalUsers": 2,
+    "totalProducts": 4,
+    "notes": "This is a fake large dataset for testing file uploads and API performance."
+  }
+},
+    {
+  "users": [
+    {
+      "id": 1,
+      "name": "User One",
+      "email": "user1@example.com",
+      "address": {
+        "street": "123 Main Street",
+        "city": "Bangalore",
+        "state": "Karnataka",
+        "zip": "560001"
+      },
+      "orders": [
+        {
+          "orderId": "ORD-1001",
+          "amount": 2500,
+          "items": [
+            { "productId": "P1", "name": "Laptop", "price": 2000 },
+            { "productId": "P2", "name": "Mouse", "price": 500 }
+          ]
+        },
+        {
+          "orderId": "ORD-1002",
+          "amount": 1500,
+          "items": [
+            { "productId": "P3", "name": "Keyboard", "price": 1500 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "User Two",
+      "email": "user2@example.com",
+      "address": {
+        "street": "456 Second Street",
+        "city": "Hyderabad",
+        "state": "Telangana",
+        "zip": "500001"
+      },
+      "orders": [
+        {
+          "orderId": "ORD-2001",
+          "amount": 3000,
+          "items": [
+            { "productId": "P4", "name": "Monitor", "price": 3000 }
+          ]
+        }
+      ]
+    }
+  ],
+  "products": [
+    {
+      "id": "P1",
+      "name": "Laptop",
+      "category": "Electronics",
+      "price": 2000,
+      "stock": 50,
+      "ratings": [5, 4, 5, 3, 4]
+    },
+    {
+      "id": "P2",
+      "name": "Mouse",
+      "category": "Accessories",
+      "price": 500,
+      "stock": 150,
+      "ratings": [4, 4, 5, 3]
+    },
+    {
+      "id": "P3",
+      "name": "Keyboard",
+      "category": "Accessories",
+      "price": 1500,
+      "stock": 75,
+      "ratings": [5, 5, 4]
+    },
+    {
+      "id": "P4",
+      "name": "Monitor",
+      "category": "Electronics",
+      "price": 3000,
+      "stock": 30,
+      "ratings": [4, 4, 4, 5]
+    }
+  ],
+  "metadata": {
+    "generatedAt": "2026-04-21T10:00:00Z",
+    "totalUsers": 2,
+    "totalProducts": 4,
+    "notes": "This is a fake large dataset for testing file uploads and API performance."
+  }
+},
+    {
+  "users": [
+    {
+      "id": 1,
+      "name": "User One",
+      "email": "user1@example.com",
+      "address": {
+        "street": "123 Main Street",
+        "city": "Bangalore",
+        "state": "Karnataka",
+        "zip": "560001"
+      },
+      "orders": [
+        {
+          "orderId": "ORD-1001",
+          "amount": 2500,
+          "items": [
+            { "productId": "P1", "name": "Laptop", "price": 2000 },
+            { "productId": "P2", "name": "Mouse", "price": 500 }
+          ]
+        },
+        {
+          "orderId": "ORD-1002",
+          "amount": 1500,
+          "items": [
+            { "productId": "P3", "name": "Keyboard", "price": 1500 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "User Two",
+      "email": "user2@example.com",
+      "address": {
+        "street": "456 Second Street",
+        "city": "Hyderabad",
+        "state": "Telangana",
+        "zip": "500001"
+      },
+      "orders": [
+        {
+          "orderId": "ORD-2001",
+          "amount": 3000,
+          "items": [
+            { "productId": "P4", "name": "Monitor", "price": 3000 }
+          ]
+        }
+      ]
+    }
+  ],
+  "products": [
+    {
+      "id": "P1",
+      "name": "Laptop",
+      "category": "Electronics",
+      "price": 2000,
+      "stock": 50,
+      "ratings": [5, 4, 5, 3, 4]
+    },
+    {
+      "id": "P2",
+      "name": "Mouse",
+      "category": "Accessories",
+      "price": 500,
+      "stock": 150,
+      "ratings": [4, 4, 5, 3]
+    },
+    {
+      "id": "P3",
+      "name": "Keyboard",
+      "category": "Accessories",
+      "price": 1500,
+      "stock": 75,
+      "ratings": [5, 5, 4]
+    },
+    {
+      "id": "P4",
+      "name": "Monitor",
+      "category": "Electronics",
+      "price": 3000,
+      "stock": 30,
+      "ratings": [4, 4, 4, 5]
+    }
+  ],
+  "metadata": {
+    "generatedAt": "2026-04-21T10:00:00Z",
+    "totalUsers": 2,
+    "totalProducts": 4,
+    "notes": "This is a fake large dataset for testing file uploads and API performance."
+  }
+},
+    {
+  "users": [
+    {
+      "id": 1,
+      "name": "User One",
+      "email": "user1@example.com",
+      "address": {
+        "street": "123 Main Street",
+        "city": "Bangalore",
+        "state": "Karnataka",
+        "zip": "560001"
+      },
+      "orders": [
+        {
+          "orderId": "ORD-1001",
+          "amount": 2500,
+          "items": [
+            { "productId": "P1", "name": "Laptop", "price": 2000 },
+            { "productId": "P2", "name": "Mouse", "price": 500 }
+          ]
+        },
+        {
+          "orderId": "ORD-1002",
+          "amount": 1500,
+          "items": [
+            { "productId": "P3", "name": "Keyboard", "price": 1500 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "User Two",
+      "email": "user2@example.com",
+      "address": {
+        "street": "456 Second Street",
+        "city": "Hyderabad",
+        "state": "Telangana",
+        "zip": "500001"
+      },
+      "orders": [
+        {
+          "orderId": "ORD-2001",
+          "amount": 3000,
+          "items": [
+            { "productId": "P4", "name": "Monitor", "price": 3000 }
+          ]
+        }
+      ]
+    }
+  ],
+  "products": [
+    {
+      "id": "P1",
+      "name": "Laptop",
+      "category": "Electronics",
+      "price": 2000,
+      "stock": 50,
+      "ratings": [5, 4, 5, 3, 4]
+    },
+    {
+      "id": "P2",
+      "name": "Mouse",
+      "category": "Accessories",
+      "price": 500,
+      "stock": 150,
+      "ratings": [4, 4, 5, 3]
+    },
+    {
+      "id": "P3",
+      "name": "Keyboard",
+      "category": "Accessories",
+      "price": 1500,
+      "stock": 75,
+      "ratings": [5, 5, 4]
+    },
+    {
+      "id": "P4",
+      "name": "Monitor",
+      "category": "Electronics",
+      "price": 3000,
+      "stock": 30,
+      "ratings": [4, 4, 4, 5]
+    }
+  ],
+  "metadata": {
+    "generatedAt": "2026-04-21T10:00:00Z",
+    "totalUsers": 2,
+    "totalProducts": 4,
+    "notes": "This is a fake large dataset for testing file uploads and API performance."
+  }
+},
+    {
+  "users": [
+    {
+      "id": 1,
+      "name": "User One",
+      "email": "user1@example.com",
+      "address": {
+        "street": "123 Main Street",
+        "city": "Bangalore",
+        "state": "Karnataka",
+        "zip": "560001"
+      },
+      "orders": [
+        {
+          "orderId": "ORD-1001",
+          "amount": 2500,
+          "items": [
+            { "productId": "P1", "name": "Laptop", "price": 2000 },
+            { "productId": "P2", "name": "Mouse", "price": 500 }
+          ]
+        },
+        {
+          "orderId": "ORD-1002",
+          "amount": 1500,
+          "items": [
+            { "productId": "P3", "name": "Keyboard", "price": 1500 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "User Two",
+      "email": "user2@example.com",
+      "address": {
+        "street": "456 Second Street",
+        "city": "Hyderabad",
+        "state": "Telangana",
+        "zip": "500001"
+      },
+      "orders": [
+        {
+          "orderId": "ORD-2001",
+          "amount": 3000,
+          "items": [
+            { "productId": "P4", "name": "Monitor", "price": 3000 }
+          ]
+        }
+      ]
+    }
+  ],
+  "products": [
+    {
+      "id": "P1",
+      "name": "Laptop",
+      "category": "Electronics",
+      "price": 2000,
+      "stock": 50,
+      "ratings": [5, 4, 5, 3, 4]
+    },
+    {
+      "id": "P2",
+      "name": "Mouse",
+      "category": "Accessories",
+      "price": 500,
+      "stock": 150,
+      "ratings": [4, 4, 5, 3]
+    },
+    {
+      "id": "P3",
+      "name": "Keyboard",
+      "category": "Accessories",
+      "price": 1500,
+      "stock": 75,
+      "ratings": [5, 5, 4]
+    },
+    {
+      "id": "P4",
+      "name": "Monitor",
+      "category": "Electronics",
+      "price": 3000,
+      "stock": 30,
+      "ratings": [4, 4, 4, 5]
+    }
+  ],
+  "metadata": {
+    "generatedAt": "2026-04-21T10:00:00Z",
+    "totalUsers": 2,
+    "totalProducts": 4,
+    "notes": "This is a fake large dataset for testing file uploads and API performance."
+  }
+},
+    {
+  "users": [
+    {
+      "id": 1,
+      "name": "User One",
+      "email": "user1@example.com",
+      "address": {
+        "street": "123 Main Street",
+        "city": "Bangalore",
+        "state": "Karnataka",
+        "zip": "560001"
+      },
+      "orders": [
+        {
+          "orderId": "ORD-1001",
+          "amount": 2500,
+          "items": [
+            { "productId": "P1", "name": "Laptop", "price": 2000 },
+            { "productId": "P2", "name": "Mouse", "price": 500 }
+          ]
+        },
+        {
+          "orderId": "ORD-1002",
+          "amount": 1500,
+          "items": [
+            { "productId": "P3", "name": "Keyboard", "price": 1500 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "User Two",
+      "email": "user2@example.com",
+      "address": {
+        "street": "456 Second Street",
+        "city": "Hyderabad",
+        "state": "Telangana",
+        "zip": "500001"
+      },
+      "orders": [
+        {
+          "orderId": "ORD-2001",
+          "amount": 3000,
+          "items": [
+            { "productId": "P4", "name": "Monitor", "price": 3000 }
+          ]
+        }
+      ]
+    }
+  ],
+  "products": [
+    {
+      "id": "P1",
+      "name": "Laptop",
+      "category": "Electronics",
+      "price": 2000,
+      "stock": 50,
+      "ratings": [5, 4, 5, 3, 4]
+    },
+    {
+      "id": "P2",
+      "name": "Mouse",
+      "category": "Accessories",
+      "price": 500,
+      "stock": 150,
+      "ratings": [4, 4, 5, 3]
+    },
+    {
+      "id": "P3",
+      "name": "Keyboard",
+      "category": "Accessories",
+      "price": 1500,
+      "stock": 75,
+      "ratings": [5, 5, 4]
+    },
+    {
+      "id": "P4",
+      "name": "Monitor",
+      "category": "Electronics",
+      "price": 3000,
+      "stock": 30,
+      "ratings": [4, 4, 4, 5]
+    }
+  ],
+  "metadata": {
+    "generatedAt": "2026-04-21T10:00:00Z",
+    "totalUsers": 2,
+    "totalProducts": 4,
+    "notes": "This is a fake large dataset for testing file uploads and API performance."
+  }
+},
+    {
+  "users": [
+    {
+      "id": 1,
+      "name": "User One",
+      "email": "user1@example.com",
+      "address": {
+        "street": "123 Main Street",
+        "city": "Bangalore",
+        "state": "Karnataka",
+        "zip": "560001"
+      },
+      "orders": [
+        {
+          "orderId": "ORD-1001",
+          "amount": 2500,
+          "items": [
+            { "productId": "P1", "name": "Laptop", "price": 2000 },
+            { "productId": "P2", "name": "Mouse", "price": 500 }
+          ]
+        },
+        {
+          "orderId": "ORD-1002",
+          "amount": 1500,
+          "items": [
+            { "productId": "P3", "name": "Keyboard", "price": 1500 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "User Two",
+      "email": "user2@example.com",
+      "address": {
+        "street": "456 Second Street",
+        "city": "Hyderabad",
+        "state": "Telangana",
+        "zip": "500001"
+      },
+      "orders": [
+        {
+          "orderId": "ORD-2001",
+          "amount": 3000,
+          "items": [
+            { "productId": "P4", "name": "Monitor", "price": 3000 }
+          ]
+        }
+      ]
+    }
+  ],
+  "products": [
+    {
+      "id": "P1",
+      "name": "Laptop",
+      "category": "Electronics",
+      "price": 2000,
+      "stock": 50,
+      "ratings": [5, 4, 5, 3, 4]
+    },
+    {
+      "id": "P2",
+      "name": "Mouse",
+      "category": "Accessories",
+      "price": 500,
+      "stock": 150,
+      "ratings": [4, 4, 5, 3]
+    },
+    {
+      "id": "P3",
+      "name": "Keyboard",
+      "category": "Accessories",
+      "price": 1500,
+      "stock": 75,
+      "ratings": [5, 5, 4]
+    },
+    {
+      "id": "P4",
+      "name": "Monitor",
+      "category": "Electronics",
+      "price": 3000,
+      "stock": 30,
+      "ratings": [4, 4, 4, 5]
+    }
+  ],
+  "metadata": {
+    "generatedAt": "2026-04-21T10:00:00Z",
+    "totalUsers": 2,
+    "totalProducts": 4,
+    "notes": "This is a fake large dataset for testing file uploads and API performance."
+  }
+}
+]

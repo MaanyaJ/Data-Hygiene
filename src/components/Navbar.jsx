@@ -1,7 +1,7 @@
 import React from "react";
 import { AppBar, Toolbar, Typography, Box } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import { NavLink } from "react-router-dom";
+import { useNavigate, NavLink } from "react-router-dom";
+import UploadJSON from "./UploadJSON";
 
 const NAV_LINKS = [
   { label: "All", path: "/" },
@@ -50,8 +50,8 @@ const Navbar = () => {
           />
         </Typography>
 
-        {/* Nav Links */}
-        <Box sx={{ display: "flex", gap: 3 }}>
+        {/* Nav Links + Upload */}
+        <Box sx={{ display: "flex", alignItems: "center", gap: 3 }}>
           {NAV_LINKS.map(({ label, path }) => (
             <NavLink
               key={label}
@@ -72,6 +72,8 @@ const Navbar = () => {
               {label}
             </NavLink>
           ))}
+
+          <UploadJSON />
         </Box>
       </Toolbar>
     </AppBar>
