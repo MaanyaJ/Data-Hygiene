@@ -37,8 +37,8 @@ const SuggestionRow = ({
           alignItems: "center",
           gap: 0,
           cursor: isPending ? "pointer" : "not-allowed",
-          border: `1.5px solid ${isSelected ? p.accent : "#e2e8f0"}`,
-          borderRadius: 2,
+          border: `1px solid ${isSelected ? p.accent : "#e2e8f0"}`,
+          borderRadius: 1.5,
           overflow: "hidden",
           backgroundColor: isSelected ? p.light : "#fff",
           transition: "all 0.15s ease",
@@ -48,7 +48,7 @@ const SuggestionRow = ({
               borderColor: p.accent,
               backgroundColor: isSelected ? p.light : p.light + "40",
             },
-            boxShadow: isSelected ? `0 0 0 3px ${p.accent}20` : "none",
+            boxShadow: isSelected ? `0 0 0 2px ${p.accent}20` : "none",
           }),
         }}
       >
@@ -56,15 +56,15 @@ const SuggestionRow = ({
         {showRadio && (
           <Box
             sx={{
-              width: 44,
+              width: 36,
               alignSelf: "stretch",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               flexShrink: 0,
               backgroundColor: isSelected ? p.light : "#f1f5f9",
-              borderRight: `1.5px solid ${isSelected ? p.accent : "#e2e8f0"}`,
-              borderLeft: `3px solid ${isSelected ? p.accent : "transparent"}`,
+              borderRight: `1px solid ${isSelected ? p.accent : "#e2e8f0"}`,
+              borderLeft: `2px solid ${isSelected ? p.accent : "transparent"}`,
               transition: "background-color 0.15s ease",
             }}
           >
@@ -82,7 +82,7 @@ const SuggestionRow = ({
         )}
  
         {/* Primary value with EditableField */}
-        <Box sx={{ minWidth: 140, flexShrink: 0 }}>
+        <Box sx={{ minWidth: 110, flexShrink: 0 }}>
           <EditableField
             label={primaryKey}
             value={primaryVal}
@@ -126,7 +126,7 @@ const SuggestionRow = ({
           sx={{ flex: 1, flexWrap: "wrap" }}
         >
           {secondaryEntries.map(([key, val], i) => (
-            <Box key={i} sx={{ minWidth: 100 }}>
+            <Box key={i} sx={{ minWidth: 80 }}>
               <EditableField
                 label={key}
                 value={val}

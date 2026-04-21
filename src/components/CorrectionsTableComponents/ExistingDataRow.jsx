@@ -8,7 +8,7 @@ const ExistingDataRow = ({ existingData, theme }) => (
       alignItems: "center",
       gap: 1.5,
       px: 1.5,
-      py: 0.5,
+      py: 0.35,
       backgroundColor: "#f8fafc",
       borderBottom: "1px solid #e2e8f0",
     }}
@@ -16,7 +16,7 @@ const ExistingDataRow = ({ existingData, theme }) => (
     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
       <Typography
         sx={{
-          fontSize: 11,
+          fontSize: 10,
           fontWeight: 700,
           color: "#64748b",
           textTransform: "uppercase",
@@ -32,19 +32,20 @@ const ExistingDataRow = ({ existingData, theme }) => (
     <Stack direction="row" alignItems="center" gap={3} flexWrap="wrap">
       {existingData.map((item, i) => (
         <Stack key={i} direction="row" alignItems="center" gap={1}>
-          <Typography sx={{ fontSize: 11, color: "#94a3b8", fontWeight: 600, letterSpacing: 0.5 }}>
+          <Typography sx={{ fontSize: 10, color: "#94a3b8", fontWeight: 600, letterSpacing: 0.5 }}>
             {item.field}
           </Typography>
           <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
             <Typography
               sx={{
-                fontSize: 14,
+                fontSize: 12,
                 fontWeight: 700,
-                color: item.validation_status === "invalid" ? "#ef4444" : item.value ? "#0f172a" : "#94a3b8",
+                // Monochrome: underline instead of red for invalid, dark for valid
+                color: "#0f172a",
+                textDecoration: item.validation_status === "invalid" ? "underline" : "none",
               }}
             >
               {(() => {
-                // If history exists, the 'from' value of the oldest entry is the original value
                 if (item.history && Array.isArray(item.history) && item.history.length > 0) {
                   return item.history[item.history.length - 1].from || "—";
                 }

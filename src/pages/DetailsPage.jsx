@@ -5,6 +5,7 @@ import ErrorPage from "../components/ErrorPage";
 import Loader from "../components/Loader";
 import ExecutionInfoBox from "../components/ExecutionInfoBox";
 import CorrectionsTable from "../components/CorrectionsTable";
+import Navbar from "../components/Navbar";
 import { API_URL } from "../config";
 
 const transformOldApiData = (rawData) => {
@@ -110,8 +111,9 @@ const DetailsPage = () => {
   // if (!data || data.length === 0) return "No invalid data in the response to show";
 
   return (
-    <Box>
-      <Box sx={{ p: 4, mt: 5 }}>
+    <Box sx={{ backgroundColor: "#f5f5f5", minHeight: "100vh" }}>
+      <Navbar />
+      <Box sx={{ p: 3, pt: 9 }}>
         <ExecutionInfoBox executionInfo={executionData} />
         <Box sx={{ mt: -2 }}>
           <CorrectionsTable

@@ -1,73 +1,48 @@
 import React from "react";
-import { Stack, Typography, Chip, Box } from "@mui/material";
+import { Stack, Typography, Box } from "@mui/material";
 
 const InconsistentFieldsList = ({ invalidFields = [], SuggestionsCount, status }) => {
   const errors = invalidFields;
-  const MAX_VISIBLE = 8;
- 
+  const MAX_VISIBLE = 5;
+
   const visibleErrors = errors.slice(0, MAX_VISIBLE);
   const remaining = errors.length - MAX_VISIBLE;
- 
+
   return (
-    <Box>
-      <Stack spacing={0.4} mt={0.25}>
-        <Typography
+    <Stack direction="row" flexWrap="wrap" gap={0.4} alignItems="center">
+      {visibleErrors.map((e, i) => (
+        <Box
+          key={i}
           sx={{
-            fontSize: "0.72rem",
-            fontWeight: 700,
-            color: "text.secondary",
-            textTransform: "uppercase",
-            letterSpacing: 0.4,
-            lineHeight: 1.1,
-            opacity: 0.85,
+            px: 1,
+            py: 0.1,
+            fontSize: "0.68rem",
+            fontWeight: 600,
+            color: "#333",
+            backgroundColor: "#f0f0f0",
+            border: "1px solid #d0d0d0",
+            borderRadius: "2px",
+            lineHeight: 1.6,
+            whiteSpace: "nowrap",
           }}
         >
-          Inconsistent Fields
+          {e}
+        </Box>
+      ))}
+
+      {remaining > 0 && (
+        <Typography sx={{ fontSize: "0.68rem", color: "#888", alignSelf: "center" }}>
+          +{remaining} more
         </Typography>
- 
-        <Stack flexDirection={"row"} sx={{justifyContent: "space-between"}}>
-          <Stack
-            direction="row"
-            spacing={0.6}
-            useFlexGap
-            flexWrap="wrap"
-            sx={{
-              alignItems: "center",
-            }}
-          >
-            {visibleErrors.map((e, i) => (
-              <Chip
-                key={i}
-                label={e}
-                size="small"
-                color="error"
-                variant="outlined"
-                sx={{
-                  height: 22,
-                  fontSize: "0.7rem",
-                  fontWeight: 600,
-                  borderRadius: "8px",
-                }}
-              />
-            ))}
- 
-            {remaining > 0 && (
-              <Typography
-                sx={{
-                  fontSize: "0.72rem",
-                  color: "text.secondary",
-                  alignSelf: "center",
-                }}
-              >
-                +{remaining} more
-              </Typography>
-            )}
-          </Stack>
-        <Typography variant="caption" sx={{fontStyle: "italic"}}>{status.toLowerCase() === "pending" && (SuggestionsCount == true ? "Suggestions available" : "")}</Typography>
-        </Stack>
-      </Stack>
-    </Box>
+      )}
+
+      {status?.toLowerCase() === "pending" && SuggestionsCount === true && (
+        <Typography sx={{ fontSize: "0.68rem", color: "#555", fontStyle: "italic", ml: 0.5 }}>
+          · suggestions available
+        </Typography>
+      )}
+    </Stack>
   );
 };
- 
+
 export default InconsistentFieldsList;

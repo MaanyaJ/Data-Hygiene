@@ -56,13 +56,13 @@ const AcceptConfirmDialog = ({ open, onClose, onConfirm, fieldName, isAccepting 
             width: 52,
             height: 52,
             borderRadius: "50%",
-            backgroundColor: "#f0fdf4",
+            backgroundColor: "#f1f5f9",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
           }}
         >
-          <CheckCircleIcon sx={{ color: "#16a34a", fontSize: 28 }} />
+          <CheckCircleIcon sx={{ color: "#0f172a", fontSize: 28 }} />
         </Box>
         <Box textAlign="center">
           <Typography fontWeight={600} fontSize="0.95rem" gutterBottom>
@@ -92,10 +92,10 @@ const AcceptConfirmDialog = ({ open, onClose, onConfirm, fieldName, isAccepting 
           )
         }
         sx={{
-          backgroundColor: "#16a34a",
-          "&:hover": { backgroundColor: "#15803d" },
+          backgroundColor: "#000000",
+          "&:hover": { backgroundColor: "#333333" },
           ...(isAccepting && {
-            "&.Mui-disabled": { backgroundColor: "#15803d", color: "white" },
+            "&.Mui-disabled": { backgroundColor: "#334155", color: "white" },
           }),
         }}
       >
@@ -130,13 +130,13 @@ const L0ConfirmDialog = ({ open, onClose, onConfirm, submitting }) => (
             width: 52,
             height: 52,
             borderRadius: "50%",
-            backgroundColor: "#fff3e0",
+            backgroundColor: "#f1f5f9",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
           }}
         >
-          <WarningAmberIcon sx={{ color: "#f57c00", fontSize: 28 }} />
+          <WarningAmberIcon sx={{ color: "#475569", fontSize: 28 }} />
         </Box>
         <Box textAlign="center">
           <Typography fontWeight={600} fontSize="0.95rem" gutterBottom>
@@ -362,7 +362,7 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                 onClick={() => toggleGroup(groupIdx)}
                 sx={{
                   px: 1.5,
-                  height: 38,
+                  height: 32,
                   cursor: "pointer",
                   userSelect: "none",
                   backgroundColor: "#fafafa",
@@ -370,7 +370,7 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                 }}
               >
                 <Stack direction="row" alignItems="center" gap={1.5}>
-                  <Typography sx={{ fontWeight: 700, fontSize: 14, color: "#0f172a" }}>
+                  <Typography sx={{ fontWeight: 700, fontSize: 12, color: "#0f172a" }}>
                     {group.invalid_field}
                   </Typography>
 
@@ -379,49 +379,51 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                       label="L0 Data"
                       size="small"
                       sx={{
-                        height: 20,
-                        fontSize: 11,
+                        height: 18,
+                        fontSize: 10,
                         fontWeight: 700,
-                        backgroundColor: "#fef2f2",
-                        color: "#dc2626",
-                        border: "1px solid #fca5a5",
+                        backgroundColor: "#000000",
+                        color: "#ffffff",
+                        borderRadius: "4px",
                         "& .MuiChip-label": { px: 1 },
                       }}
                     />
                   )}
-
+ 
                   {fieldStatus === STATUS.ON_HOLD && (
                     <Chip
                       label="On Hold"
                       size="small"
                       sx={{
-                        height: 20,
-                        fontSize: 11,
+                        height: 18,
+                        fontSize: 10,
                         fontWeight: 700,
-                        backgroundColor: "#fef9c3",
-                        color: "#ca8a04",
-                        border: "1px solid #fde047",
+                        backgroundColor: "#f1f5f9",
+                        color: "#0f172a",
+                        border: "1px solid #e2e8f0",
+                        borderRadius: "4px",
                         "& .MuiChip-label": { px: 1 },
                       }}
                     />
                   )}
-
+ 
                   {isPending && (
                     <Chip
                       label="Pending"
                       size="small"
                       sx={{
-                        height: 20,
-                        fontSize: 11,
+                        height: 18,
+                        fontSize: 10,
                         fontWeight: 700,
-                        backgroundColor: "#fff7ed",
-                        color: "#9a3412",
-                        border: "1px solid #fdba74",
+                        backgroundColor: "#ffffff",
+                        color: "#64748b",
+                        border: "1px solid #cbd5e1",
+                        borderRadius: "4px",
                         "& .MuiChip-label": { px: 1 },
                       }}
                     />
                   )}
-
+ 
                   {fieldStatus === STATUS.ACCEPTED && (
                     <>
                       <Chip
@@ -431,9 +433,9 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                           height: 20,
                           fontSize: 11,
                           fontWeight: 700,
-                          backgroundColor: "#f0fdf4",
-                          color: "#16a34a",
-                          border: "1px solid #bbf7d0",
+                          backgroundColor: "#0f172a",
+                          color: "#ffffff",
+                          borderRadius: "4px",
                           "& .MuiChip-label": { px: 1 },
                         }}
                       />
@@ -448,9 +450,10 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                           height: 20,
                           fontSize: 11,
                           fontWeight: 700,
-                          backgroundColor: "#f0fdf4",
-                          color: "#16a34a",
-                          border: "1px solid #bbf7d0",
+                          backgroundColor: "#f8fafc",
+                          color: "#475569",
+                          border: "1px solid #e2e8f0",
+                          borderRadius: "4px",
                           "& .MuiChip-label": { px: 1 },
                         }}
                       />
@@ -648,8 +651,8 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                     justifyContent="flex-end"
                     gap={1}
                     sx={{
-                      px: 1.5,
-                      py: 0.5,
+                      px: 1.25,
+                      py: 0.4,
                       borderTop: "1px solid #f1f5f9",
                       backgroundColor: "#fafafa",
                     }}
@@ -664,8 +667,10 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                       sx={{
                         fontWeight: 700,
                         borderRadius: 1.5,
-                        backgroundColor: "#16a34a",
-                        "&:hover": { backgroundColor: "#15803d" },
+                        backgroundColor: "#000000",
+                        color: "#ffffff",
+                        "&:hover": { backgroundColor: "#333333" },
+                        "&.Mui-disabled": { backgroundColor: "#e2e8f0", color: "#94a3b8" }
                       }}
                     >
                       Accept
@@ -673,7 +678,7 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
 
                     {/* Submit Draft Record — disabled when a suggestion IS selected (same logic as old Reject All) */}
                     <Button
-                      variant="contained"
+                      variant="outlined"
                       size="small"
                       disabled={canAccept}
                       startIcon={<EditNoteIcon />}
@@ -681,8 +686,10 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                       sx={{
                         fontWeight: 700,
                         borderRadius: 1.5,
-                        backgroundColor: "#ffc400",
-                        "&:hover": { backgroundColor: "#e5b000" },
+                        borderColor: "#334155",
+                        color: "#334155",
+                        "&:hover": { backgroundColor: "#f1f5f9", borderColor: "#0f172a", color: "#0f172a" },
+                        "&.Mui-disabled": { borderColor: "#e2e8f0", color: "#94a3b8" }
                       }}
                     >
                       Submit Draft Record
@@ -698,8 +705,10 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                       sx={{
                         fontWeight: 700,
                         borderRadius: 1.5,
-                        backgroundColor: "#dc2626",
-                        "&:hover": { backgroundColor: "#b91c1c" },
+                        backgroundColor: "#475569",
+                        color: "#ffffff",
+                        "&:hover": { backgroundColor: "#334155" },
+                        "&.Mui-disabled": { backgroundColor: "#e2e8f0", color: "#94a3b8" }
                       }}
                     >
                       Send to L0

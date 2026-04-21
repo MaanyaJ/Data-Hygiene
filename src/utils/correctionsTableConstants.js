@@ -1,8 +1,8 @@
-export const SELECTED = { accent: "#2563eb", light: "#eff6ff", border: "#bfdbfe", text: "#1d4ed8" };
-export const ACCEPTED = { accent: "#16a34a", light: "#f0fdf4", border: "#bbf7d0", text: "#15803d" };
-export const ON_HOLD_THEME = { accent: "#ca8a04", light: "#fef9c3", border: "#fde047", text: "#854d0e" };
-export const PENDING_THEME = { accent: "#ea580c", light: "#fff7ed", border: "#fdba74", text: "#9a3412" };
-export const REJECTED_THEME = { accent: "#dc2626", light: "#fef2f2", border: "#fca5a5", text: "#dc2626" };
+export const SELECTED = { accent: "#000000", light: "#f8fafc", border: "#e2e8f0", text: "#0f172a" };
+export const ACCEPTED = { accent: "#1e293b", light: "#f1f5f9", border: "#cbd5e1", text: "#334155" };
+export const ON_HOLD_THEME = { accent: "#475569", light: "#f8fafc", border: "#e2e8f0", text: "#1e293b" };
+export const PENDING_THEME = { accent: "#334155", light: "#f1f5f9", border: "#cbd5e1", text: "#475569" };
+export const REJECTED_THEME = { accent: "#000000", light: "#ffffff", border: "#000000", text: "#000000" };
 
 export const STATUS = {
   ACCEPTED: "accepted",

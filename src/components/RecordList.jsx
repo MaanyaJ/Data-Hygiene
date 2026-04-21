@@ -13,14 +13,11 @@ import "react-virtualized/styles.css";
 const RecordList = ({
   records,
   totalRecords,
-  countLabel,       // optional formatted string, e.g. "779+" for age-filtered views
+  countLabel,
   totalPages,
   page,
   loading,
   onLoadMore,
-  showCount,
-  showAgeColors,
-  ageColorFn,
 }) => {
   const isRowLoaded = ({ index }) => !!records[index];
 
@@ -31,18 +28,8 @@ const RecordList = ({
     return Promise.resolve();
   };
 
-  const getRowHeight = ({ index }) => {
-    const record = records[index];
-
-    if (!record) return 180;
-
-    const status = record?.Status?.toLowerCase();
-    const isCompleted = status === "accepted" || status === "approved";
-
-    // completed records were too short and had too much empty space
-    // non-completed records were slightly too tall visually
-    return isCompleted ? 100 : 160;
-  };
+  const ROW_HEIGHT = 78;
+  const getRowHeight = () => ROW_HEIGHT;
 
   const rowRenderer = ({ index, key, style }) => {
     const record = records[index];
@@ -57,12 +44,7 @@ const RecordList = ({
 
     return (
       <div key={key} style={style}>
-        <Box sx={{ px: 2, py: 0.75 }}>
-          <RecordCard
-            record={record}
-            ageColor={showAgeColors && ageColorFn ? ageColorFn(record) : null}
-          />
-        </Box>
+        <RecordCard record={record} index={index} />
       </div>
     );
   };
@@ -77,12 +59,6 @@ const RecordList = ({
 
   return (
     <Box>
-      {showCount ? (
-        <Typography align="center" sx={{ mb: 2 }}>
-          Total records: {countLabel ?? totalRecords}
-        </Typography>
-      ) : null}
-
       <InfiniteLoader
         isRowLoaded={isRowLoaded}
         loadMoreRows={loadMoreRows}
@@ -115,7 +91,7 @@ const RecordList = ({
       </InfiniteLoader>
 
       {loading && records.length > 0 && (
-        <Box sx={{ textAlign: "center", py: 2 }}>
+        <Box sx={{ textAlign: "center", py: 2, borderTop: "1px solid #e8e8e8" }}>
           <Loader />
         </Box>
       )}

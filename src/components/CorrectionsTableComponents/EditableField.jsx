@@ -21,10 +21,10 @@ const EditableField = ({ label, value, color, onSave, isEditable = true }) => {
   };
 
   return (
-    <Box sx={{ px: 1.5, py: 0.5, display: "flex", flexDirection: "column", minHeight: 48, minWidth: 120 }}>
+    <Box sx={{ px: 1, py: 0.4, display: "flex", flexDirection: "column", minHeight: 36, minWidth: 100 }}>
       {isEditing ? (
         <>
-          <Typography sx={{ fontSize: 10, fontWeight: 600, color, letterSpacing: 0.5, mb: 0.25, opacity: 0.7 }}>
+          <Typography sx={{ fontSize: 9, fontWeight: 600, color, letterSpacing: 0.5, mb: 0.25, opacity: 0.7 }}>
             {label}
           </Typography>
           <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
@@ -38,7 +38,7 @@ const EditableField = ({ label, value, color, onSave, isEditable = true }) => {
                 if (e.key === "Enter") handleSave(e);
                 if (e.key === "Escape") handleCancel(e);
               }}
-              sx={{ fontSize: 14, fontWeight: 700, color, borderBottom: `1px solid ${color}`, pb: 0.25, flex: 1 }}
+              sx={{ fontSize: 12, fontWeight: 700, color, borderBottom: `1px solid ${color}`, pb: 0.25, flex: 1 }}
             />
             <IconButton size="small" onClick={handleSave} sx={{ p: 0.25, color }}>
               <CheckOutlinedIcon sx={{ fontSize: 18 }} />
@@ -50,11 +50,11 @@ const EditableField = ({ label, value, color, onSave, isEditable = true }) => {
         </>
       ) : (
         <>
-          <Typography sx={{ fontSize: 10, fontWeight: 600, color, letterSpacing: 0.5, mb: 0, opacity: 0.7 }}>
+          <Typography sx={{ fontSize: 9, fontWeight: 600, color, letterSpacing: 0.5, mb: 0, opacity: 0.7 }}>
             {label}
           </Typography>
           <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-            <Typography sx={{ fontSize: 14, fontWeight: 700, color }}>
+            <Typography sx={{ fontSize: 12, fontWeight: 700, color }}>
               {value || "—"}
             </Typography>
             {isEditable && (

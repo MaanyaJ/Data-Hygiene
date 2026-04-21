@@ -1,45 +1,14 @@
 import React from "react";
-import { Box, Typography, TextField, Stack, CircularProgress, InputAdornment } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
+import {
+  Box,
+  Typography,
+  TextField,
+  Stack,
+  CircularProgress,
+  InputAdornment,
+  Checkbox,
+} from "@mui/material";
 import Navbar from "./Navbar";
-
-/**
- * Common styling for the status/age patches
- */
-const patchSx = (isActive, activeBg, bg, activeColor, color, dot) => ({
-  display: "flex",
-  alignItems: "center",
-  gap: 1,
-  px: 2.2,
-  py: 1,
-  borderRadius: "8px",
-  cursor: "pointer",
-  userSelect: "none",
-  background: isActive ? activeBg : "#ffffff",
-  border: `1.3px solid ${isActive ? activeBg : "#727579ff"}`,
-  color: isActive ? "#fff" : "#475569",
-  fontWeight: isActive ? 600 : 500,
-  fontSize: "0.85rem",
-  transition: "all 0.2s ease",
-  boxShadow: isActive
-    ? `0 4px 12px ${activeBg}44`
-    : "0 1px 2px rgba(0,0,0,0.05)",
-  "&:hover": {
-    borderColor: isActive ? activeBg : color,
-    backgroundColor: isActive ? activeBg : "#f8fafc",
-    transform: "translateY(-1px)",
-    boxShadow: isActive ? `0 6px 15px ${activeBg}66` : "0 4px 6px rgba(0,0,0,0.05)",
-  },
-});
-
-const dotSx = (isActive, dot) => ({
-  width: 8,
-  height: 8,
-  borderRadius: "50%",
-  background: isActive ? "#fff" : dot,
-  flexShrink: 0,
-  transition: "background 0.2s ease",
-});
 
 const ListHeader = ({
   title,
@@ -50,129 +19,161 @@ const ListHeader = ({
   counts = {},
   showAgeFilters = false,
   showStatusFilters = false,
-  allowedFilters,   // optional array of status values to restrict which buttons show
+  allowedFilters,
   loading = false,
+  totalRecords,
+  countLabel,
 }) => {
   const AGE_FILTERS = [
-    {
-      label: `< 3 Days`,
-      value: "<3",
-      countKey: "green",
-      color: "#059669",
-      activeColor: "#065f46",
-      bg: "#ffffff",
-      activeBg: "#10b981",
-      dot: "#34d399",
-    },
-    {
-      label: `3 - 6 Days`,
-      value: "3-6",
-      countKey: "yellow",
-      color: "#d97706",
-      activeColor: "#b45309",
-      bg: "#ffffff",
-      activeBg: "#f59e0b",
-      dot: "#fbbf24",
-    },
-    {
-      label: `> 6 Days`,
-      value: ">6",
-      countKey: "red",
-      color: "#dc2626",
-      activeColor: "#991b1b",
-      bg: "#ffffff",
-      activeBg: "#ef4444",
-      dot: "#f87171",
-    },
+    { label: "< 3 DAYS", value: "<3" },
+    { label: "3 - 6 DAYS", value: "3-6" },
+    { label: "> 6 DAYS", value: ">6" },
   ];
 
   const STATUS_FILTERS = [
-    { label: "Pending",  value: "pending", color: "#ea580c", activeColor: "#9a3412", bg: "#ffffff", activeBg: "#f97316", dot: "#f9972fff" },
-    { label: "Accepted", value: "accepted", color: "#059669", activeColor: "#065f46", bg: "#ffffff", activeBg: "#10b981", dot: "#34d399" },
-    { label: "L0 Data", value: "rejected", color: "#dc2626", activeColor: "#991b1b", bg: "#ffffff", activeBg: "#ef4444", dot: "#f87171" },
-    { label: "On Hold",  value: "On Hold",  color: "#ca8a04", activeColor: "#854d0e", bg: "#ffffff", activeBg: "#dbbc23", dot: "#facc15" },
+    { label: "PENDING", value: "pending" },
+    { label: "ACCEPTED", value: "accepted" },
+    { label: "L0 DATA", value: "rejected" },
+    { label: "ON HOLD", value: "On Hold" },
   ];
+
+  const baseFilters = showAgeFilters
+    ? AGE_FILTERS
+    : showStatusFilters
+    ? STATUS_FILTERS
+    : [];
+
+  const visibleFilters = baseFilters.filter(
+    (f) => !f.value || !allowedFilters || allowedFilters.includes(f.value)
+  );
+
+  const handleFilterClick = (value) => {
+    if (value === "") {
+      onFilterChange("");
+    } else {
+      onFilterChange(value);
+    }
+  };
 
   return (
     <Box>
       <Navbar />
-      <Typography variant="h3" align="center" sx={{ my: 3, mt: -4, fontWeight: 700, color: "#1e293b" }}>
-        {title}
-      </Typography>
 
-      <Stack
-        direction="column"
-        alignItems="center"
-        justifyContent="center"
-        gap={4}
-        sx={{ px: 2, mb: 3, flexWrap: "wrap" }}
+      {/* Page Header */}
+      <Box sx={{ px: 3, pt: 10, pb: 1.5, backgroundColor: "#f5f5f5" }}>
+        <Typography sx={{ fontSize: 11, color: "#777", mb: 0.5 }}>
+          AMD / {title}
+        </Typography>
+        <Typography
+          sx={{ fontSize: 20, fontWeight: 700, color: "#000", lineHeight: 1.2 }}
+        >
+          {title}
+        </Typography>
+      </Box>
+
+      {/* Filter + Search Row */}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
+          px: 3,
+          py: 0.75,
+          flexWrap: "wrap",
+          minHeight: 48,
+        }}
       >
+        {/* Search */}
         <TextField
-          placeholder="Search Execution ID, Type, or Category..."
+          placeholder="Search"
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
           variant="outlined"
+          size="small"
           sx={{
-            width: { xs: "90%", md: 500 },
+            width: 160,
+            mr: 1,
             "& .MuiOutlinedInput-root": {
-              border: "1px solid #747d8aff",
-              borderRadius: "8px",
+              borderRadius: "2px",
+              fontSize: 12,
+              height: 28,
               backgroundColor: "#fff",
-              boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
-              "&:hover": { boxShadow: "0 4px 15px rgba(0,0,0,0.1)" },
-            }
+              "& fieldset": { borderColor: "#bbb" },
+              "&:hover fieldset": { borderColor: "#555" },
+              "&.Mui-focused fieldset": { borderColor: "#000", borderWidth: "1px" },
+            },
+            "& input": { px: 1, py: 0.5, fontSize: 12 },
           }}
           slotProps={{
             input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon sx={{ color: "#94a3b8" }} />
-                </InputAdornment>
-              ),
               endAdornment: loading ? (
                 <InputAdornment position="end">
-                  <CircularProgress size={18} thickness={5} />
+                  <CircularProgress size={12} color="inherit" />
                 </InputAdornment>
-              ) : null
-            }
+              ) : null,
+            },
           }}
         />
 
-        <Stack direction="row" gap={1.5} sx={{ flexWrap: "wrap", justifyContent: "center" }}>
-          {showAgeFilters && AGE_FILTERS.map((f) => {
-            const isActive = filter === f.value;
-            const count = counts[f.countKey];
+        {/* Filter checkbox buttons */}
+        <Stack direction="row" gap={0.5} alignItems="center" flexWrap="wrap">
+          {visibleFilters.map((f) => {
+            const isActive = f.value === "" ? filter === "" : filter === f.value;
             return (
               <Box
-                key={f.value}
-                onClick={() => onFilterChange(f.value)}
-                sx={patchSx(isActive, f.activeBg, f.bg, f.activeColor, f.color, f.dot)}
+                key={f.value || "all"}
+                onClick={() => handleFilterClick(f.value)}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 0.5,
+                  px: 1,
+                  py: 0.25,
+                  border: "1px solid #bbb",
+                  cursor: "pointer",
+                  backgroundColor: isActive ? "#e8e8e8" : "#fff",
+                  userSelect: "none",
+                  "&:hover": { backgroundColor: "#f0f0f0", borderColor: "#666" },
+                  transition: "background-color 0.1s ease",
+                }}
               >
-                <Box sx={dotSx(isActive, f.dot)} />
-                {f.label}
-
+                <Checkbox
+                  checked={isActive}
+                  readOnly
+                  size="small"
+                  sx={{
+                    p: 0,
+                    color: "#777",
+                    "&.Mui-checked": { color: "#000" },
+                    "& .MuiSvgIcon-root": { fontSize: 14 },
+                  }}
+                />
+                <Typography
+                  sx={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: "#111",
+                    letterSpacing: 0.3,
+                    lineHeight: 1,
+                  }}
+                >
+                  {f.label}
+                </Typography>
               </Box>
             );
           })}
-
-
-          {showStatusFilters && STATUS_FILTERS
-            .filter((f) => !allowedFilters || allowedFilters.includes(f.value))
-            .map((f) => {
-              const isActive = filter === f.value;
-              return (
-                <Box
-                  key={f.value}
-                  onClick={() => onFilterChange(f.value)}
-                  sx={patchSx(isActive, f.activeBg, f.bg, f.activeColor, f.color, f.dot)}
-                >
-                  <Box sx={dotSx(isActive, f.dot)} />
-                  {f.label}
-                </Box>
-              );
-            })}
         </Stack>
-      </Stack>
+
+        {/* Spacer */}
+        <Box sx={{ flex: 1 }} />
+
+        {/* Record Count */}
+        {totalRecords !== undefined && (
+          <Typography sx={{ fontSize: 12, color: "#555", whiteSpace: "nowrap", fontStyle: "italic" }}>
+            No.of Records: {totalRecords}
+          </Typography>
+        )}
+      </Box>
     </Box>
   );
 };

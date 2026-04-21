@@ -4,7 +4,6 @@ import ListHeader from "../components/ListHeader";
 import RecordList from "../components/RecordList";
 import ErrorPage from "../components/ErrorPage";
 import { usePaginatedRecords } from "../hooks/usePaginatedRecords";
-import { getAgeColor } from "../utils/recordHelpers";
 
 /**
  * Modes and their default parameters for usePaginatedRecords
@@ -26,9 +25,14 @@ const RecordsListPage = ({ mode = "landing" }) => {
   // Age filter (client-side) or Status filter (server-side)
   const [filter, setFilter] = useState("");
 
-  const handleFilterChange = (value) =>
-    setFilter((prev) => (prev === value ? "" : value));
-
+  const handleFilterChange = (value) => {
+    // If value is "" (ALL), always clear the filter
+    if (value === "") {
+      setFilter("");
+    } else {
+      setFilter((prev) => (prev === value ? "" : value));
+    }
+  };
 
   // Determine which parameters to send to the API based on mode and filter
   const extraParams = useMemo(() => {
@@ -40,7 +44,7 @@ const RecordsListPage = ({ mode = "landing" }) => {
     }
     // Status-based filter modes — a clicked filter always wins
     if (filter) return { status: filter };
-    
+
     // Single-status default
     if (config.defaultStatus) return { status: config.defaultStatus };
 
@@ -62,14 +66,8 @@ const RecordsListPage = ({ mode = "landing" }) => {
     meta,
   } = usePaginatedRecords({ extraParams });
 
-  // Server now handles age filtering — no client-side filtering needed
   const displayRecords = records;
-
-  // countLabel: server always returns the correct filtered total
   const countLabel = String(totalRecords);
-
-
-  // UI state for search/loading
   const isSearching = loading && searchInput !== search;
 
   if (error) {
@@ -77,21 +75,23 @@ const RecordsListPage = ({ mode = "landing" }) => {
   }
 
   return (
-    <Box>
-      <Box sx={{ mt: 15 }}>
-        <ListHeader
-          title={config.title}
-          search={searchInput}
-          onSearchChange={setSearchInput}
-          filter={filter}
-          onFilterChange={handleFilterChange}
-          counts={meta}
-          showAgeFilters={config.showAgeFilters}
-          showStatusFilters={config.showStatusFilters}
-          allowedFilters={config.allowedFilters}
-          loading={isSearching}
-        />
+    <Box sx={{ backgroundColor: "#f5f5f5", minHeight: "100vh" }}>
+      <ListHeader
+        title={config.title}
+        search={searchInput}
+        onSearchChange={setSearchInput}
+        filter={filter}
+        onFilterChange={handleFilterChange}
+        counts={meta}
+        showAgeFilters={config.showAgeFilters}
+        showStatusFilters={config.showStatusFilters}
+        allowedFilters={config.allowedFilters}
+        loading={isSearching}
+        totalRecords={totalRecords}
+        countLabel={countLabel}
+      />
 
+      <Box sx={{ px: 3, py: 2 }}>
         <RecordList
           records={displayRecords}
           totalRecords={totalRecords}
@@ -100,16 +100,23 @@ const RecordsListPage = ({ mode = "landing" }) => {
           page={page}
           loading={loading}
           onLoadMore={loadMore}
-          showAgeColors={config.showAgeFilters}
-          showCount={config.showStatusFilters || config.showAgeFilters}
-          ageColorFn={getAgeColor}
         />
 
         {/* Empty States */}
         {!loading && displayRecords.length === 0 && (
-          <Box sx={{ textAlign: "center", mt: 4, mb: 8 }}>
-            <Typography variant="h6" color="text.secondary">
-              {filter ? "No records match the selected filter." : "No records found in this category."}
+          <Box
+            sx={{
+              textAlign: "center",
+              py: 8,
+              backgroundColor: "#fff",
+              border: "1px solid #e0e0e0",
+              borderTop: "none",
+            }}
+          >
+            <Typography variant="h6" color="text.secondary" sx={{ fontSize: 14 }}>
+              {filter
+                ? "No records match the selected filter."
+                : "No records found in this category."}
             </Typography>
           </Box>
         )}

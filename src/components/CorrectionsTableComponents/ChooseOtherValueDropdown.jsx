@@ -65,8 +65,8 @@ const ChooseOtherValueDropdown = ({
       sx={{
         mx: 1.5,
         mb: 1,
-        py: 0.5,
-        px: 1.5,
+        py: 0.35,
+        px: 1,
         display: "flex",
         alignItems: "center",
         gap: 1.5,
@@ -82,7 +82,7 @@ const ChooseOtherValueDropdown = ({
       {/* Main Content */}
 
       <Box sx={{ flex: 1, px: 1.5, py: 0.5 }}>
-        <Typography sx={{ fontSize: 13, fontWeight: 600, color: "#64748b", mb: 0.5 }}>
+        <Typography sx={{ fontSize: 11, fontWeight: 600, color: "#64748b", mb: 0.5 }}>
           Choose other {invalidField}:
         </Typography>
         <Autocomplete
