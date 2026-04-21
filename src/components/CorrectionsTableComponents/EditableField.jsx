@@ -21,10 +21,10 @@ const EditableField = ({ label, value, color, onSave, isEditable = true }) => {
   };
 
   return (
-    <Box sx={{ px: 1, py: 0.4, display: "flex", flexDirection: "column", minHeight: 36, minWidth: 100 }}>
+    <Box sx={{ px: 1, py: 0.4, display: "flex", flexDirection: "column", minHeight: 40, minWidth: 110 }}>
       {isEditing ? (
         <>
-          <Typography sx={{ fontSize: 9, fontWeight: 600, color, letterSpacing: 0.5, mb: 0.25, opacity: 0.7 }}>
+          <Typography sx={{ fontSize: 10, fontWeight: 600, color, letterSpacing: 0.5, mb: 0.25, opacity: 0.7 }}>
             {label}
           </Typography>
           <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
@@ -38,13 +38,13 @@ const EditableField = ({ label, value, color, onSave, isEditable = true }) => {
                 if (e.key === "Enter") handleSave(e);
                 if (e.key === "Escape") handleCancel(e);
               }}
-              sx={{ fontSize: 12, fontWeight: 700, color, borderBottom: `1px solid ${color}`, pb: 0.25, flex: 1 }}
+              sx={{ fontSize: 13, fontWeight: 700, color, borderBottom: `1px solid ${color}`, pb: 0.25, flex: 1 }}
             />
             <IconButton size="small" onClick={handleSave} sx={{ p: 0.25, color }}>
-              <CheckOutlinedIcon sx={{ fontSize: 18 }} />
+              <CheckOutlinedIcon sx={{ fontSize: 19 }} />
             </IconButton>
             <IconButton size="small" onClick={handleCancel} sx={{ p: 0.25, color }}>
-              <CloseOutlinedIcon sx={{ fontSize: 18 }} />
+              <CloseOutlinedIcon sx={{ fontSize: 19 }} />
             </IconButton>
           </Box>
         </>
@@ -54,7 +54,7 @@ const EditableField = ({ label, value, color, onSave, isEditable = true }) => {
             {label}
           </Typography>
           <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-            <Typography sx={{ fontSize: 12, fontWeight: 700, color }}>
+            <Typography sx={{ fontSize: 13, fontWeight: 700, color }}>
               {value || "—"}
             </Typography>
             {isEditable && (
@@ -67,7 +67,7 @@ const EditableField = ({ label, value, color, onSave, isEditable = true }) => {
                 }}
                 sx={{ p: 0.25, color, opacity: 0.5, "&:hover": { opacity: 1 } }}
               >
-                <EditOutlinedIcon sx={{ fontSize: 14 }} />
+                <EditOutlinedIcon sx={{ fontSize: 15 }} />
               </IconButton>
             )}
           </Box>

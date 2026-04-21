@@ -7,8 +7,8 @@ const ExistingDataRow = ({ existingData, theme }) => (
       display: "flex",
       alignItems: "center",
       gap: 1.5,
-      px: 1.5,
-      py: 0.35,
+      px: 1.75,
+      py: 0.5,
       backgroundColor: "#f8fafc",
       borderBottom: "1px solid #e2e8f0",
     }}
@@ -16,7 +16,7 @@ const ExistingDataRow = ({ existingData, theme }) => (
     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
       <Typography
         sx={{
-          fontSize: 10,
+          fontSize: 11,
           fontWeight: 700,
           color: "#64748b",
           textTransform: "uppercase",
@@ -32,17 +32,17 @@ const ExistingDataRow = ({ existingData, theme }) => (
     <Stack direction="row" alignItems="center" gap={3} flexWrap="wrap">
       {existingData.map((item, i) => (
         <Stack key={i} direction="row" alignItems="center" gap={1}>
-          <Typography sx={{ fontSize: 10, color: "#94a3b8", fontWeight: 600, letterSpacing: 0.5 }}>
+          <Typography sx={{ fontSize: 11, color: "#94a3b8", fontWeight: 600, letterSpacing: 0.5 }}>
             {item.field}
           </Typography>
           <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
             <Typography
               sx={{
-                fontSize: 12,
+                fontSize: 13,
                 fontWeight: 700,
                 // Monochrome: underline instead of red for invalid, dark for valid
-                color: "#0f172a",
-                textDecoration: item.validation_status === "invalid" ? "underline" : "none",
+                color: item.validation_status === "invalid" ?"#990c0cff" :"#0f172a",
+                
               }}
             >
               {(() => {

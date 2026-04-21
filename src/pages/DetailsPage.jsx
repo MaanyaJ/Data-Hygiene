@@ -111,7 +111,7 @@ const DetailsPage = () => {
   // if (!data || data.length === 0) return "No invalid data in the response to show";
 
   return (
-    <Box sx={{ backgroundColor: "#f5f5f5", minHeight: "100vh" }}>
+    <Box sx={{ backgroundColor: "#ebebebff", minHeight: "100vh" }}>
       <Navbar />
       <Box sx={{ p: 3, pt: 9 }}>
         <ExecutionInfoBox executionInfo={executionData} />

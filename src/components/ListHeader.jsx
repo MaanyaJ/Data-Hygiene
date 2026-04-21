@@ -48,11 +48,24 @@ const ListHeader = ({
   );
 
   const handleFilterClick = (value) => {
-    if (value === "") {
-      onFilterChange("");
-    } else {
-      onFilterChange(value);
-    }
+    onFilterChange(value);
+  };
+
+  // Map filter value → summary key from API response
+  const STATUS_KEY_MAP = {
+    pending: "PENDING",
+    accepted: "ACCEPTED",
+    rejected: "REJECTED",
+    "On Hold": "ON HOLD",
+  };
+  const AGE_KEY_MAP = { "<3": "green", "3-6": "yellow", ">6": "red" };
+
+  const getCount = (filterValue) => {
+    const summary = counts?.summary;
+    if (!summary) return null;
+    const key = STATUS_KEY_MAP[filterValue] ?? AGE_KEY_MAP[filterValue];
+    const val = key !== undefined ? summary[key] : undefined;
+    return val !== undefined ? val : null;
   };
 
   return (
@@ -60,9 +73,9 @@ const ListHeader = ({
       <Navbar />
 
       {/* Page Header */}
-      <Box sx={{ px: 3, pt: 10, pb: 1.5, backgroundColor: "#f5f5f5" }}>
-        <Typography sx={{ fontSize: 11, color: "#777", mb: 0.5 }}>
-          AMD / {title}
+      <Box sx={{ px: 3, pt: 10, pb: 1.5, backgroundColor: "#ebebebff"}}>
+        <Typography sx={{ fontSize: 12, color: "#777", mb: 0.5 }}>
+          AMD_DH / {title}
         </Typography>
         <Typography
           sx={{ fontSize: 20, fontWeight: 700, color: "#000", lineHeight: 1.2 }}
@@ -85,24 +98,24 @@ const ListHeader = ({
       >
         {/* Search */}
         <TextField
-          placeholder="Search"
+          placeholder="Search for a ExecutionID/ BenchmarkType/ BenchmarkCategory"
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
           variant="outlined"
           size="small"
           sx={{
-            width: 160,
+            width: 380,
             mr: 1,
             "& .MuiOutlinedInput-root": {
               borderRadius: "2px",
               fontSize: 12,
-              height: 28,
+              height: 40,
               backgroundColor: "#fff",
               "& fieldset": { borderColor: "#bbb" },
               "&:hover fieldset": { borderColor: "#555" },
               "&.Mui-focused fieldset": { borderColor: "#000", borderWidth: "1px" },
             },
-            "& input": { px: 1, py: 0.5, fontSize: 12 },
+            "& input": { px: 1, py: 0.5, fontSize: 12},
           }}
           slotProps={{
             input: {
@@ -127,37 +140,54 @@ const ListHeader = ({
                   display: "flex",
                   alignItems: "center",
                   gap: 0.5,
-                  px: 1,
-                  py: 0.25,
-                  border: "1px solid #bbb",
+                  px: 0.8,
+                  py: 0.8,
+                 
+                  border: isActive ? "1px solid #0e0808ff" : "none",
                   cursor: "pointer",
-                  backgroundColor: isActive ? "#e8e8e8" : "#fff",
-                  userSelect: "none",
-                  "&:hover": { backgroundColor: "#f0f0f0", borderColor: "#666" },
-                  transition: "background-color 0.1s ease",
+                  borderRadius:"3px",
+                 
                 }}
               >
                 <Checkbox
                   checked={isActive}
                   readOnly
-                  size="small"
+                  size="large"
                   sx={{
                     p: 0,
-                    color: "#777",
-                    "&.Mui-checked": { color: "#000" },
-                    "& .MuiSvgIcon-root": { fontSize: 14 },
+
+                    color: "#605d5dff",
+                    "&.Mui-checked": { color: "#030202ff" },
+                    "& .MuiSvgIcon-root": { fontSize: 22 },
                   }}
                 />
                 <Typography
                   sx={{
-                    fontSize: 11,
-                    fontWeight: 700,
-                    color: "#111",
+                    fontSize: 12,
+                    fontWeight: 550,
+                    color: isActive ? "#111" : "#5e5d5dff",
                     letterSpacing: 0.3,
                     lineHeight: 1,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 0.5,
                   }}
                 >
+                  
                   {f.label}
+                  {getCount(f.value) !== null && (
+                    <Box
+                      component="span"
+                      sx={{
+                        fontSize: 11,
+                        fontWeight: 400,
+                        color: isActive ? "#444" : "#888",
+                      }}
+                    >
+                      ({!loading ? "(0)" : getCount(f.value).toLocaleString()})
+                      {console.log(f.value)}
+                    </Box>
+                  )}
                 </Typography>
               </Box>
             );
