@@ -80,6 +80,9 @@ const DetailsPage = () => {
       if (!res.ok) throw new Error("Failed to fetch record details");
 
       const json = await res.json();
+      if(json.status === "error") {
+        throw new Error(json.message);
+      }
       setExecutionData(json.execution_details);
       setHistory(json.history);
 
