@@ -173,7 +173,7 @@ const ListHeader = ({
                     gap: 0.5,
                   }}
                 >
-
+ 
                   {f.label}
                   <Box
                     component="span"
@@ -190,6 +190,7 @@ const ListHeader = ({
                         : "0"})                    
                     </Box>
                 </Typography>
+
               </Box>
             );
           })}
