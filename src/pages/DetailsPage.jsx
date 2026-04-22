@@ -114,6 +114,7 @@ const DetailsPage = () => {
     <Box sx={{ backgroundColor: "#ebebebff", minHeight: "100vh" }}>
       <Navbar />
       <Box sx={{ p: 3, pt: 9 }}>
+       
         <ExecutionInfoBox executionInfo={executionData} />
         <Box sx={{ mt: -2 }}>
           <CorrectionsTable

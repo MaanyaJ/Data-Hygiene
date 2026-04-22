@@ -74,9 +74,6 @@ const ListHeader = ({
 
       {/* Page Header */}
       <Box sx={{ px: 3, pt: 10, pb: 1.5, backgroundColor: "#ebebebff"}}>
-        <Typography sx={{ fontSize: 12, color: "#777", mb: 0.5 }}>
-          AMD_DH / {title}
-        </Typography>
         <Typography
           sx={{ fontSize: 20, fontWeight: 700, color: "#000", lineHeight: 1.2 }}
         >
@@ -196,15 +193,8 @@ const ListHeader = ({
           })}
         </Stack>
 
-        {/* Spacer */}
-        <Box sx={{ flex: 1 }} />
 
-        {/* Record Count */}
-        {totalRecords !== undefined && (
-          <Typography sx={{ fontSize: 12, color: "#555", whiteSpace: "nowrap", fontStyle: "italic" }}>
-            No.of Records: {totalRecords}
-          </Typography>
-        )}
+  
       </Box>
     </Box>
   );

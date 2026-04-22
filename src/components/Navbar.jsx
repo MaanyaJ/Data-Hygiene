@@ -5,7 +5,7 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import UploadJSON from "./UploadJSON";
 
 const NAV_LINKS = [
-  { label: "All", path: "/" },
+  
   { label: "Active List", path: "/active" },
   { label: "Completed List", path: "/completed" },
   { label: "On Hold", path: "/on-hold" },
@@ -84,7 +84,7 @@ const Navbar = () => {
                 userSelect: "none",
               }}
             >
-              {activeLink ? activeLink.label : "Lists"}
+              {activeLink ? activeLink.label : "Standardised Data"}
             </Typography>
 
             <KeyboardArrowDownIcon
