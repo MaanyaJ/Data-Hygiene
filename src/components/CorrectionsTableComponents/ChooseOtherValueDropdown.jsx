@@ -19,7 +19,7 @@ const ChooseOtherValueDropdown = ({
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(null);
 
-  if(!isPending) return;
+  if (!isPending) return;
 
   const handleOpen = () => {
     if (!isPending) return;
@@ -96,6 +96,11 @@ const ChooseOtherValueDropdown = ({
             <TextField
               {...params}
               placeholder="Search or select..."
+              sx={{
+                "& .MuiOutlinedInput-root.Mui-focused fieldset": {
+                  borderColor: "#000",
+                },
+              }}
               slotProps={{
                 input: {
                   ...params.InputProps,

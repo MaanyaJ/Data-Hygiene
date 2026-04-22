@@ -157,13 +157,13 @@ const L0ConfirmDialog = ({ open, onClose, onConfirm, submitting }) => (
     </DialogContent>
     <Divider />
     <DialogActions sx={{ px: 3, py: 2 }}>
-      <Button variant="outlined" onClick={onClose} disabled={submitting}  sx={{
-          borderColor: "#000000",
-          color: "#000000",
-          "&:hover": {
-            backgroundColor: "#eeeeee",
-          },
-        }}>
+      <Button variant="outlined" onClick={onClose} disabled={submitting} sx={{
+        borderColor: "#000000",
+        color: "#000000",
+        "&:hover": {
+          backgroundColor: "#eeeeee",
+        },
+      }}>
         Cancel
       </Button>
       <Button
@@ -245,6 +245,14 @@ const DraftRecordDialog = ({
           <Stack gap={2.5} sx={{ mt: 0.5 }}>
             {fields.map((field) => (
               <TextField
+                sx={{
+                  "& .MuiOutlinedInput-root.Mui-focused fieldset": {
+                    borderColor: "#000000",
+                  }, 
+                  "& .MuiInputLabel-root.Mui-focused": {
+                    color: "#000000", // 🔥 remove blue on focus
+                  },
+                }}
                 key={field.fieldname}
                 label={
                   field.fieldname === "value"
@@ -268,13 +276,13 @@ const DraftRecordDialog = ({
         <>
           <Divider />
           <DialogActions sx={{ px: 3, py: 2 }}>
-            <Button variant="outlined" onClick={onClose} disabled={submitting}  sx={{
-          borderColor: "#000000",
-          color: "#000000",
-          "&:hover": {
-            backgroundColor: "#eeeeee",
-          },
-        }}>
+            <Button variant="outlined" onClick={onClose} disabled={submitting} sx={{
+              borderColor: "#000000",
+              color: "#000000",
+              "&:hover": {
+                backgroundColor: "#eeeeee",
+              },
+            }}>
               Cancel
             </Button>
             <Button
@@ -282,6 +290,11 @@ const DraftRecordDialog = ({
               onClick={() => onSubmit(formValues)}
               disabled={!allFilled || submitting}
               startIcon={submitting ? <CircularProgress size={14} color="inherit" /> : null}
+              sx={{
+                color: "#ffffff",
+                backgroundColor: "#000000",
+                "&.Mui-disabled": { backgroundColor: "#efefef", color: "#888888" }
+              }}
             >
               {submitting ? "Submitting..." : "Submit"}
             </Button>

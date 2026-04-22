@@ -13,8 +13,8 @@ const Loader = () => {
         gap: 2,
       }}
     >
-      <CircularProgress size={40} />
-      <Typography color="text.secondary">
+      <CircularProgress size={40} sx={{color: "#000000"}}/>
+      <Typography sx={{color: "#000000"}}>
         Loading...
       </Typography>
     </Box>

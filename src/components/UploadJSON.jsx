@@ -111,7 +111,7 @@ const UploadJSON = () => {
             px: 1.8,
             py: 0.5,
             minHeight: "30px",
-            borderRadius: "6px",
+            borderRadius: "2px",
             boxShadow: "none",
             "&:hover": {
               backgroundColor: "#e4e4e4",
