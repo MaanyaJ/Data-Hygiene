@@ -246,19 +246,6 @@ const UploadJSON = () => {
 
         <DialogActions sx={{ px: 3, pb: 2.5, pt: 1.5, gap: 1 }}>
           <Button
-            onClick={handleCloseDialog}
-            disabled={loading}
-            sx={{
-              fontFamily: "'Inter', sans-serif",
-              fontSize: "0.78rem",
-              textTransform: "none",
-              color: "#999",
-              "&:hover": { color: "#333", backgroundColor: "transparent" },
-            }}
-          >
-            Cancel
-          </Button>
-          <Button
             onClick={handleUpload}
             disabled={!selectedFile || loading}
             variant="contained"
