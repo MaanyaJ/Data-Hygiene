@@ -5,7 +5,7 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import UploadJSON from "./UploadJSON";
 
 const NAV_LINKS = [
-  
+  { label: "Dashboard", path: "/" },
   { label: "Active List", path: "/active" },
   { label: "Completed List", path: "/completed" },
   { label: "On Hold", path: "/on-hold" },
@@ -24,9 +24,7 @@ const Navbar = () => {
     handleClose();
   };
 
-  const activeLink = NAV_LINKS.find((l) => l.path === location.pathname);
-  // Exclude the currently selected route from the dropdown
-  const dropdownLinks = NAV_LINKS.filter((l) => l.path !== location.pathname);
+  const dropdownLinks = NAV_LINKS;
 
   return (
     <AppBar
@@ -84,14 +82,13 @@ const Navbar = () => {
                 userSelect: "none",
               }}
             >
-              {activeLink ? activeLink.label : "Standardised Data"}
+              {"Data Hygiene"}
             </Typography>
 
             <KeyboardArrowDownIcon
               sx={{
                 fontSize: 16,
                 color: "#fff",
-                
                 transition: "transform 0.2s ease",
                 transform: open ? "rotate(180deg)" : "rotate(0deg)",
               }}
