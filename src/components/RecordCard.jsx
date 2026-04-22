@@ -25,16 +25,16 @@ const RecordCard = ({ record, index = 0 }) => {
     <Box
       sx={{
         display: "flex",
-        alignItems: "flex-start",
+        justifyContent: "space-between",
         px: 3,
         height: 78, // Fixed height for uniformity
         width: "97%",
         mb: "6px",   // Uniform gap
-        pt:1.2,
-        pb:1.9,
+        py:2,
         backgroundColor: isEven ? "#ffffff" : "#fafafa",
         boxShadow:"0 2px 8px rgba(0,0,0,0.07)",
         transition: "background-color 0.1s ease, box-shadow 0.1s ease",
+        gap: 2
     
       }}
     >
@@ -51,13 +51,26 @@ const RecordCard = ({ record, index = 0 }) => {
         </Typography>
       </Box>
 
-      {/* Benchmark Category */}
-      <Box sx={{ width: "12%", pl: 2, flexShrink: 0 }}>
+      {/* updated on */}
+      <Box >
         <Typography
           sx={{ fontSize: 11, color: "#777", fontWeight: 700, mb: 0.3,
             textTransform: "uppercase", letterSpacing: 0.5 }}
         >
-          Category
+          Updated On
+        </Typography>
+        <Typography sx={{ fontSize: 12, fontWeight: 600, color: "#111", lineHeight: 1.2 }}>
+          {new Date(record.updatedOn).toLocaleDateString()}
+        </Typography>
+      </Box>
+
+      {/* Benchmark Category */}
+      <Box >
+        <Typography
+          sx={{ fontSize: 11, color: "#777", fontWeight: 700, mb: 0.3,
+            textTransform: "uppercase", letterSpacing: 0.5 }}
+        >
+         Benchmark Category
         </Typography>
         <Typography sx={{ fontSize: 12, fontWeight: 600, color: "#111", lineHeight: 1.2 }}>
           {record.BenchmarkCategory}
@@ -65,12 +78,12 @@ const RecordCard = ({ record, index = 0 }) => {
       </Box>
 
       {/* Benchmark Type */}
-      <Box sx={{ width: "10%", pr: 2 }}>
+      <Box >
         <Typography
           sx={{ fontSize: 11, color: "#777", fontWeight: 700, mb: 0.3,
             textTransform: "uppercase", letterSpacing: 0.5 }}
         >
-          Type
+         Benchmark Type
         </Typography>
         <Typography sx={{ fontSize: 12, fontWeight: 600, color: "#111", lineHeight: 1.2 }}>
           {record.BenchmarkType}
@@ -78,7 +91,7 @@ const RecordCard = ({ record, index = 0 }) => {
       </Box>
 
       {/* Status */}
-      <Box sx={{ width: "12%", pr: 2, flexShrink: 0 }}>
+      <Box >
         <Typography
           sx={{ fontSize: 11, color: "#777", fontWeight: 700, mb: 0.3,
             textTransform: "uppercase", letterSpacing: 0.5 }}
@@ -91,7 +104,7 @@ const RecordCard = ({ record, index = 0 }) => {
       </Box>
 
       {/* Inconsistent Fields */}
-      <Box sx={{ flex: 1, pr: 2, minWidth: 0 }}>
+      <Box>
         <Typography
           sx={{ fontSize: 11, color: "#777", fontWeight: 700, mb: 0.3,
             textTransform: "uppercase", letterSpacing: 0.5,
@@ -109,7 +122,7 @@ const RecordCard = ({ record, index = 0 }) => {
       </Box>
 
       {/* Actions */}
-      <Box sx={{ display: "flex", gap: 0.5, alignItems: "center", flexShrink: 0, pt: 0.5 }}>
+      <Box sx={{ display: "flex", gap: 0.5, alignItems: "center", pt: 0.5 }}>
       
         <IconButton
           size="medium"
