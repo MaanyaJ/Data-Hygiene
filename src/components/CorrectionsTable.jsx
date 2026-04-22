@@ -56,13 +56,13 @@ const AcceptConfirmDialog = ({ open, onClose, onConfirm, fieldName, isAccepting 
             width: 52,
             height: 52,
             borderRadius: "50%",
-            backgroundColor: "#f1f5f9",
+            backgroundColor: "#f1f0f0",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
           }}
         >
-          <CheckCircleIcon sx={{ color: "#0f172a", fontSize: 28 }} />
+          <CheckCircleIcon sx={{ color: "#000000", fontSize: 28 }} />
         </Box>
         <Box textAlign="center">
           <Typography fontWeight={600} fontSize="0.95rem" gutterBottom>
@@ -77,7 +77,14 @@ const AcceptConfirmDialog = ({ open, onClose, onConfirm, fieldName, isAccepting 
     </DialogContent>
     <Divider />
     <DialogActions sx={{ px: 3, py: 2 }}>
-      <Button variant="outlined" onClick={onClose} disabled={isAccepting}>
+      <Button variant="outlined" onClick={onClose} disabled={isAccepting}
+        sx={{
+          borderColor: "#000000",
+          color: "#000000",
+          "&:hover": {
+            backgroundColor: "#eeeeee",
+          },
+        }}>
         Cancel
       </Button>
       <Button
@@ -130,13 +137,13 @@ const L0ConfirmDialog = ({ open, onClose, onConfirm, submitting }) => (
             width: 52,
             height: 52,
             borderRadius: "50%",
-            backgroundColor: "#f1f5f9",
+            backgroundColor: "#f1f0f0",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
           }}
         >
-          <WarningAmberIcon sx={{ color: "#475569", fontSize: 28 }} />
+          <WarningAmberIcon sx={{ color: "#000000", fontSize: 28 }} />
         </Box>
         <Box textAlign="center">
           <Typography fontWeight={600} fontSize="0.95rem" gutterBottom>
@@ -150,15 +157,23 @@ const L0ConfirmDialog = ({ open, onClose, onConfirm, submitting }) => (
     </DialogContent>
     <Divider />
     <DialogActions sx={{ px: 3, py: 2 }}>
-      <Button variant="outlined" onClick={onClose} disabled={submitting}>
+      <Button variant="outlined" onClick={onClose} disabled={submitting}  sx={{
+          borderColor: "#000000",
+          color: "#000000",
+          "&:hover": {
+            backgroundColor: "#eeeeee",
+          },
+        }}>
         Cancel
       </Button>
       <Button
         variant="contained"
-        color="warning"
         onClick={onConfirm}
         disabled={submitting}
         startIcon={submitting ? <CircularProgress size={14} color="inherit" /> : null}
+        sx={{
+          backgroundColor: "#000000"
+        }}
       >
         {submitting ? "Submitting..." : "Yes, Confirm"}
       </Button>
@@ -195,79 +210,85 @@ const DraftRecordDialog = ({
     fields.every((f) => !!formValues[f.fieldname]?.trim());
 
   return (
-  <Dialog
-    open={open}
-    onClose={() => !submitting && onClose()}
-    maxWidth="xs"
-    fullWidth
-    slotProps={{ paper: { sx: { borderRadius: 3 } } }}
-  >
-    <DialogTitle sx={{ pb: 1 }}>
-      <Stack direction="row" alignItems="center" justifyContent="space-between">
-        <Box>
-          <Typography fontWeight={700} fontSize="1rem">Submit Draft Record</Typography>
-          {fieldName && (
-            <Typography variant="caption" color="text.secondary">
-              Field: {fieldName}
+    <Dialog
+      open={open}
+      onClose={() => !submitting && onClose()}
+      maxWidth="xs"
+      fullWidth
+      slotProps={{ paper: { sx: { borderRadius: 3 } } }}
+    >
+      <DialogTitle sx={{ pb: 1 }}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between">
+          <Box>
+            <Typography fontWeight={700} fontSize="1rem">Submit Draft Record</Typography>
+            {fieldName && (
+              <Typography variant="caption" color="text.secondary">
+                Field: {fieldName}
+              </Typography>
+            )}
+          </Box>
+          <IconButton size="small" onClick={onClose} disabled={submitting}>
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        </Stack>
+      </DialogTitle>
+      <Divider />
+      <DialogContent sx={{ pt: 2.5 }}>
+        {loadingFields ? (
+          <Stack alignItems="center" justifyContent="center" py={4} gap={1.5}>
+            <CircularProgress size={28} />
+            <Typography variant="body2" color="text.secondary">
+              Loading fields...
             </Typography>
-          )}
-        </Box>
-        <IconButton size="small" onClick={onClose} disabled={submitting}>
-          <CloseIcon fontSize="small" />
-        </IconButton>
-      </Stack>
-    </DialogTitle>
-    <Divider />
-    <DialogContent sx={{ pt: 2.5 }}>
-      {loadingFields ? (
-        <Stack alignItems="center" justifyContent="center" py={4} gap={1.5}>
-          <CircularProgress size={28} />
-          <Typography variant="body2" color="text.secondary">
-            Loading fields...
-          </Typography>
-        </Stack>
-      ) : (
-        <Stack gap={2.5} sx={{ mt: 0.5 }}>
-          {fields.map((field) => (
-            <TextField
-              key={field.fieldname}
-              label={
-                field.fieldname === "value"
-                  ? fieldName
-                  : field.datatype === "integer"
-                  ? `${field.fieldname} (integer)`
-                  : field.fieldname
-              }
-              size="small"
-              fullWidth
-              type={field.datatype === "integer" ? "number" : "text"}
-              inputProps={field.datatype === "integer" ? { step: 1, min: 0 } : undefined}
-              value={formValues[field.fieldname] ?? ""}
-              onChange={(e) => handleFieldChange(field.fieldname, e.target.value)}
-            />
-          ))}
-        </Stack>
+          </Stack>
+        ) : (
+          <Stack gap={2.5} sx={{ mt: 0.5 }}>
+            {fields.map((field) => (
+              <TextField
+                key={field.fieldname}
+                label={
+                  field.fieldname === "value"
+                    ? fieldName
+                    : field.datatype === "integer"
+                      ? `${field.fieldname} (integer)`
+                      : field.fieldname
+                }
+                size="small"
+                fullWidth
+                type={field.datatype === "integer" ? "number" : "text"}
+                inputProps={field.datatype === "integer" ? { step: 1, min: 0 } : undefined}
+                value={formValues[field.fieldname] ?? ""}
+                onChange={(e) => handleFieldChange(field.fieldname, e.target.value)}
+              />
+            ))}
+          </Stack>
+        )}
+      </DialogContent>
+      {!loadingFields && (
+        <>
+          <Divider />
+          <DialogActions sx={{ px: 3, py: 2 }}>
+            <Button variant="outlined" onClick={onClose} disabled={submitting}  sx={{
+          borderColor: "#000000",
+          color: "#000000",
+          "&:hover": {
+            backgroundColor: "#eeeeee",
+          },
+        }}>
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              onClick={() => onSubmit(formValues)}
+              disabled={!allFilled || submitting}
+              startIcon={submitting ? <CircularProgress size={14} color="inherit" /> : null}
+            >
+              {submitting ? "Submitting..." : "Submit"}
+            </Button>
+          </DialogActions>
+        </>
       )}
-    </DialogContent>
-    {!loadingFields && (
-      <>
-        <Divider />
-        <DialogActions sx={{ px: 3, py: 2 }}>
-          <Button variant="outlined" onClick={onClose} disabled={submitting}>
-            Cancel
-          </Button>
-          <Button
-            variant="contained"
-            onClick={() => onSubmit(formValues)}
-            disabled={!allFilled || submitting}
-            startIcon={submitting ? <CircularProgress size={14} color="inherit" /> : null}
-          >
-            {submitting ? "Submitting..." : "Submit"}
-          </Button>
-        </DialogActions>
-      </>
-    )}
-  </Dialog>
+    </Dialog>
   );
 };
 
@@ -305,7 +326,7 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
     openDraftDialog,
     handleDraftSubmit,
   } = useCorrectionsTable(data, history, execID, sutType, fetchData, showNotification);
- 
+
   if (!data || data.length === 0) {
     return (
       <Box sx={{ py: 6, textAlign: "center" }}>
@@ -366,7 +387,7 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                   cursor: "pointer",
                   userSelect: "none",
                   backgroundColor: "#f2f2f2ff",
-                  
+
                   borderBottom: isExpanded ? "1px solid #e2e8f0" : "none",
                 }}
               >
@@ -390,7 +411,7 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                       }}
                     />
                   )}
- 
+
                   {fieldStatus === STATUS.ON_HOLD && (
                     <Chip
                       label="On Hold"
@@ -399,15 +420,14 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                         height: 18,
                         fontSize: 10,
                         fontWeight: 700,
-                        backgroundColor: "#f1f5f9",
-                        color: "#0f172a",
-                        border: "1px solid #e2e8f0",
+                        backgroundColor: "#000000",
+                        color: "#ffffff",
                         borderRadius: "4px",
                         "& .MuiChip-label": { px: 1 },
                       }}
                     />
                   )}
- 
+
                   {isPending && (
                     <Chip
                       label="Pending"
@@ -416,15 +436,14 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                         height: 18,
                         fontSize: 10,
                         fontWeight: 700,
-                        backgroundColor: "#ffffff",
-                        color: "#64748b",
-                        border: "1px solid #cbd5e1",
+                        backgroundColor: "#000000",
+                        color: "#ffffff",
                         borderRadius: "4px",
                         "& .MuiChip-label": { px: 1 },
                       }}
                     />
                   )}
- 
+
                   {fieldStatus === STATUS.ACCEPTED && (
                     <>
                       <Chip
@@ -434,7 +453,7 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                           height: 20,
                           fontSize: 11,
                           fontWeight: 700,
-                          backgroundColor: "#0f172a",
+                          backgroundColor: "#000000",
                           color: "#ffffff",
                           borderRadius: "4px",
                           "& .MuiChip-label": { px: 1 },
@@ -451,9 +470,8 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                           height: 20,
                           fontSize: 11,
                           fontWeight: 700,
-                          backgroundColor: "#f8fafc",
-                          color: "#475569",
-                          border: "1px solid #e2e8f0",
+                          backgroundColor: "#000000",
+                          color: "#ffffff",
                           borderRadius: "4px",
                           "& .MuiChip-label": { px: 1 },
                         }}
@@ -475,22 +493,22 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                 <ExistingDataRow existingData={group.existing_data ?? []} />
 
                 <Stack gap={0.5} sx={{ p: 1.5 }}>
-                  { group.suggestions?.length > 0 ? <Typography
+                  {group.suggestions?.length > 0 ? <Typography
                     sx={{
                       fontSize: 10,
                       fontWeight: 700,
-                      color: "#64748b",
+                      color: "#303030",
                       textTransform: "uppercase",
                       letterSpacing: 0.5,
                       mb: 0,
                     }}
                   >
-                    Suggestions <Typography variant="caption"  sx={{
+                    Suggestions <Typography variant="caption" sx={{
                       fontSize: 12,
                       fontWeight: 300,
                       fontStyle: "italic",
                       textTransform: "LowerCase",
-                    }}>{( group.currentStatus === null || group.currentStatus.toLowerCase() === "pending" || group.currentStatus.toLowerCase() === "invalid") ? "( Hover over an option to see confidence score )" : ""}</Typography>
+                    }}>{(group.currentStatus === null || group.currentStatus.toLowerCase() === "pending" || group.currentStatus.toLowerCase() === "invalid") ? "( Hover over an option to see confidence score )" : ""}</Typography>
                   </Typography> : ""}
 
                   {group.suggestions?.length > 0 ? (
@@ -504,7 +522,7 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                       const baseSugg = sugg;
                       const editedSugg = isSelected ? editedSuggestions[groupIdx] || {} : {};
                       const mergedSugg = { ...baseSugg, ...editedSugg };
-                      
+
                       // UI Override: Always show History CPU(s) value if it exists for VM
                       if (isSelected && sutType?.toLowerCase() === "vm") {
                         const historyArr = getHistoryChangesForField(group.invalid_field);
@@ -515,7 +533,7 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                           mergedSugg[cpuKey] = historyCpu.to;
                         }
                       }
- 
+
                       return (
                         <SuggestionRow
                           key={si}
@@ -531,7 +549,7 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                     })
                   ) : (
                     <Typography
-                      sx={{ color: "#94a3b8", fontSize: 13, py: 2, textAlign: "center" }}
+                      sx={{ color: "#303030", fontSize: 13, py: 2, textAlign: "center" }}
                     >
                       No suggestions available
                     </Typography>
@@ -556,7 +574,7 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                         sx={{
                           fontSize: 10,
                           fontWeight: 700,
-                          color: "#64748b",
+                          color: "#303030",
                           textTransform: "uppercase",
                           letterSpacing: 0.5,
                           mt: 2,
@@ -570,8 +588,8 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                           suggestion={draftSugg}
                           isSelected={fieldStatus === STATUS.ON_HOLD}
                           theme={ON_HOLD_THEME}
-                          onSelect={() => {}}
-                          onEditField={() => {}}
+                          onSelect={() => { }}
+                          onEditField={() => { }}
                           sutType={sutType}
                           isPending={false}
                           showRadio={false}
@@ -580,13 +598,13 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                     </>
                   );
                 })()}
- 
+
                 {selectedIdx === "custom" && (
                   <Typography
                     sx={{
                       fontSize: 10,
                       fontWeight: 700,
-                      color: "#64748b",
+                      color: "#303030",
                       textTransform: "uppercase",
                       letterSpacing: 0.5,
                       mb: 0,
@@ -596,7 +614,7 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                     Custom Value
                   </Typography>
                 )}
- 
+
                 <ChooseOtherValueDropdown
                   invalidField={group.invalid_field}
                   isSelected={selectedIdx === "custom"}
@@ -628,7 +646,7 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                         mergedSugg[cpuKey] = historyCpu.to;
                       }
                     }
- 
+
                     return (
                       <Box sx={{ mt: 1, px: 1.5 }}>
                         <SuggestionRow
@@ -671,7 +689,7 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                         backgroundColor: "#000000",
                         color: "#ffffff",
                         "&:hover": { backgroundColor: "#333333" },
-                        "&.Mui-disabled": { backgroundColor: "#e2e8f0", color: "#94a3b8" }
+                        "&.Mui-disabled": { backgroundColor: "#efefef", color: "#888888" }
                       }}
                     >
                       Accept
@@ -679,7 +697,7 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
 
                     {/* Submit Draft Record — disabled when a suggestion IS selected (same logic as old Reject All) */}
                     <Button
-                      variant="outlined"
+                      variant="contained"
                       size="small"
                       disabled={canAccept}
                       startIcon={<EditNoteIcon />}
@@ -687,10 +705,10 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                       sx={{
                         fontWeight: 700,
                         borderRadius: 1.5,
-                        borderColor: "#334155",
-                        color: "#334155",
-                        "&:hover": { backgroundColor: "#f1f5f9", borderColor: "#0f172a", color: "#0f172a" },
-                        "&.Mui-disabled": { borderColor: "#e2e8f0", color: "#94a3b8" }
+                        backgroundColor: "#000000",
+                        color: "#ffffff",
+                        "&:hover": { backgroundColor: "#333333" },
+                        "&.Mui-disabled": { backgroundColor: "#efefef", color: "#888888" }
                       }}
                     >
                       Submit Draft Record
@@ -706,10 +724,10 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                       sx={{
                         fontWeight: 700,
                         borderRadius: 1.5,
-                        backgroundColor: "#475569",
+                        backgroundColor: "#000000",
                         color: "#ffffff",
-                        "&:hover": { backgroundColor: "#334155" },
-                        "&.Mui-disabled": { backgroundColor: "#e2e8f0", color: "#94a3b8" }
+                        "&:hover": { backgroundColor: "#333333" },
+                        "&.Mui-disabled": { backgroundColor: "#efefef", color: "#888888" }
                       }}
                     >
                       Send to L0

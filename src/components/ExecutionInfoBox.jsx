@@ -9,23 +9,23 @@ const ExecutionInfoBox = ({ executionInfo }) => {
   return (
     <Box
       sx={{
-        border: "1px solid #e2e8f0",
+        border: "1px solid #d0d0d0",
         background: "#ffffff",
         borderRadius: 2,
         p: 2.5,
         mb: 3.5,
       }}
     >
-      <Typography variant="body2" sx={{ fontWeight: 700, color: "#0f172a", mb: 1.5, fontSize: 14 }}>
+      <Typography variant="body2" sx={{ fontWeight: 800, color: "#0a0a0a", mb: 1.5, fontSize: 13, textTransform: "uppercase", letterSpacing: 1 }}>
         Execution Information
       </Typography>
 
       <Paper
         elevation={0}
         sx={{
-          border: "1px solid #e2e8f0",
+          border: "1px solid #d0d0d0",
           borderRadius: 2,
-          bgcolor: "#f8fafc",
+          bgcolor: "#f5f5f5",
           overflow: "hidden",
         }}
       >
@@ -44,15 +44,15 @@ const ExecutionInfoBox = ({ executionInfo }) => {
                 key={key}
                 sx={{
                   p: 1.75,
-                  borderRight: { md: isLastInRow ? "none" : "1px solid #e2e8f0" },
-                  borderBottom: isLastRow ? "none" : "1px solid #e2e8f0",
+                  borderRight: { md: isLastInRow ? "none" : "1px solid #d0d0d0" },
+                  borderBottom: isLastRow ? "none" : "1px solid #d0d0d0"
                 }}
               >
-                <Typography sx={{ fontSize: 11, color: "#64748b", fontWeight: 700, mb: 0.25, textTransform: "uppercase", letterSpacing: 0.5 }}>
+                <Typography sx={{ fontSize: 10, color: "#555555", fontWeight: 700, mb: 0.5, textTransform: "uppercase", letterSpacing: 0.8 }}>
                   {key}
                 </Typography>
-                <Typography sx={{ fontSize: 14, color: "#0f172a", fontWeight: 600 }}>
-                  {value ? value : "-"}
+                <Typography sx={{ fontSize: 14, color: "#0a0a0a", fontWeight: 700 }}>
+                  {value ? value : "—"}
                 </Typography>
               </Box>
             );

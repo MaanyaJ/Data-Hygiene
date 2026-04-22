@@ -37,8 +37,8 @@ const SuggestionRow = ({
           alignItems: "center",
           gap: 0,
           cursor: isPending ? "pointer" : "not-allowed",
-          border: `1px solid ${isSelected ? p.accent : "#e2e8f0"}`,
-          borderRadius: 1.5,
+          border: `1.5px solid ${isSelected ? p.accent : "#b6b8ba"}`,
+          borderRadius: 2,
           overflow: "hidden",
           backgroundColor: isSelected ? p.light : "#fff",
           transition: "all 0.15s ease",
@@ -48,7 +48,6 @@ const SuggestionRow = ({
               borderColor: p.accent,
               backgroundColor: isSelected ? p.light : p.light + "40",
             },
-            boxShadow: isSelected ? `0 0 0 2px ${p.accent}20` : "none",
           }),
         }}
       >
@@ -56,15 +55,15 @@ const SuggestionRow = ({
         {showRadio && (
           <Box
             sx={{
-              width: 40,
+              width: 44,
               alignSelf: "stretch",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               flexShrink: 0,
-              backgroundColor: isSelected ? p.light : "#f1f5f9",
-              borderRight: `1px solid ${isSelected ? p.accent : "#e2e8f0"}`,
-              borderLeft: `2px solid ${isSelected ? p.accent : "transparent"}`,
+              backgroundColor: isSelected ? p.light : "#f3f3f3",
+              borderRight: `1.5px solid ${isSelected ? p.accent : "#fdfdfd"}`,
+              borderLeft: `3px solid ${isSelected ? p.accent : "transparent"}`,
               transition: "background-color 0.15s ease",
             }}
           >
@@ -73,7 +72,7 @@ const SuggestionRow = ({
               disabled={!isPending}
               size="small"
               sx={{
-                color: "#cbd5e1",
+                color: "#747474",
                 "&.Mui-checked": { color: p.accent },
                 p: 0.5,
               }}
@@ -82,11 +81,11 @@ const SuggestionRow = ({
         )}
  
         {/* Primary value with EditableField */}
-        <Box sx={{ minWidth: 122, flexShrink: 0 }}>
+        <Box sx={{ minWidth: 140, flexShrink: 0 }}>
           <EditableField
             label={primaryKey}
             value={primaryVal}
-            color={isSelected ? p.text : "#0f172a"}
+            color={isSelected ? p.text : "#303030"}
             isEditable={
               isSelected &&
               isPending &&
@@ -103,7 +102,7 @@ const SuggestionRow = ({
             sx={{
               width: "1px",
               alignSelf: "stretch",
-              backgroundColor: isSelected ? p.border : "#e2e8f0",
+              backgroundColor: isSelected ? p.border : "#d4d4d4",
               flexShrink: 0,
             }}
           />
@@ -118,7 +117,6 @@ const SuggestionRow = ({
               sx={{
                 width: "1px",
                 alignSelf: "stretch",
-                backgroundColor: isSelected ? p.border : "#f1f5f9",
                 flexShrink: 0,
               }}
             />
@@ -126,11 +124,11 @@ const SuggestionRow = ({
           sx={{ flex: 1, flexWrap: "wrap" }}
         >
           {secondaryEntries.map(([key, val], i) => (
-            <Box key={i} sx={{ minWidth: 88 }}>
+            <Box key={i} sx={{ minWidth: 100 }}>
               <EditableField
                 label={key}
                 value={val}
-                color={isSelected ? p.text : "#334155"}
+                color={isSelected ? p.text : "#303030"}
                 isEditable={
                   isSelected &&
                   isPending &&

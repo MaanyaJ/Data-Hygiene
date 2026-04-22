@@ -70,11 +70,7 @@ const ChooseOtherValueDropdown = ({
         display: "flex",
         alignItems: "center",
         gap: 1.5,
-        border: `1.5px solid ${isSelected ? p.accent : "#e2e8f0"}`,
         borderRadius: 2,
-        backgroundColor: isSelected ? p.light : "#fff",
-        boxShadow: isSelected ? `0 0 0 3px ${p.accent}20` : "none",
-        transition: "all 0.15s ease",
         opacity: isPending ? 1 : 0.5,
         pointerEvents: isPending ? "auto" : "none",
       }}
@@ -82,7 +78,7 @@ const ChooseOtherValueDropdown = ({
       {/* Main Content */}
 
       <Box sx={{ flex: 1, px: 1.5, py: 0.5 }}>
-        <Typography sx={{ fontSize: 11, fontWeight: 600, color: "#64748b", mb: 0.5 }}>
+        <Typography sx={{ fontSize: 11, fontWeight: 600, color: "#303030", mb: 0.5 }}>
           Choose other {invalidField}:
         </Typography>
         <Autocomplete

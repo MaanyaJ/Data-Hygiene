@@ -18,7 +18,7 @@ const ExistingDataRow = ({ existingData, theme }) => (
         sx={{
           fontSize: 11,
           fontWeight: 700,
-          color: "#64748b",
+          color: "#303030",
           textTransform: "uppercase",
           letterSpacing: 0.8,
         }}
@@ -32,7 +32,7 @@ const ExistingDataRow = ({ existingData, theme }) => (
     <Stack direction="row" alignItems="center" gap={3} flexWrap="wrap">
       {existingData.map((item, i) => (
         <Stack key={i} direction="row" alignItems="center" gap={1}>
-          <Typography sx={{ fontSize: 11, color: "#94a3b8", fontWeight: 600, letterSpacing: 0.5 }}>
+          <Typography sx={{ fontSize: 11, color: "#585858", fontWeight: 500, letterSpacing: 0.5 }}>
             {item.field}
           </Typography>
           <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
@@ -40,8 +40,7 @@ const ExistingDataRow = ({ existingData, theme }) => (
               sx={{
                 fontSize: 13,
                 fontWeight: 700,
-                // Monochrome: underline instead of red for invalid, dark for valid
-                color: item.validation_status === "invalid" ?"#990c0cff" :"#0f172a",
+                color: item.validation_status === "invalid" ?"rgb(183, 1, 1)" :"#0f172a",
                 
               }}
             >
