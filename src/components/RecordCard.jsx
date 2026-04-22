@@ -52,7 +52,7 @@ const RecordCard = ({ record, index = 0 }) => {
       </Box>
 
       {/* Benchmark Category */}
-      <Box sx={{ width: "10%", pl: 2, flexShrink: 0 }}>
+      <Box sx={{ width: "12%", pl: 2, flexShrink: 0 }}>
         <Typography
           sx={{ fontSize: 11, color: "#777", fontWeight: 700, mb: 0.3,
             textTransform: "uppercase", letterSpacing: 0.5 }}
@@ -65,7 +65,7 @@ const RecordCard = ({ record, index = 0 }) => {
       </Box>
 
       {/* Benchmark Type */}
-      <Box sx={{ width: "15%", pr: 2 }}>
+      <Box sx={{ width: "10%", pr: 2 }}>
         <Typography
           sx={{ fontSize: 11, color: "#777", fontWeight: 700, mb: 0.3,
             textTransform: "uppercase", letterSpacing: 0.5 }}
@@ -112,13 +112,14 @@ const RecordCard = ({ record, index = 0 }) => {
       <Box sx={{ display: "flex", gap: 0.5, alignItems: "center", flexShrink: 0, pt: 0.5 }}>
       
         <IconButton
-          size="small"
+          size="medium"
           onClick={stopAndNavigate}
           title="View Details"
           sx={{
             border: "1px solid #c8c8c8",
             borderRadius: "2px",
             p: 0.5,
+            mt:1,
         
             backgroundColor: isClicked? "#fef7f7ff": "#000", color: "#ffffffff", borderColor: "#000",
             "&:hover": { backgroundColor: "#fef7f7ff", color: "#000", borderColor: "#000" },
