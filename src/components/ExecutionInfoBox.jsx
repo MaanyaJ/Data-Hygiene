@@ -12,11 +12,11 @@ const ExecutionInfoBox = ({ executionInfo }) => {
         border: "1px solid #e2e8f0",
         background: "#ffffff",
         borderRadius: 2,
-        p: 2,
-        mb: 3,
+        p: 2.5,
+        mb: 3.5,
       }}
     >
-      <Typography variant="body2" sx={{ fontWeight: 700, color: "#0f172a", mb: 1.5, fontSize: 13 }}>
+      <Typography variant="body2" sx={{ fontWeight: 700, color: "#0f172a", mb: 1.5, fontSize: 14 }}>
         Execution Information
       </Typography>
 
@@ -43,15 +43,15 @@ const ExecutionInfoBox = ({ executionInfo }) => {
               <Box
                 key={key}
                 sx={{
-                  p: 1.5,
+                  p: 1.75,
                   borderRight: { md: isLastInRow ? "none" : "1px solid #e2e8f0" },
                   borderBottom: isLastRow ? "none" : "1px solid #e2e8f0",
                 }}
               >
-                <Typography sx={{ fontSize: 10, color: "#64748b", fontWeight: 700, mb: 0.25, textTransform: "uppercase", letterSpacing: 0.5 }}>
+                <Typography sx={{ fontSize: 11, color: "#64748b", fontWeight: 700, mb: 0.25, textTransform: "uppercase", letterSpacing: 0.5 }}>
                   {key}
                 </Typography>
-                <Typography sx={{ fontSize: 13, color: "#0f172a", fontWeight: 600 }}>
+                <Typography sx={{ fontSize: 14, color: "#0f172a", fontWeight: 600 }}>
                   {value ? value : "-"}
                 </Typography>
               </Box>

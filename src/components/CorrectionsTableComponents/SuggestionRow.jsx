@@ -56,7 +56,7 @@ const SuggestionRow = ({
         {showRadio && (
           <Box
             sx={{
-              width: 36,
+              width: 40,
               alignSelf: "stretch",
               display: "flex",
               alignItems: "center",
@@ -82,7 +82,7 @@ const SuggestionRow = ({
         )}
  
         {/* Primary value with EditableField */}
-        <Box sx={{ minWidth: 110, flexShrink: 0 }}>
+        <Box sx={{ minWidth: 122, flexShrink: 0 }}>
           <EditableField
             label={primaryKey}
             value={primaryVal}
@@ -126,7 +126,7 @@ const SuggestionRow = ({
           sx={{ flex: 1, flexWrap: "wrap" }}
         >
           {secondaryEntries.map(([key, val], i) => (
-            <Box key={i} sx={{ minWidth: 80 }}>
+            <Box key={i} sx={{ minWidth: 88 }}>
               <EditableField
                 label={key}
                 value={val}

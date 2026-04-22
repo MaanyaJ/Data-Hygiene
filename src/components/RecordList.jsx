@@ -28,7 +28,7 @@ const RecordList = ({
     return Promise.resolve();
   };
 
-  const ROW_HEIGHT = 78;
+  const ROW_HEIGHT = 84;
   const getRowHeight = () => ROW_HEIGHT;
 
   const rowRenderer = ({ index, key, style }) => {

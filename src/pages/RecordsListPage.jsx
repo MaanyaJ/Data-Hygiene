@@ -75,7 +75,7 @@ const RecordsListPage = ({ mode = "landing" }) => {
   }
 
   return (
-    <Box sx={{ backgroundColor: "#f5f5f5", minHeight: "100vh" }}>
+    <Box sx={{ backgroundColor: "#ebebebff", minHeight: "100vh" }}>
       <ListHeader
         title={config.title}
         search={searchInput}
@@ -108,7 +108,7 @@ const RecordsListPage = ({ mode = "landing" }) => {
             sx={{
               textAlign: "center",
               py: 8,
-              backgroundColor: "#fff",
+              backgroundColor: "#ebebebff",
               border: "1px solid #e0e0e0",
               borderTop: "none",
             }}

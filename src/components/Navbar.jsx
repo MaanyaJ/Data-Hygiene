@@ -19,7 +19,7 @@ const Navbar = () => {
       elevation={0}
       sx={{ backgroundColor: "#000000", borderBottom: "1px solid #222" }}
     >
-      <Toolbar sx={{ justifyContent: "space-between", minHeight: "48px !important", px: 3 }}>
+      <Toolbar sx={{ justifyContent: "space-between", minHeight: "55px !important", px: 3 }}>
         {/* AMD Wordmark */}
         <Typography
           variant="h6"
@@ -34,20 +34,8 @@ const Navbar = () => {
             "&:hover": { color: "#ccc" },
           }}
         >
-          AMD
-          <Box
-            component="span"
-            sx={{
-              display: "inline-block",
-              width: 6,
-              height: 6,
-              backgroundColor: "#fff",
-              borderRadius: "50%",
-              mb: "2px",
-              mx: "1px",
-              verticalAlign: "bottom",
-            }}
-          />
+          AMD_DH
+          
         </Typography>
 
         {/* Nav Links + Upload */}

@@ -115,7 +115,7 @@ const ListHeader = ({
               "&:hover fieldset": { borderColor: "#555" },
               "&.Mui-focused fieldset": { borderColor: "#000", borderWidth: "1px" },
             },
-            "& input": { px: 1, py: 0.5, fontSize: 12 },
+            "& input": { px: 1, py: 0.5, fontSize: 12},
           }}
           slotProps={{
             input: {
