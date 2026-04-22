@@ -1,3 +1,32 @@
+/* ── Responsive root font-size ──────────────────────────────────────────
+   MUI converts fontSize numbers and spacing (px/py/gap/m/p) to rem,
+   so scaling html font-size cascades to all fonts + spacing automatically.
+   The baseline (16 px) matches the current look at ≥ 1920 px.
+───────────────────────────────────────────────────────────────────────── */
+html {
+  font-size: 16px; /* baseline – preserves current appearance */
+}
+
+@media (max-width: 1600px) {
+  html { font-size: 15px; }
+}
+
+@media (max-width: 1440px) {
+  html { font-size: 14px; }
+}
+
+@media (max-width: 1280px) {
+  html { font-size: 13px; }
+}
+
+@media (max-width: 1024px) {
+  html { font-size: 12px; }
+}
+
+@media (max-width: 768px) {
+  html { font-size: 11px; }
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -13,8 +42,19 @@
 body {
   background-color: #f5f5f5;
   color: #111111;
-  font-size: 13px;
+  font-size: 0.8125rem; /* ≈ 13px at 16px root; scales with html font-size */
   line-height: 1.5;
+}
+
+/* ── Navbar toolbar: override the hardcoded 55px !important ─────────── */
+@media (max-width: 1440px) {
+  .MuiToolbar-root { min-height: 50px !important; }
+}
+@media (max-width: 1280px) {
+  .MuiToolbar-root { min-height: 46px !important; }
+}
+@media (max-width: 1024px) {
+  .MuiToolbar-root { min-height: 42px !important; }
 }
 
 /* Thin scrollbars for all elements */

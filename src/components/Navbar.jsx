@@ -24,9 +24,7 @@ const Navbar = () => {
     handleClose();
   };
 
-  const activeLink = NAV_LINKS.find((l) => l.path === location.pathname);
-  // Exclude the currently selected route from the dropdown
-  const dropdownLinks = NAV_LINKS.filter((l) => l.path !== location.pathname);
+  const dropdownLinks = NAV_LINKS
 
   return (
     <AppBar
@@ -34,7 +32,7 @@ const Navbar = () => {
       elevation={0}
       sx={{ backgroundColor: "#000000", borderBottom: "1px solid #222" }}
     >
-      <Toolbar sx={{ justifyContent: "space-between", minHeight: "55px !important", px: 3 }}>
+      <Toolbar sx={{ justifyContent: "space-between", minHeight: { xs: "42px !important", sm: "46px !important", md: "50px !important", lg: "55px !important" }, px: 3 }}>
         {/* Left: Logo + Dropdown trigger box */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           {/* AMD Wordmark */}
@@ -66,7 +64,7 @@ const Navbar = () => {
               justifyContent: "space-between",
               minWidth: 180,
               px: 2,
-              height: "55px",
+              height: { xs: "42px", sm: "46px", md: "50px", lg: "55px" },
               cursor: "pointer",
               backgroundColor: "#000000ff",
               transition: "background-color 0.15s ease",
@@ -84,7 +82,7 @@ const Navbar = () => {
                 userSelect: "none",
               }}
             >
-              {activeLink ? activeLink.label : "Standardised Data"}
+            Standardised Data
             </Typography>
 
             <KeyboardArrowDownIcon

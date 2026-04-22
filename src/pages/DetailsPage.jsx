@@ -113,7 +113,7 @@ const DetailsPage = () => {
   return (
     <Box sx={{ backgroundColor: "#ebebebff", minHeight: "100vh" }}>
       <Navbar />
-      <Box sx={{ p: 3, pt: 9 }}>
+      <Box sx={{ p: 3, pt: { xs: 6.5, sm: 7, md: 8, lg: 9 } }}>
        
         <ExecutionInfoBox executionInfo={executionData} />
         <Box sx={{ mt: -2 }}>
