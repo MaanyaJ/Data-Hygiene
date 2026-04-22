@@ -9,8 +9,8 @@ const ExistingDataRow = ({ existingData, theme }) => (
       gap: 1.5,
       px: 1.75,
       py: 0.5,
-      backgroundColor: "#f8fafc",
-      borderBottom: "1px solid #e2e8f0",
+      backgroundColor: "#f5f3f3ff",
+      border: "1px solid #d5d8dbff",
     }}
   >
     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>

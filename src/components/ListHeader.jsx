@@ -173,22 +173,24 @@ const ListHeader = ({
                     gap: 0.5,
                   }}
                 >
-                  
+ 
                   {f.label}
-                  {getCount(f.value) !== null && (
-                    <Box
-                      component="span"
-                      sx={{
-                        fontSize: 11,
-                        fontWeight: 400,
-                        color: isActive ? "#444" : "#888",
-                      }}
-                    >
-                      ({!loading ? "(0)" : getCount(f.value).toLocaleString()})
-                      {console.log(f.value)}
+                  <Box
+                    component="span"
+                    sx={{
+                      fontSize: 11,
+                      fontWeight: 400,
+                      color: isActive ? "#444" : "#888",
+                    }}
+                  >
+                    ({loading
+                      ? "0"
+                      : getCount(f.value) != null
+                        ? getCount(f.value).toLocaleString()
+                        : "0"})                    
                     </Box>
-                  )}
                 </Typography>
+
               </Box>
             );
           })}
