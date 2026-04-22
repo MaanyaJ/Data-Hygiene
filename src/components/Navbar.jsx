@@ -24,9 +24,7 @@ const Navbar = () => {
     handleClose();
   };
 
-  const activeLink = NAV_LINKS.find((l) => l.path === location.pathname);
-  // Exclude the currently selected route from the dropdown
-  const dropdownLinks = NAV_LINKS.filter((l) => l.path !== location.pathname);
+  const dropdownLinks = NAV_LINKS
 
   return (
     <AppBar
@@ -48,6 +46,7 @@ const Navbar = () => {
               fontSize: "1.1rem",
               color: "#fff",
               fontFamily: "'Inter', sans-serif",
+              transition: "color 0.2s ease",
               "&:hover": { color: "#ccc" },
             }}
           >
@@ -84,7 +83,7 @@ const Navbar = () => {
                 userSelect: "none",
               }}
             >
-              {activeLink ? activeLink.label : "Standardised Data"}
+              Standardised Data
             </Typography>
 
             <KeyboardArrowDownIcon
