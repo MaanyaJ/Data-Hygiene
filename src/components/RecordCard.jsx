@@ -99,7 +99,7 @@ const RecordCard = ({ record, index = 0 }) => {
           Status
         </Typography>
         <Typography sx={{ fontSize: 12, fontWeight: 600, color: "#111", lineHeight: 1.2 }}>
-          {record.Status?.toLowerCase() === "rejected" ? "L0 Data" : record.Status}
+          {record.Status?.toLowerCase() === "rejected" ? "L0 Data" : record.Status?.toLowerCase() === "pending"?  "ACTION REQUIRED" : record.Status}
         </Typography>
       </Box>
 
