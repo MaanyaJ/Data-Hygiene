@@ -1,9 +1,84 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import InconsistentFieldsList from "./InconsistentFieldsList";
 import { useNavigate } from "react-router-dom";
 import { Box, Typography, IconButton } from "@mui/material";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+
+/**
+ * Derives the progress percentage and display label from the Stage / isValid fields.
+ *
+ * Stage values (case-insensitive):
+ *   validation_inprogress          → 25 %
+ *   validation_completed + isValid:true  → show "Valid" message  (no bar)
+ *   validation_completed + isValid:false → 50 %
+ *   standardization_inprogress     → 75 %
+ *   standardization_completed      → 100 % then auto-dismiss after 3 s
+ */
+const getStageInfo = (stage, isValid) => {
+  if (!stage) return null;
+
+  // Normalize: lowercase, trim, then collapse any run of spaces/underscores → single underscore
+  const s = stage.toLowerCase().trim().replace(/[\s_]+/g, "_");
+
+  console.debug("[RecordCard] Stage raw:", stage, "→ normalized:", s, "isValid:", isValid);
+
+  if (s === "validation_inprogress") {
+    return { pct: 25, label: "Validation in progress…", color: "#f59e0b", isValid: null };
+  }
+  if (s === "validation_completed") {
+    if (isValid === true)
+      return { pct: null, label: "This record is valid", color: "#22c55e", isValid: true };
+    return { pct: 50, label: "Validation done — proceeding to standardization", color: "#f59e0b", isValid: false };
+  }
+  if (s === "validation_failed") {
+    return { pct: 50, label: "Validation failed — review required", color: "#ef4444", isValid: null };
+  }
+  if (s === "standardization_inprogress") {
+    return { pct: 75, label: "Standardization in progress…", color: "#3b82f6", isValid: null };
+  }
+  // standardization_completed → show normal Status + Inconsistent Fields
+  if (s === "standardization_completed") return null;
+  if (s === "standardization_failed") {
+    return { pct: 75, label: "Standardization failed — review required", color: "#ef4444", isValid: null };
+  }
+
+  console.warn("[RecordCard] Unrecognised stage value:", stage);
+  return null;
+};
+
+/** Animated progress bar with label */
+const StageProgress = ({ pct, label, color, onDismiss }) => {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    // Small delay so the CSS width transition plays on first render
+    const t = setTimeout(() => setMounted(true), 30);
+    return () => clearTimeout(t);
+  }, []);
+
+  return (
+    <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "center", width: "60%", maxWidth: 200 }}>
+      <Typography sx={{ fontSize: 10.5, fontWeight: 600, color: color, mb: 0.5, letterSpacing: 0.2 }}>
+        {label}
+      </Typography>
+      {/* Track */}
+      <Box sx={{ height: 4, borderRadius: 99, backgroundColor: "#e5e7eb", overflow: "hidden" }}>
+        {/* Fill */}
+        <Box
+          sx={{
+            height: "100%",
+            borderRadius: 99,
+            backgroundColor: color,
+            width: mounted ? `${pct}%` : "0%",
+            transition: "width 0.7s cubic-bezier(0.4,0,0.2,1)",
+          }}
+        />
+      </Box>
+      <Typography sx={{ fontSize: 9.5, color: "#aaa", mt: 0.4 }}>{pct}%</Typography>
+    </Box>
+  );
+};
 
 const RecordCard = ({ record, index = 0 }) => {
   const [isClicked, setIsClicked] = useState(false);
@@ -13,7 +88,10 @@ const RecordCard = ({ record, index = 0 }) => {
   const isCompleted = status === "accepted" || status === "approved";
   const isEven = index % 2 === 0;
 
-  const handleClick = () => navigate(`/${record.ExecutionId}`);
+  const stageInfo = getStageInfo(record.Stage, record.isValid);
+
+  // Show the stage panel only when there is actionable stage info
+  const showStagePanelInsteadOfStatus = !!stageInfo;
 
   const stopAndNavigate = (e) => {
     e.stopPropagation();
@@ -27,23 +105,20 @@ const RecordCard = ({ record, index = 0 }) => {
         display: "flex",
         justifyContent: "space-between",
         px: 3,
-        height: 78, // Fixed height for uniformity
+        height: 78,
         width: "97%",
-        mb: "6px",   // Uniform gap
-        py:2,
+        mb: "6px",
+        py: 2,
         backgroundColor: isEven ? "#ffffff" : "#fafafa",
-        boxShadow:"0 2px 8px rgba(0,0,0,0.07)",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.07)",
         transition: "background-color 0.1s ease, box-shadow 0.1s ease",
-        gap: 2
-    
+        gap: 2,
+        alignItems: "center",
       }}
     >
       {/* Execution ID */}
       <Box sx={{ width: "18%", pr: 2, flexShrink: 0 }}>
-        <Typography
-          sx={{ fontSize: 11, color: "#777", fontWeight: 700, mb: 0.3,
-            textTransform: "uppercase", letterSpacing: 0.5 }}
-        >
+        <Typography sx={{ fontSize: 11, color: "#777", fontWeight: 700, mb: 0.3, textTransform: "uppercase", letterSpacing: 0.5 }}>
           Execution ID
         </Typography>
         <Typography sx={{ fontSize: 12, fontWeight: 600, color: "#111", wordBreak: "break-all", lineHeight: 1.2 }}>
@@ -51,12 +126,9 @@ const RecordCard = ({ record, index = 0 }) => {
         </Typography>
       </Box>
 
-      {/* updated on */}
+      {/* Updated On */}
       <Box sx={{ width: "7%", pr: 2, flexShrink: 0 }}>
-        <Typography
-          sx={{fontSize: 11, color: "#777", fontWeight: 700, mb: 0.3,
-            textTransform: "uppercase", letterSpacing: 0.5 }}
-        >
+        <Typography sx={{ fontSize: 11, color: "#777", fontWeight: 700, mb: 0.3, textTransform: "uppercase", letterSpacing: 0.5 }}>
           Updated On
         </Typography>
         <Typography sx={{ fontSize: 12, fontWeight: 600, color: "#111", lineHeight: 1.2 }}>
@@ -66,11 +138,8 @@ const RecordCard = ({ record, index = 0 }) => {
 
       {/* Benchmark Category */}
       <Box sx={{ width: "8%", pr: 2, flexShrink: 0 }}>
-        <Typography
-          sx={{ fontSize: 11, color: "#777", fontWeight: 700, mb: 0.3,
-            textTransform: "uppercase", letterSpacing: 0.5 }}
-        >
-         Benchmark Category
+        <Typography sx={{ fontSize: 11, color: "#777", fontWeight: 700, mb: 0.3, textTransform: "uppercase", letterSpacing: 0.5 }}>
+          Benchmark Category
         </Typography>
         <Typography sx={{ fontSize: 12, fontWeight: 600, color: "#111", lineHeight: 1.2 }}>
           {record.BenchmarkCategory}
@@ -79,68 +148,101 @@ const RecordCard = ({ record, index = 0 }) => {
 
       {/* Benchmark Type */}
       <Box sx={{ width: "10%", pr: 2, flexShrink: 0 }}>
-        <Typography
-          sx={{ fontSize: 11, color: "#777", fontWeight: 700, mb: 0.3,
-            textTransform: "uppercase", letterSpacing: 0.5 }}
-        >
-         Benchmark Type
+        <Typography sx={{ fontSize: 11, color: "#777", fontWeight: 700, mb: 0.3, textTransform: "uppercase", letterSpacing: 0.5 }}>
+          Benchmark Type
         </Typography>
         <Typography sx={{ fontSize: 12, fontWeight: 600, color: "#111", lineHeight: 1.2 }}>
           {record.BenchmarkType}
         </Typography>
       </Box>
 
-      {/* Status */}
-      <Box sx={{ width: "6%", pr: 2, flexShrink: 0 }}>
-        <Typography
-          sx={{fontSize: 11, color: "#777", fontWeight: 700, mb: 0.3,
-            textTransform: "uppercase", letterSpacing: 0.5 }}
-        >
-          Status
-        </Typography>
-        <Typography sx={{ fontSize: 12, fontWeight: 600, color: "#111", lineHeight: 1.2 }}>
-          {record.Status?.toLowerCase() === "rejected" ? "L0 Data" : record.Status}
-        </Typography>
-      </Box>
-
-      {/* Inconsistent Fields */}
-      <Box sx={{width: "39%", pr: 2, flexShrink: 0 }}>
-        <Typography
-          sx={{ fontSize: 11, color: "#777", fontWeight: 700, mb: 0.3,
-            textTransform: "uppercase", letterSpacing: 0.5,
-            visibility: isCompleted ? "hidden" : "visible" }}
-        >
-          Inconsistent Fields
-        </Typography>
-        <Box sx={{ visibility: isCompleted ? "hidden" : "visible", minHeight: 22 }}>
-          <InconsistentFieldsList
-            invalidFields={invalidFields}
-            SuggestionsCount={record.suggestionsCount}
-            status={record.Status}
-          />
-        </Box>
-      </Box>
-
-      {/* Actions */}
-      <Box sx={{ display: "flex", gap: 0.5, alignItems: "center", pt: 0.5 }}>
-      
-        <IconButton
-          size="medium"
-          onClick={stopAndNavigate}
-          title="View Details"
+      {/* ──────────────────────────────────────────────────────────
+           STAGE PANEL  ↔  STATUS + INCONSISTENT FIELDS
+          When stage info is present (and not yet dismissed), we
+          replace the right section with the progress panel.
+      ────────────────────────────────────────────────────────── */}
+      {showStagePanelInsteadOfStatus ? (
+        /* ── Stage progress / valid message ── */
+        <Box
           sx={{
-            border: "1px solid #c8c8c8",
-            borderRadius: "2px",
-            p: 0.5,
-            mt:1,
-        
-            backgroundColor: isClicked? "#fef7f7ff": "#000", color: "#ffffffff", borderColor: "#000",
-            "&:hover": { backgroundColor: "#fef7f7ff", color: "#000", borderColor: "#000" },
+            flex: 1,
+            display: "flex",
+            alignItems: "center",
+            gap: 1.5,
+            pr: 2,
+            overflow: "hidden",
           }}
         >
-          <VisibilityOutlinedIcon sx={{ fontSize: 15 }} />
-        </IconButton>
-      </Box>
+          {stageInfo.isValid === true ? (
+            /* "This record is valid" message */
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <CheckCircleOutlineIcon sx={{ fontSize: 18, color: "#22c55e" }} />
+              <Typography sx={{ fontSize: 12.5, fontWeight: 700, color: "#22c55e" }}>
+                This record is valid
+              </Typography>
+            </Box>
+          ) : (
+            /* 25 / 50 / 75 % bars */
+            <StageProgress pct={stageInfo.pct} label={stageInfo.label} color={stageInfo.color} />
+          )}
+        </Box>
+      ) : (
+        /* ── Normal: Status + Inconsistent Fields ── */
+        <>
+          {/* Status */}
+          <Box sx={{ width: "6%", pr: 2, flexShrink: 0 }}>
+            <Typography sx={{ fontSize: 11, color: "#777", fontWeight: 700, mb: 0.3, textTransform: "uppercase", letterSpacing: 0.5 }}>
+              Status
+            </Typography>
+            <Typography sx={{ fontSize: 12, fontWeight: 600, color: "#111", lineHeight: 1.2 }}>
+              {record.Status?.toLowerCase() === "rejected" ? "L0 Data" : record.Status}
+            </Typography>
+          </Box>
+
+          {/* Inconsistent Fields */}
+          <Box sx={{ width: "39%", pr: 2, flexShrink: 0 }}>
+            <Typography
+              sx={{
+                fontSize: 11, color: "#777", fontWeight: 700, mb: 0.3,
+                textTransform: "uppercase", letterSpacing: 0.5,
+                visibility: isCompleted ? "hidden" : "visible",
+              }}
+            >
+              Inconsistent Fields
+            </Typography>
+            <Box sx={{ visibility: isCompleted ? "hidden" : "visible", minHeight: 22 }}>
+              <InconsistentFieldsList
+                invalidFields={invalidFields}
+                SuggestionsCount={record.suggestionsCount}
+                status={record.Status}
+              />
+            </Box>
+          </Box>
+        </>
+      )}
+
+      {/* Actions — hide button when there is no valid status (record not yet processed) */}
+      {record.Status && record.Status !== "N/A" && (
+        <Box sx={{ display: "flex", gap: 0.5, alignItems: "center", pt: 0.5, flexShrink: 0 }}>
+          <IconButton
+            size="medium"
+            onClick={stopAndNavigate}
+            title="View Details"
+            sx={{
+              border: "1px solid #c8c8c8",
+              borderRadius: "2px",
+              p: 0.5,
+              mt: 1,
+              backgroundColor: isClicked ? "#fef7f7ff" : "#000",
+              color: "#ffffffff",
+              borderColor: "#000",
+              "&:hover": { backgroundColor: "#fef7f7ff", color: "#000", borderColor: "#000" },
+            }}
+          >
+            <VisibilityOutlinedIcon sx={{ fontSize: 15 }} />
+          </IconButton>
+        </Box>
+      )}
     </Box>
   );
 };

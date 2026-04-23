@@ -9,8 +9,8 @@ import {
   Checkbox,
   Popover,
 } from "@mui/material";
-import Navbar from "./Navbar";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import Navbar from "./Navbar";
 
 const ListHeader = ({
   title,
@@ -21,6 +21,7 @@ const ListHeader = ({
   counts = {},
   showAgeFilters = false,
   showStatusFilters = false,
+  showStageFilters = false,
   allowedFilters,
   loading,
   totalRecords,
@@ -41,11 +42,21 @@ const ListHeader = ({
     { label: "ON HOLD", value: "On Hold" },
   ];
 
-  const baseFilters = showAgeFilters
+  const STAGE_FILTERS = [
+    { label: "VALIDATION IN-PROGRESS", value: "validation_inprogress,validation_completed,validation failed" },
+    { label: "STANDARDIZATION IN-PROGRESS", value: "standardization_inprogress,standardization failed" },
+  ];
+
+  let baseFilters = showAgeFilters
     ? AGE_FILTERS
     : showStatusFilters
       ? STATUS_FILTERS
       : [];
+
+  // Add stage filters to the same list if requested
+  if (showStatusFilters && showStageFilters) {
+    baseFilters = [...baseFilters, ...STAGE_FILTERS];
+  }
 
   const visibleFilters = baseFilters.filter(
     (f) => !f.value || !allowedFilters || allowedFilters.includes(f.value)
@@ -129,7 +140,7 @@ const ListHeader = ({
           }}
         />
 
-        {/* Filter Dropdown */}
+        {/* Unified Filter Dropdown */}
         <Box>
           <Box
             onClick={(e) => setAnchorEl(e.currentTarget)}
@@ -141,9 +152,9 @@ const ListHeader = ({
               px: 1.5,
               height: 40,
               minWidth: 160,
-              border: "1px solid #c7c7c7ff",
+              border: "1px solid #bbb",
               borderRadius: "2px",
-              backgroundColor: "#ffffffd1",
+              backgroundColor: "#fff",
               cursor: "pointer",
               "&:hover": { borderColor: "#555" },
             }}
@@ -178,66 +189,72 @@ const ListHeader = ({
             }}
           >
             <Stack sx={{ p: 1 }} gap={0.5}>
-              {visibleFilters.map((f) => {
+              {visibleFilters.map((f, idx) => {
                 const isActive = f.value === "" ? filter.length === 0 : filter.includes(f.value);
+                const isStage = f.value.includes("validation") || f.value.includes("standardization");
+                
+                // Add a small divider before stage filters for clarity
+                const showDivider = isStage && idx > 0 && !visibleFilters[idx-1].value.includes("validation") && !visibleFilters[idx-1].value.includes("standardization");
+
                 return (
-                  <Box
-                    key={f.value || "all"}
-                    onClick={() => handleFilterClick(f.value)}
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1,
-                      px: 1,
-                      py: 1,
-                      cursor: "pointer",
-                      borderRadius: "2px",
-                      "&:hover": { backgroundColor: "#f5f5f5" },
-                    }}
-                  >
-                    <Checkbox
-                      checked={isActive}
-                      size="small"
+                  <React.Fragment key={f.value || "all"}>
+                    {showDivider && <Box sx={{ height: "1px", backgroundColor: "#eee", my: 0.5, mx: 1 }} />}
+                    <Box
+                      onClick={() => handleFilterClick(f.value)}
                       sx={{
-                        p: 0,
-                        color: "#999",
-                        "&.Mui-checked": { color: "#000" },
-                      }}
-                    />
-                    <Typography
-                      sx={{
-                        fontSize: 12,
-                        fontWeight: 550,
-                        color: "#111",
                         display: "flex",
                         alignItems: "center",
-                        gap: 0.5,
+                        gap: 1,
+                        px: 1,
+                        py: 1,
+                        cursor: "pointer",
+                        borderRadius: "2px",
+                        "&:hover": { backgroundColor: "#f5f5f5" },
                       }}
                     >
-                      {f.label}
-                      <Box component="span" sx={{ fontSize: 11, fontWeight: 400, color: "#888" }}>
-                        ({loading ? "0" : getCount(f.value)?.toLocaleString() || "0"})
-                      </Box>
-                    </Typography>
-                  </Box>
+                      <Checkbox
+                        checked={isActive}
+                        size="small"
+                        sx={{
+                          p: 0,
+                          color: "#999",
+                          "&.Mui-checked": { color: "#000" },
+                        }}
+                      />
+                      <Typography
+                        sx={{
+                          fontSize: 12,
+                          fontWeight: 550,
+                          color: "#111",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 0.5,
+                        }}
+                      >
+                        {f.label}
+                        {!isStage && (
+                          <Box component="span" sx={{ fontSize: 11, fontWeight: 400, color: "#888" }}>
+                            ({loading ? "0" : getCount(f.value)?.toLocaleString() || "0"})
+                          </Box>
+                        )}
+                      </Typography>
+                    </Box>
+                  </React.Fragment>
                 );
               })}
             </Stack>
           </Popover>
         </Box>
 
-         <Box sx={{ flex: 1 }} />
+        <Box sx={{ flex: 1 }} />
 
         {/* Record Count */}
         {totalRecords !== undefined && (
-          <Typography sx={{ fontSize: 12, color: "#555", whiteSpace: "nowrap", fontStyle: "italic" }}>
+          <Typography sx={{ fontSize: 12, fontWeight: 600, color: "#000", pr: 1 }}>
             No.of Records: {totalRecords}
           </Typography>
         )}
-
-
       </Box>
-      
     </Box>
   );
 };

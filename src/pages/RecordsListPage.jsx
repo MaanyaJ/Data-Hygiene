@@ -9,7 +9,7 @@ import { usePaginatedRecords } from "../hooks/usePaginatedRecords";
  * Modes and their default parameters for usePaginatedRecords
  */
 const MODE_CONFIG = {
-  landing: { title: "Data Hygiene Dashboard", showStatusFilters: true },
+  landing: { title: "Data Hygiene Dashboard", showStatusFilters: true, showStageFilters: true },
   active: { title: "My Active List", defaultStatus: "pending", showAgeFilters: true },
   completed: { title: "My Completed List", defaultStatus: "accepted,rejected", showStatusFilters: true, allowedFilters: ["accepted", "rejected"] },
   onhold: { title: "On Hold Records", defaultStatus: "On Hold", showAgeFilters: true },
@@ -51,11 +51,27 @@ const RecordsListPage = ({ mode = "landing" }) => {
       if (filter.length > 0) {
         params.age = filter.map((f) => AGE_TO_SERVER[f] || f).join(",");
       }
-    } else {
-      // Status-based filter modes
-      if (filter.length > 0) {
-        params.status = filter.join(",");
-      }
+      return params;
+    }
+
+    // Status and Stage based filter modes
+    if (filter.length > 0) {
+      const statuses = [];
+      const stages = [];
+
+      filter.forEach((val) => {
+        // Distinguish stage filters by their values
+        if (val.includes("validation") || val.includes("standardization")) {
+          stages.push(val);
+        } else {
+          statuses.push(val);
+        }
+      });
+
+      if (statuses.length > 0) params.status = statuses.join(",");
+      if (stages.length > 0) params.stage = stages.join(",");
+    } else if (config.defaultStatus) {
+      params.status = config.defaultStatus;
     }
 
     return params;
@@ -95,6 +111,7 @@ const RecordsListPage = ({ mode = "landing" }) => {
         counts={meta}
         showAgeFilters={config.showAgeFilters}
         showStatusFilters={config.showStatusFilters}
+        showStageFilters={config.showStageFilters}
         allowedFilters={config.allowedFilters}
         loading={isSearching}
         totalRecords={totalRecords}
