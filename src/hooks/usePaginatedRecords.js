@@ -3,7 +3,7 @@ import { API_URL } from "../config";
 
 const PAGE_SIZE = 50;
 const DEBOUNCE_MS = 500;
-const POLL_MS = 5000;
+const POLL_MS = 30000;
 
 export const BASE_URL = `${API_URL}/invalid-summary`;
 
@@ -20,65 +20,71 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
   const [search, setSearch] = useState("");
 
   const abortRef = useRef(null);
+  const pollAbortRef = useRef(null);
   const fetchIdRef = useRef(0);
   const pageRef = useRef(1);
+  const isReadyToPoll = useRef(false);   // ← gates polling until first success
+  const hasErrorRef = useRef(false);     // ← blocks polling during error state
 
   const extraParamsKey = JSON.stringify(extraParams);
 
-  // ── Abort on unmount ──────────────────────────────────────────────────────
   useEffect(() => {
     return () => {
       if (abortRef.current) abortRef.current.abort();
+      if (pollAbortRef.current) pollAbortRef.current.abort();
     };
   }, []);
 
-  // ── Debounce search input ─────────────────────────────────────────────────
   useEffect(() => {
     const t = setTimeout(() => setSearch(searchInput), DEBOUNCE_MS);
     return () => clearTimeout(t);
   }, [searchInput]);
 
-  // ── Keep pageRef in sync ──────────────────────────────────────────────────
   useEffect(() => {
     pageRef.current = page;
   }, [page]);
 
-  // ── Core fetch ────────────────────────────────────────────────────────────
+  // ── Fetch a single page (pure, no state side-effects) ────────────────────
+  const fetchPage = useCallback(
+    async (pageNum, signal) => {
+      const parsed = JSON.parse(extraParamsKey);
+      const qs = new URLSearchParams({
+        page: pageNum,
+        size: PAGE_SIZE,
+        search: search || "",
+        ...parsed,
+      });
+
+      const res = await fetch(`${BASE_URL}?${qs}`, { signal });
+      if (!res.ok) throw new Error(`Failed to fetch data: ${res.status}`);
+      return res.json();
+    },
+    [search, extraParamsKey]
+  );
+
+  // ── Core fetch (user-triggered) ───────────────────────────────────────────
   const fetchRecords = useCallback(
-    async (pageNum, isNew = false, silent = false) => {
+    async (pageNum, isNew = false) => {
       if (abortRef.current) abortRef.current.abort();
       const controller = new AbortController();
       abortRef.current = controller;
 
       const fetchId = ++fetchIdRef.current;
 
-      // Only wipe existing records for user-triggered new fetches, not silent polls
-      if (isNew && !silent) {
+      if (isNew) {
         setRecords([]);
         setTotalRecords(0);
         setTotalPages(0);
         setMeta({});
+        isReadyToPoll.current = false;   // reset on new search/filter
       }
 
-      // Only show loader for user-triggered fetches
-      if (!silent) setLoading(true);
+      setLoading(true);
       setError(null);
+      hasErrorRef.current = false;
 
       try {
-        const parsed = JSON.parse(extraParamsKey);
-        const baseParams = {
-          page: pageNum,
-          size: PAGE_SIZE,
-          search: search || "",
-          ...parsed,
-        };
-
-        const qs = new URLSearchParams();
-        Object.entries(baseParams).forEach(([k, v]) => qs.set(k, v));
-
-        const res = await fetch(`${BASE_URL}?${qs}`, { signal: controller.signal });
-        if (!res.ok) throw new Error(`Failed to fetch data: ${res.status}`);
-        const data = await res.json();
+        const data = await fetchPage(pageNum, controller.signal);
 
         if (fetchId !== fetchIdRef.current) return;
 
@@ -87,62 +93,94 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
 
         setTotalPages(Math.ceil(total / PAGE_SIZE));
         setTotalRecords(total);
-
-        setRecords((prev) => {
-          if (silent) return incoming;        // poll: replace page-1 quietly
-          if (isNew) return incoming;         // new search/filter: replace
-          return [...prev, ...incoming];      // load more: append
-        });
+        setRecords((prev) => (isNew ? incoming : [...prev, ...incoming]));
 
         const { data: _d, total_invalid_records: _t, ...rest } = data;
         setMeta(rest);
+
+        isReadyToPoll.current = true;    // ✅ first success — polling can start
       } catch (err) {
         if (fetchId !== fetchIdRef.current) return;
         if (err.name !== "AbortError") {
           console.error("usePaginatedRecords:", err);
           setError(err);
+          hasErrorRef.current = true;    // 🚫 block polling on error
         }
       } finally {
-        if (fetchId === fetchIdRef.current && !silent) setLoading(false);
+        if (fetchId === fetchIdRef.current) setLoading(false);
       }
     },
-    [search, extraParamsKey]
+    [fetchPage]
   );
 
-  // ── Reset + refetch when search or extraParams change ────────────────────
+  // ── Silent poll — fetch all loaded pages simultaneously ───────────────────
+  const pollAllPages = useCallback(async () => {
+    // Don't poll until first fetch succeeded, or if there's an active error
+    if (!isReadyToPoll.current || hasErrorRef.current) return;
+
+    if (pollAbortRef.current) pollAbortRef.current.abort();
+    const controller = new AbortController();
+    pollAbortRef.current = controller;
+
+    const currentPage = pageRef.current;
+    const pageNums = Array.from({ length: currentPage }, (_, i) => i + 1);
+
+    try {
+      const results = await Promise.all(
+        pageNums.map((p) => fetchPage(p, controller.signal))
+      );
+
+      if (controller.signal.aborted) return;
+
+      const stitched = results.flatMap((data) =>
+        Array.isArray(data?.data) ? data.data : []
+      );
+
+      const lastData = results[results.length - 1];
+      const total = lastData?.total_invalid_records ?? stitched.length;
+      const { data: _d, total_invalid_records: _t, ...rest } = lastData;
+
+      setTotalPages(Math.ceil(total / PAGE_SIZE));
+      setTotalRecords(total);
+      setRecords(stitched);
+      setMeta(rest);
+    } catch (err) {
+      if (err.name !== "AbortError") {
+        console.error("usePaginatedRecords [poll]:", err);
+        // Silently swallow — don't show error UI for background poll failures
+      }
+    }
+  }, [fetchPage]);
+
+  // ── Reset + refetch when search or extraParams change ─────────────────────
   useEffect(() => {
     setPage(1);
-    fetchRecords(1, true, false);
+    fetchRecords(1, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, extraParamsKey]);
 
   // ── Load next page ────────────────────────────────────────────────────────
   useEffect(() => {
-    if (page > 1) fetchRecords(page, false, false);
+    if (page > 1) fetchRecords(page, false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
 
-  // ── Background polling (silent, page 1 only) ─────────────────────────────
+  // ── Background polling ────────────────────────────────────────────────────
   useEffect(() => {
-    const id = setInterval(() => {
-      if (pageRef.current === 1) {
-        fetchRecords(1, false, true);
-      }
-    }, POLL_MS);
+    const id = setInterval(pollAllPages, POLL_MS);
     return () => clearInterval(id);
-  }, [fetchRecords]);
+  }, [pollAllPages]);
 
-  // ── Public helpers ────────────────────────────────────────────────────────
   const loadMore = useCallback(() => setPage((p) => p + 1), []);
 
-  const retry = useCallback(
-    () => fetchRecords(page, page === 1, false),
-    [fetchRecords, page]
-  );
+  const retry = useCallback(() => {
+    hasErrorRef.current = false;         // allow polling again after retry
+    fetchRecords(page, page === 1);
+  }, [fetchRecords, page]);
 
   const refresh = useCallback(() => {
     setPage(1);
-    fetchRecords(1, true, false);
+    fetchRecords(1, true);
   }, [fetchRecords]);
 
   return {
