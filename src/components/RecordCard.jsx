@@ -52,9 +52,9 @@ const RecordCard = ({ record, index = 0 }) => {
       </Box>
 
       {/* updated on */}
-      <Box >
+      <Box sx={{ width: "7%", pr: 2, flexShrink: 0 }}>
         <Typography
-          sx={{ fontSize: 11, color: "#777", fontWeight: 700, mb: 0.3,
+          sx={{fontSize: 11, color: "#777", fontWeight: 700, mb: 0.3,
             textTransform: "uppercase", letterSpacing: 0.5 }}
         >
           Updated On
@@ -65,7 +65,7 @@ const RecordCard = ({ record, index = 0 }) => {
       </Box>
 
       {/* Benchmark Category */}
-      <Box >
+      <Box sx={{ width: "8%", pr: 2, flexShrink: 0 }}>
         <Typography
           sx={{ fontSize: 11, color: "#777", fontWeight: 700, mb: 0.3,
             textTransform: "uppercase", letterSpacing: 0.5 }}
@@ -78,7 +78,7 @@ const RecordCard = ({ record, index = 0 }) => {
       </Box>
 
       {/* Benchmark Type */}
-      <Box >
+      <Box sx={{ width: "10%", pr: 2, flexShrink: 0 }}>
         <Typography
           sx={{ fontSize: 11, color: "#777", fontWeight: 700, mb: 0.3,
             textTransform: "uppercase", letterSpacing: 0.5 }}
@@ -91,9 +91,9 @@ const RecordCard = ({ record, index = 0 }) => {
       </Box>
 
       {/* Status */}
-      <Box >
+      <Box sx={{ width: "6%", pr: 2, flexShrink: 0 }}>
         <Typography
-          sx={{ fontSize: 11, color: "#777", fontWeight: 700, mb: 0.3,
+          sx={{fontSize: 11, color: "#777", fontWeight: 700, mb: 0.3,
             textTransform: "uppercase", letterSpacing: 0.5 }}
         >
           Status
@@ -104,7 +104,7 @@ const RecordCard = ({ record, index = 0 }) => {
       </Box>
 
       {/* Inconsistent Fields */}
-      <Box>
+      <Box sx={{width: "39%", pr: 2, flexShrink: 0 }}>
         <Typography
           sx={{ fontSize: 11, color: "#777", fontWeight: 700, mb: 0.3,
             textTransform: "uppercase", letterSpacing: 0.5,
