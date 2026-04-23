@@ -51,9 +51,10 @@ const RecordsListPage = ({ mode = "landing" }) => {
     retry,
     refresh,
     meta,
+    patchRecords, // ← new
+    isReady,      // ← new
   } = usePaginatedRecords({ extraParams });
 
-  // Register refresh so UploadJSON can trigger it via context
   useEffect(() => {
     registerRefresh(refresh);
   }, [refresh, registerRefresh]);
@@ -91,6 +92,8 @@ const RecordsListPage = ({ mode = "landing" }) => {
           page={page}
           loading={loading}
           onLoadMore={loadMore}
+          patchRecords={patchRecords} // ← new
+          isReady={isReady}           // ← new
         />
 
         {!loading && records.length === 0 && (
