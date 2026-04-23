@@ -22,34 +22,44 @@ const AGE_TO_SERVER = { "<3": "green", "3-6": "yellow", ">6": "red" };
 const RecordsListPage = ({ mode = "landing" }) => {
   const config = MODE_CONFIG[mode] || MODE_CONFIG.landing;
 
-  // Age filter (client-side) or Status filter (server-side)
-  const [filter, setFilter] = useState("");
+  // Age filter or Status filter (as an array for multi-select)
+  const [filter, setFilter] = useState(() => {
+    if (config.showStatusFilters && config.defaultStatus) {
+      return config.defaultStatus.split(",").filter(Boolean);
+    }
+    return [];
+  });
 
   const handleFilterChange = (value) => {
-    // If value is "" (ALL), always clear the filter
+    // If value is "" (ALL), clear all filters
     if (value === "") {
-      setFilter("");
+      setFilter([]);
     } else {
-      setFilter((prev) => (prev === value ? "" : value));
+      setFilter((prev) =>
+        prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
+      );
     }
   };
 
   // Determine which parameters to send to the API based on mode and filter
   const extraParams = useMemo(() => {
+    const params = {};
+
     // Age-based filter modes (active, onhold) — status always fixed; age sent when selected
     if (!config.showStatusFilters) {
-      const params = { status: config.defaultStatus };
-      if (filter) params.age = AGE_TO_SERVER[filter];
-      return params;
+      params.status = config.defaultStatus;
+      if (filter.length > 0) {
+        params.age = filter.map((f) => AGE_TO_SERVER[f] || f).join(",");
+      }
+    } else {
+      // Status-based filter modes
+      if (filter.length > 0) {
+        params.status = filter.join(",");
+      }
     }
-    // Status-based filter modes — a clicked filter always wins
-    if (filter) return { status: filter };
 
-    // Single-status default
-    if (config.defaultStatus) return { status: config.defaultStatus };
-
-    return {};
-  }, [mode, filter, config.showStatusFilters, config.defaultStatus]);
+    return params;
+  }, [filter, config.showStatusFilters, config.defaultStatus]);
 
   const {
     records,
@@ -114,7 +124,7 @@ const RecordsListPage = ({ mode = "landing" }) => {
             }}
           >
             <Typography variant="h6" color="text.secondary" sx={{ fontSize: 14 }}>
-              {filter
+              {filter.length > 0
                 ? "No records match the selected filter."
                 : "No records found in this category."}
             </Typography>

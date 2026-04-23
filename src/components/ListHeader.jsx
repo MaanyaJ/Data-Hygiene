@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Typography,
@@ -7,8 +7,10 @@ import {
   CircularProgress,
   InputAdornment,
   Checkbox,
+  Popover,
 } from "@mui/material";
 import Navbar from "./Navbar";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
 const ListHeader = ({
   title,
@@ -24,6 +26,8 @@ const ListHeader = ({
   totalRecords,
   countLabel,
 }) => {
+  const [anchorEl, setAnchorEl] = useState(null);
+
   const AGE_FILTERS = [
     { label: "< 3 DAYS", value: "<3" },
     { label: "3 - 6 DAYS", value: "3-6" },
@@ -125,77 +129,115 @@ const ListHeader = ({
           }}
         />
 
-        {/* Filter checkbox buttons */}
-        <Stack direction="row" gap={0.5} alignItems="center" flexWrap="wrap">
-          {visibleFilters.map((f) => {
-            const isActive = f.value === "" ? filter === "" : filter === f.value;
-            return (
-              <Box
-                key={f.value || "all"}
-                onClick={() => handleFilterClick(f.value)}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 0.5,
-                  px: 0.8,
-                  py: 0.8,
+        {/* Filter Dropdown */}
+        <Box>
+          <Box
+            onClick={(e) => setAnchorEl(e.currentTarget)}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 1,
+              px: 1.5,
+              height: 40,
+              minWidth: 160,
+              border: "1px solid #c7c7c7ff",
+              borderRadius: "2px",
+              backgroundColor: "#ffffffd1",
+              cursor: "pointer",
+              "&:hover": { borderColor: "#555" },
+            }}
+          >
+            <Typography sx={{ fontSize: 12, fontWeight: 600, color: "#111", letterSpacing: 0.5 }}>
+              {showAgeFilters ? "FILTER BY AGE" : "FILTER BY STATUS"}
+              {filter.length > 0 && (
+                <Box component="span" sx={{ color: "#777", ml: 0.5, fontWeight: 400 }}>
+                  ({filter.length})
+                </Box>
+              )}
+            </Typography>
+            <KeyboardArrowDownIcon sx={{ fontSize: 18, color: "#777" }} />
+          </Box>
 
-                  border: isActive ? "1px solid #0e0808ff" : "none",
-                  cursor: "pointer",
-                  borderRadius: "3px",
-
-                }}
-              >
-                <Checkbox
-                  checked={isActive}
-                  readOnly
-                  size="large"
-                  sx={{
-                    p: 0,
-
-                    color: "#605d5dff",
-                    "&.Mui-checked": { color: "#030202ff" },
-                    "& .MuiSvgIcon-root": { fontSize: 22 },
-                  }}
-                />
-                <Typography
-                  sx={{
-                    fontSize: 12,
-                    fontWeight: 550,
-                    color: isActive ? "#111" : "#5e5d5dff",
-                    letterSpacing: 0.3,
-                    lineHeight: 1,
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 0.5,
-                  }}
-                >
- 
-                  {f.label}
+          <Popover
+            open={Boolean(anchorEl)}
+            anchorEl={anchorEl}
+            onClose={() => setAnchorEl(null)}
+            anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+            transformOrigin={{ vertical: "top", horizontal: "left" }}
+            slotProps={{
+              paper: {
+                sx: {
+                  mt: 0.5,
+                  borderRadius: "2px",
+                  boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+                  border: "1px solid #ddd",
+                  minWidth: 200,
+                },
+              },
+            }}
+          >
+            <Stack sx={{ p: 1 }} gap={0.5}>
+              {visibleFilters.map((f) => {
+                const isActive = f.value === "" ? filter.length === 0 : filter.includes(f.value);
+                return (
                   <Box
-                    component="span"
+                    key={f.value || "all"}
+                    onClick={() => handleFilterClick(f.value)}
                     sx={{
-                      fontSize: 11,
-                      fontWeight: 400,
-                      color: isActive ? "#444" : "#888",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      px: 1,
+                      py: 1,
+                      cursor: "pointer",
+                      borderRadius: "2px",
+                      "&:hover": { backgroundColor: "#f5f5f5" },
                     }}
                   >
-                    ({loading
-                      ? "0"
-                      : getCount(f.value) != null
-                        ? getCount(f.value).toLocaleString()
-                        : "0"})                    
-                    </Box>
-                </Typography>
+                    <Checkbox
+                      checked={isActive}
+                      size="small"
+                      sx={{
+                        p: 0,
+                        color: "#999",
+                        "&.Mui-checked": { color: "#000" },
+                      }}
+                    />
+                    <Typography
+                      sx={{
+                        fontSize: 12,
+                        fontWeight: 550,
+                        color: "#111",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 0.5,
+                      }}
+                    >
+                      {f.label}
+                      <Box component="span" sx={{ fontSize: 11, fontWeight: 400, color: "#888" }}>
+                        ({loading ? "0" : getCount(f.value)?.toLocaleString() || "0"})
+                      </Box>
+                    </Typography>
+                  </Box>
+                );
+              })}
+            </Stack>
+          </Popover>
+        </Box>
 
-              </Box>
-            );
-          })}
-        </Stack>
+         <Box sx={{ flex: 1 }} />
+
+        {/* Record Count */}
+        {totalRecords !== undefined && (
+          <Typography sx={{ fontSize: 12, color: "#555", whiteSpace: "nowrap", fontStyle: "italic" }}>
+            No.of Records: {totalRecords}
+          </Typography>
+        )}
 
 
-  
       </Box>
+      
     </Box>
   );
 };
