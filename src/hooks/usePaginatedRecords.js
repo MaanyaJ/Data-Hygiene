@@ -149,6 +149,11 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
     [fetchRecords, page]
   );
 
+  const refresh = useCallback(() => {
+  setPage(1);
+  fetchRecords(1, true);
+}, [fetchRecords]);
+
   return {
     records,          // raw records from API
     totalRecords,
@@ -161,6 +166,7 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
     search,           // debounced search term for custom secondary fetches
     loadMore,         // call on "Load More" button
     retry,            // call from <ErrorPage onRetry>
+    refresh,
     meta,             // extra API top-level fields (red, green, yellow, ...)
   };
 }
