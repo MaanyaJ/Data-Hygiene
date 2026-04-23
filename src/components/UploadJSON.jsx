@@ -16,10 +16,12 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutlined";
-
 import { API_URL } from "../config";
+import { useRefresh } from "../context/RefreshContext";
 
 const UploadJSON = () => {
+  const { triggerRefresh } = useRefresh();
+
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -77,7 +79,6 @@ const UploadJSON = () => {
         method: "POST",
         body: formData,
       });
-      console.log("response: ", response);
       if (!response.ok) {
         const err = await response.json().catch(() => null);
         throw new Error(err?.detail || `Server error: ${response.status}`);
@@ -85,6 +86,7 @@ const UploadJSON = () => {
       showNotification("File uploaded successfully!", "success");
       setDialogOpen(false);
       setSelectedFile(null);
+      triggerRefresh(); // ← triggers RecordsListPage refresh
     } catch (err) {
       showNotification(err.message || "Upload failed. Please try again.", "error");
     } finally {
@@ -94,7 +96,6 @@ const UploadJSON = () => {
 
   return (
     <>
-      {/* Trigger Button */}
       <Tooltip title="Upload execution data in JSON" placement="bottom" arrow>
         <Button
           onClick={handleOpenDialog}
@@ -123,7 +124,6 @@ const UploadJSON = () => {
         </Button>
       </Tooltip>
 
-      {/* Dialog */}
       <Dialog
         open={dialogOpen}
         onClose={handleCloseDialog}
@@ -175,7 +175,6 @@ const UploadJSON = () => {
             Select a JSON file from your system to upload execution data.
           </Typography>
 
-          {/* Drop Zone — disabled while uploading */}
           <Box
             onClick={() => { if (!loading) fileInputRef.current?.click(); }}
             onDragOver={(e) => { e.preventDefault(); if (!loading) setDragOver(true); }}
@@ -275,7 +274,6 @@ const UploadJSON = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Snackbar */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={5000}

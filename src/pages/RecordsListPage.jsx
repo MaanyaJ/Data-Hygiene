@@ -1,9 +1,10 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Box, Typography } from "@mui/material";
 import ListHeader from "../components/ListHeader";
 import RecordList from "../components/RecordList";
 import ErrorPage from "../components/ErrorPage";
 import { usePaginatedRecords } from "../hooks/usePaginatedRecords";
+import { useRefresh } from "../context/RefreshContext";
 
 const MODE_CONFIG = {
   landing:   { title: "Data Hygiene Dashboard",  showStatusFilters: true },
@@ -17,6 +18,7 @@ const AGE_TO_SERVER = { "<3": "green", "3-6": "yellow", ">6": "red" };
 
 const RecordsListPage = ({ mode = "landing" }) => {
   const config = MODE_CONFIG[mode] || MODE_CONFIG.landing;
+  const { registerRefresh } = useRefresh();
 
   const [filter, setFilter] = useState("");
 
@@ -50,6 +52,11 @@ const RecordsListPage = ({ mode = "landing" }) => {
     refresh,
     meta,
   } = usePaginatedRecords({ extraParams });
+
+  // Register refresh so UploadJSON can trigger it via context
+  useEffect(() => {
+    registerRefresh(refresh);
+  }, [refresh, registerRefresh]);
 
   const isSearching = loading && searchInput !== search;
 
