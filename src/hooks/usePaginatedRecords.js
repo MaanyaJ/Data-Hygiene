@@ -102,17 +102,41 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
   // ── Patch specific records in-place by ExecutionId ────────────────────────
   // Called by useProgressPolling when batch status poll returns.
   // Only updates fields that came back — order and all other records untouched.
-  const patchRecords = useCallback((updates) => {
+  const patchRecords = useCallback((batchData, polledIds = []) => {
+    const updates = Array.isArray(batchData) ? batchData : (batchData?.data || []);
+    const summary = !Array.isArray(batchData) ? batchData?.summary : null;
+
+    if (summary) {
+      setMeta(prev => ({ ...prev, summary }));
+    }
+
     const updateMap = Object.fromEntries(
       updates.map((u) => [u.ExecutionId, u])
     );
-    setRecords((prev) =>
-      prev.map((record) =>
+
+    setRecords((prev) => {
+      let removedCount = 0;
+      const nextRecords = prev.filter((record) => {
+        const isPolled = polledIds.includes(record.ExecutionId);
+        const hasUpdate = !!updateMap[record.ExecutionId];
+        
+        if (isPolled && !hasUpdate) {
+          removedCount++;
+          return false;
+        }
+        return true;
+      });
+
+      if (removedCount > 0) {
+        setTotalRecords(t => Math.max(0, t - removedCount));
+      }
+
+      return nextRecords.map((record) =>
         updateMap[record.ExecutionId]
           ? { ...record, ...updateMap[record.ExecutionId] }
           : record
-      )
-    );
+      );
+    });
   }, []);
 
   // ── Reset + refetch when search or extraParams change ────────────────────

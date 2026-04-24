@@ -43,8 +43,8 @@ const ListHeader = ({
   ];
 
   const STAGE_FILTERS = [
-    { label: "VALIDATION IN-PROGRESS", value: "validation_inprogress,validation_completed,validation failed" },
-    { label: "STANDARDIZATION IN-PROGRESS", value: "standardization_inprogress,standardization failed" },
+    { label: "UNDER VALIDATION", value: "validation inprogress,validation_completed,validation failed" },
+    { label: "UNDER STANDARDIZATION IN-PROGRESS", value: "standardization_inprogress,standardization failed" },
   ];
 
   let baseFilters = showAgeFilters
@@ -72,6 +72,8 @@ const ListHeader = ({
     accepted: "ACCEPTED",
     rejected: "REJECTED",
     "On Hold": "ON HOLD",
+    "validation_inprogress,validation_completed,validation failed": "VALIDATION_IN_PROGRESS",
+    "standardization_inprogress,standardization failed": "STANDARDIZATION_IN_PROGRESS",
   };
   const AGE_KEY_MAP = { "<3": "green", "3-6": "yellow", ">6": "red" };
 
@@ -232,11 +234,9 @@ const ListHeader = ({
                         }}
                       >
                         {f.label}
-                        {!isStage && (
-                          <Box component="span" sx={{ fontSize: 11, fontWeight: 400, color: "#888" }}>
-                            ({loading ? "0" : getCount(f.value)?.toLocaleString() || "0"})
-                          </Box>
-                        )}
+                        <Box component="span" sx={{ fontSize: 11, fontWeight: 400, color: "#888" }}>
+                          ({loading ? "0" : getCount(f.value)?.toLocaleString() || "0"})
+                        </Box>
                       </Typography>
                     </Box>
                   </React.Fragment>
@@ -250,7 +250,7 @@ const ListHeader = ({
 
         {/* Record Count */}
         {totalRecords !== undefined && (
-          <Typography sx={{ fontSize: 12, fontWeight: 600, color: "#000", pr: 1 }}>
+          <Typography type="caption" sx={{ fontStyle: "italic", fontSize: 12, fontWeight: 200, color: "#000", pr: 1 }}>
             No.of Records: {totalRecords}
           </Typography>
         )}

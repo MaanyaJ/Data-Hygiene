@@ -47,7 +47,7 @@ const getStageInfo = (stage, isValid) => {
   return null;
 };
 
-/** Animated progress bar with label (Commented for A/B testing)
+/** Animated progress bar with label (Commented for A/B testing) */
 const StageProgress = ({ pct, label, color, onDismiss }) => {
   const [mounted, setMounted] = useState(false);
 
@@ -76,9 +76,8 @@ const StageProgress = ({ pct, label, color, onDismiss }) => {
     </Box>
   );
 };
-*/
 
-/** Pipeline style progress */
+/** Pipeline style progress (Commented for A/B testing) */
 const PipelineProgress = ({ pct, label, color }) => {
   const segments = [
     { threshold: 25, name: "Validation InProgress" },
@@ -240,7 +239,7 @@ const RecordCard = ({ record, index = 0 }) => {
             </Box>
           ) : (
             /* 25 / 50 / 75 % bars */
-            <PipelineProgress pct={stageInfo.pct} label={stageInfo.label} color={stageInfo.color} />
+            <StageProgress pct={stageInfo.pct} label={stageInfo.label} color={stageInfo.color} />
           )}
         </Box>
       ) : (

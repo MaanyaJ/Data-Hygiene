@@ -4,18 +4,21 @@ import { API_URL } from "../config";
 const POLL_MS = 2000;
 const BATCH_URL = `${API_URL}/invalid-summary/batch`;
 
-export function useProgressPolling({ visibleIds, patchRecords, isReady }) {
+export function useProgressPolling({ visibleIds, patchRecords, isReady, extraParams = {} }) {
   const visibleIdsRef = useRef([]);
+  const extraParamsRef = useRef(extraParams);
   const pollAbortRef = useRef(null);
 
-  // Keep ref in sync so the interval always sees latest IDs
+  // Keep ref in sync so the interval always sees latest IDs and params
   // without needing to re-register itself on every scroll
   useEffect(() => {
     visibleIdsRef.current = visibleIds;
-  }, [visibleIds]);
+    extraParamsRef.current = extraParams;
+  }, [visibleIds, extraParams]);
 
   const poll = useCallback(async () => {
     const ids = visibleIdsRef.current;
+    const currentParams = extraParamsRef.current;
 
     if (!isReady || ids.length === 0) return;
 
@@ -24,10 +27,13 @@ export function useProgressPolling({ visibleIds, patchRecords, isReady }) {
     pollAbortRef.current = controller;
 
     try {
+      const payload = { execution_ids: ids, ...currentParams };
+      console.log("[useProgressPolling] Payload:", payload);
+
       const res = await fetch(BATCH_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ execution_ids: ids }),
+        body: JSON.stringify(payload),
         signal: controller.signal,
       });
 
@@ -37,11 +43,7 @@ export function useProgressPolling({ visibleIds, patchRecords, isReady }) {
 
       if (controller.signal.aborted) return;
 
-      const updates = Array.isArray(data?.data) ? data.data : [];
-
-      if (updates.length > 0) {
-        patchRecords(updates);
-      }
+      patchRecords(data, ids);
     } catch (err) {
       if (err.name !== "AbortError") {
         console.error("useProgressPolling:", err);
