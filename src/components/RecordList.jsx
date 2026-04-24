@@ -1,5 +1,5 @@
-import React from "react";
-import { Box, Typography } from "@mui/material";
+import React, { useState, useCallback, useEffect } from "react";
+import { Box } from "@mui/material";
 import RecordCard from "./RecordCard";
 import Loader from "./Loader";
 import {
@@ -9,31 +9,51 @@ import {
   AutoSizer,
 } from "react-virtualized";
 import "react-virtualized/styles.css";
+import { useVisibleIds } from "../hooks/useVisibleIds";
+import { useProgressPolling } from "../hooks/useProgressPolling";
 
 const RecordList = ({
   records,
   totalRecords,
-  countLabel,
   totalPages,
   page,
   loading,
   onLoadMore,
+  patchRecords,
+  isReady,
 }) => {
+  const [visibleIds, setVisibleIds] = useState([]);
+
+  const { handleRowsRendered: handleVisibleRange } = useVisibleIds({
+    records,
+    onVisibleIdsChange: setVisibleIds,
+  });
+
+  useProgressPolling({
+    visibleIds,
+    patchRecords,
+    isReady: isReady.current,
+  });
+
+  // Clear stale IDs when the record list becomes empty (e.g. after a filter change)
+  // so the polling hook doesn't keep firing batch calls for the previous page's records
+  useEffect(() => {
+    if (records.length === 0) {
+      setVisibleIds([]);
+    }
+  }, [records.length]);
+
   const isRowLoaded = ({ index }) => !!records[index];
 
   const loadMoreRows = () => {
-    if (!loading && page < totalPages) {
-      onLoadMore();
-    }
+    if (!loading && page < totalPages) onLoadMore();
     return Promise.resolve();
   };
 
   const ROW_HEIGHT = 84;
-  const getRowHeight = () => ROW_HEIGHT;
 
   const rowRenderer = ({ index, key, style }) => {
     const record = records[index];
-
     if (!record) {
       return (
         <div key={key} style={style}>
@@ -41,7 +61,6 @@ const RecordList = ({
         </div>
       );
     }
-
     return (
       <div key={key} style={style}>
         <RecordCard record={record} index={index} />
@@ -77,8 +96,11 @@ const RecordList = ({
                     scrollTop={scrollTop}
                     isScrolling={isScrolling}
                     rowCount={records.length}
-                    rowHeight={getRowHeight}
-                    onRowsRendered={onRowsRendered}
+                    rowHeight={ROW_HEIGHT}
+                    onRowsRendered={(info) => {
+                      onRowsRendered(info);     // InfiniteLoader's handler
+                      handleVisibleRange(info); // our polling handler
+                    }}
                     ref={registerChild}
                     rowRenderer={rowRenderer}
                     overscanRowCount={4}

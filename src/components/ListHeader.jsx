@@ -36,7 +36,7 @@ const ListHeader = ({
   ];
 
   const STATUS_FILTERS = [
-    { label: "PENDING", value: "pending" },
+    { label: "ACTION REQUIRED", value: "pending" },
     { label: "ACCEPTED", value: "accepted" },
     { label: "L0 DATA", value: "rejected" },
     { label: "ON HOLD", value: "On Hold" },

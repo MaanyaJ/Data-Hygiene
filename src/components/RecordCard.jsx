@@ -47,7 +47,7 @@ const getStageInfo = (stage, isValid) => {
   return null;
 };
 
-/** Animated progress bar with label */
+/** Animated progress bar with label (Commented for A/B testing)
 const StageProgress = ({ pct, label, color, onDismiss }) => {
   const [mounted, setMounted] = useState(false);
 
@@ -62,9 +62,7 @@ const StageProgress = ({ pct, label, color, onDismiss }) => {
       <Typography sx={{ fontSize: 10.5, fontWeight: 600, color: color, mb: 0.5, letterSpacing: 0.2 }}>
         {label}
       </Typography>
-      {/* Track */}
       <Box sx={{ height: 4, borderRadius: 99, backgroundColor: "#e5e7eb", overflow: "hidden" }}>
-        {/* Fill */}
         <Box
           sx={{
             height: "100%",
@@ -75,7 +73,66 @@ const StageProgress = ({ pct, label, color, onDismiss }) => {
           }}
         />
       </Box>
-      <Typography sx={{ fontSize: 9.5, color: "#aaa", mt: 0.4 }}>{pct}%</Typography>
+    </Box>
+  );
+};
+*/
+
+/** Pipeline style progress */
+const PipelineProgress = ({ pct, label, color }) => {
+  const segments = [
+    { threshold: 25, name: "Validation InProgress" },
+    { threshold: 50, name: "Val. Done" },
+    { threshold: 75, name: "Standardization InProgreess" },
+    { threshold: 100, name: "Completed" },
+  ];
+
+  const themeColor = "#3b82f6";
+
+  return (
+    <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "center", width: "100%", maxWidth: 320 }}>
+      {/* 4 Pipes */}
+      <Box sx={{ display: "flex", gap: 0.8, height: 8, mb: 0.8 }}>
+        {segments.map((seg) => {
+          const isPassed = pct >= seg.threshold;
+          const isCurrent = pct === seg.threshold;
+          return (
+            <Box
+              key={seg.threshold}
+              sx={{
+                flex: 1,
+                borderRadius: 99,
+                backgroundColor: isPassed ? themeColor : "#e5e7eb",
+                opacity: isPassed && !isCurrent ? 0.6 : 1, // dims previous completed pipes slightly
+                transition: "background-color 0.4s ease, opacity 0.4s ease",
+              }}
+            />
+          );
+        })}
+      </Box>
+      
+      {/* Pipe Labels */}
+      <Box sx={{ display: "flex", gap: 0.8 }}>
+        {segments.map((seg) => {
+          const isPassed = pct >= seg.threshold;
+          const isCurrent = pct === seg.threshold;
+          return (
+            <Typography
+              key={seg.threshold}
+              sx={{
+                flex: 1,
+                fontSize: 10,
+                fontWeight: isCurrent ? 700 : 600,
+                color: isCurrent ? themeColor : isPassed ? "#6b7280" : "#a1a1aa",
+                textAlign: "center",
+                lineHeight: 1.1,
+              }}
+            >
+              {seg.name}
+            </Typography>
+          );
+        })}
+      </Box>
     </Box>
   );
 };
@@ -183,7 +240,7 @@ const RecordCard = ({ record, index = 0 }) => {
             </Box>
           ) : (
             /* 25 / 50 / 75 % bars */
-            <StageProgress pct={stageInfo.pct} label={stageInfo.label} color={stageInfo.color} />
+            <PipelineProgress pct={stageInfo.pct} label={stageInfo.label} color={stageInfo.color} />
           )}
         </Box>
       ) : (
@@ -195,7 +252,11 @@ const RecordCard = ({ record, index = 0 }) => {
               Status
             </Typography>
             <Typography sx={{ fontSize: 12, fontWeight: 600, color: "#111", lineHeight: 1.2 }}>
-              {record.Status?.toLowerCase() === "rejected" ? "L0 Data" : record.Status}
+              {record.Status?.toLowerCase() === "rejected"
+                ? "L0 Data"
+                : record.Status?.toLowerCase() === "pending"
+                ? "ACTION REQUIRED"
+                : record.Status}
             </Typography>
           </Box>
 
@@ -221,8 +282,8 @@ const RecordCard = ({ record, index = 0 }) => {
         </>
       )}
 
-      {/* Actions — hide button when there is no valid status (record not yet processed) */}
-      {record.Status && record.Status !== "N/A" && (
+      {/* Actions — hide when record is still in-pipeline (stage panel showing) or has no valid status */}
+      {!showStagePanelInsteadOfStatus && record.Status && record.Status !== "N/A" && (
         <Box sx={{ display: "flex", gap: 0.5, alignItems: "center", pt: 0.5, flexShrink: 0 }}>
           <IconButton
             size="medium"
