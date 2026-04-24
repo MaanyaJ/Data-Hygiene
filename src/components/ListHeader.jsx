@@ -43,8 +43,8 @@ const ListHeader = ({
   ];
 
   const STAGE_FILTERS = [
-    { label: "VALIDATION IN-PROGRESS", value: "validation_inprogress,validation_completed,validation failed" },
-    { label: "STANDARDIZATION IN-PROGRESS", value: "standardization_inprogress,standardization failed" },
+    { label: "VALIDATION IN-PROGRESS", value: "validation_inprogress" },
+    { label: "STANDARDIZATION IN-PROGRESS", value: "standardization_inprogress" },
   ];
 
   let baseFilters = showAgeFilters

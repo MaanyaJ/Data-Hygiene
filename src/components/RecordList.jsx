@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React from "react";
 import { Box } from "@mui/material";
 import RecordCard from "./RecordCard";
 import Loader from "./Loader";
@@ -9,8 +9,7 @@ import {
   AutoSizer,
 } from "react-virtualized";
 import "react-virtualized/styles.css";
-import { useVisibleIds } from "../hooks/useVisibleIds";
-import { useProgressPolling } from "../hooks/useProgressPolling";
+import { useProgressSocket } from "../hooks/useProgressSocket";
 
 const RecordList = ({
   records,
@@ -20,28 +19,16 @@ const RecordList = ({
   loading,
   onLoadMore,
   patchRecords,
-  isReady,
+  removeRecords,
+  isReadyState,   // ← boolean state, not ref
+  activeFilters,
 }) => {
-  const [visibleIds, setVisibleIds] = useState([]);
-
-  const { handleRowsRendered: handleVisibleRange } = useVisibleIds({
-    records,
-    onVisibleIdsChange: setVisibleIds,
-  });
-
-  useProgressPolling({
-    visibleIds,
+  useProgressSocket({
     patchRecords,
-    isReady: isReady.current,
+    removeRecords,
+    isReady: isReadyState,
+    activeFilters,
   });
-
-  // Clear stale IDs when the record list becomes empty (e.g. after a filter change)
-  // so the polling hook doesn't keep firing batch calls for the previous page's records
-  useEffect(() => {
-    if (records.length === 0) {
-      setVisibleIds([]);
-    }
-  }, [records.length]);
 
   const isRowLoaded = ({ index }) => !!records[index];
 
@@ -97,10 +84,7 @@ const RecordList = ({
                     isScrolling={isScrolling}
                     rowCount={records.length}
                     rowHeight={ROW_HEIGHT}
-                    onRowsRendered={(info) => {
-                      onRowsRendered(info);     // InfiniteLoader's handler
-                      handleVisibleRange(info); // our polling handler
-                    }}
+                    onRowsRendered={onRowsRendered}
                     ref={registerChild}
                     rowRenderer={rowRenderer}
                     overscanRowCount={4}

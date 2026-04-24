@@ -7,11 +7,11 @@ import { usePaginatedRecords } from "../hooks/usePaginatedRecords";
 import { useRefresh } from "../context/RefreshContext";
 
 const MODE_CONFIG = {
-  landing:   { title: "Data Hygiene Dashboard",  showStatusFilters: true, showStageFilters: true },
-  active:    { title: "My Active List",           defaultStatus: "pending",           showAgeFilters: true },
-  completed: { title: "My Completed List",        defaultStatus: "accepted,rejected", showStatusFilters: true, allowedFilters: ["accepted", "rejected"] },
-  onhold:    { title: "On Hold Records",          defaultStatus: "On Hold",           showAgeFilters: true },
-  all:       { title: "All Records",              showStatusFilters: true },
+  landing:   { title: "Data Hygiene Dashboard", showStatusFilters: true, showStageFilters: true },
+  active:    { title: "My Active List",          defaultStatus: "pending",           showAgeFilters: true },
+  completed: { title: "My Completed List",       defaultStatus: "accepted,rejected", showStatusFilters: true, allowedFilters: ["accepted", "rejected"] },
+  onhold:    { title: "On Hold Records",         defaultStatus: "On Hold",           showAgeFilters: true },
+  all:       { title: "All Records",             showStatusFilters: true },
 };
 
 const AGE_TO_SERVER = { "<3": "green", "3-6": "yellow", ">6": "red" };
@@ -20,12 +20,11 @@ const RecordsListPage = ({ mode = "landing" }) => {
   const config = MODE_CONFIG[mode] || MODE_CONFIG.landing;
   const { registerRefresh } = useRefresh();
 
-  // Multi-select filter state (array of selected values)
   const [filter, setFilter] = useState([]);
 
   const handleFilterChange = (value) => {
     if (value === "") {
-      setFilter([]); // clear all
+      setFilter([]);
     } else {
       setFilter((prev) =>
         prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
@@ -34,7 +33,6 @@ const RecordsListPage = ({ mode = "landing" }) => {
   };
 
   const extraParams = useMemo(() => {
-    // Age-based modes (active, onhold) — status always fixed; age sent when selected
     if (!config.showStatusFilters) {
       const params = { status: config.defaultStatus };
       if (filter.length > 0) params.age = filter.map((f) => AGE_TO_SERVER[f] || f).join(",");
@@ -68,8 +66,9 @@ const RecordsListPage = ({ mode = "landing" }) => {
     retry,
     refresh,
     meta,
-    patchRecords, // ← new
-    isReady,      // ← new
+    patchRecords,
+    removeRecords,
+    isReadyState,  // ← renamed from isReady
   } = usePaginatedRecords({ extraParams });
 
   useEffect(() => {
@@ -110,8 +109,10 @@ const RecordsListPage = ({ mode = "landing" }) => {
           page={page}
           loading={loading}
           onLoadMore={loadMore}
-          patchRecords={patchRecords} // ← new
-          isReady={isReady}           // ← new
+          patchRecords={patchRecords}
+          removeRecords={removeRecords}
+          isReadyState={isReadyState}  // ← boolean, not ref
+          activeFilters={filter}
         />
 
         {!loading && records.length === 0 && (

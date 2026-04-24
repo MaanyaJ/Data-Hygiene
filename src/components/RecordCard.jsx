@@ -47,50 +47,20 @@ const getStageInfo = (stage, isValid) => {
   return null;
 };
 
-/** Animated progress bar with label (Commented for A/B testing)
-const StageProgress = ({ pct, label, color, onDismiss }) => {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    // Small delay so the CSS width transition plays on first render
-    const t = setTimeout(() => setMounted(true), 30);
-    return () => clearTimeout(t);
-  }, []);
-
-  return (
-    <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "center", width: "60%", maxWidth: 200 }}>
-      <Typography sx={{ fontSize: 10.5, fontWeight: 600, color: color, mb: 0.5, letterSpacing: 0.2 }}>
-        {label}
-      </Typography>
-      <Box sx={{ height: 4, borderRadius: 99, backgroundColor: "#e5e7eb", overflow: "hidden" }}>
-        <Box
-          sx={{
-            height: "100%",
-            borderRadius: 99,
-            backgroundColor: color,
-            width: mounted ? `${pct}%` : "0%",
-            transition: "width 0.7s cubic-bezier(0.4,0,0.2,1)",
-          }}
-        />
-      </Box>
-    </Box>
-  );
-};
-*/
 
 /** Pipeline style progress */
 const PipelineProgress = ({ pct, label, color }) => {
   const segments = [
-    { threshold: 25, name: "Validation InProgress" },
-    { threshold: 50, name: "Val. Done" },
-    { threshold: 75, name: "Standardization InProgreess" },
-    { threshold: 100, name: "Completed" },
+    { threshold: 25, name: "Validation In Progress" },
+    { threshold: 50, name: "Validation Completed" },
+    { threshold: 75, name: "Standardization In Progreess" },
+    { threshold: 100, name: "Standardization Completed" },
   ];
 
-  const themeColor = "#3b82f6";
+  const themeColor = "#1b1b1b";
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "center", width: "100%", maxWidth: 320 }}>
+    <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "center", width: "100%", maxWidth: 500 }}>
       {/* 4 Pipes */}
       <Box sx={{ display: "flex", gap: 0.8, height: 8, mb: 0.8 }}>
         {segments.map((seg) => {
@@ -102,8 +72,8 @@ const PipelineProgress = ({ pct, label, color }) => {
               sx={{
                 flex: 1,
                 borderRadius: 99,
-                backgroundColor: isPassed ? themeColor : "#e5e7eb",
-                opacity: isPassed && !isCurrent ? 0.6 : 1, // dims previous completed pipes slightly
+                backgroundColor: isPassed ? themeColor : "#e6e6e6",
+                opacity: isPassed && !isCurrent ? 0.7 : 1, // dims previous completed pipes slightly
                 transition: "background-color 0.4s ease, opacity 0.4s ease",
               }}
             />

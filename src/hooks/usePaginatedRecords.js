@@ -18,9 +18,12 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
 
+  // Triggers WebSocket effect exactly once when first fetch succeeds
+  // Never resets — socket stays alive through refreshes and uploads
+  const [isReadyState, setIsReadyState] = useState(false);
+
   const abortRef = useRef(null);
   const fetchIdRef = useRef(0);
-  const isReadyRef = useRef(false); // flips true after first successful fetch
 
   const extraParamsKey = JSON.stringify(extraParams);
 
@@ -51,7 +54,8 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
         setTotalRecords(0);
         setTotalPages(0);
         setMeta({});
-        isReadyRef.current = false; // reset on new search/filter/refresh
+        // ← intentionally NOT resetting isReadyState here
+        //   socket stays connected through refreshes and uploads
       }
 
       setLoading(true);
@@ -85,7 +89,11 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
         const { data: _d, total_invalid_records: _t, ...rest } = data;
         setMeta(rest);
 
-        isReadyRef.current = true; // data landed — progress polling can start
+        // Flip once — after this the WebSocket connects and stays connected
+        setIsReadyState((prev) => {
+          if (!prev) return true;
+          return prev;
+        });
       } catch (err) {
         if (fetchId !== fetchIdRef.current) return;
         if (err.name !== "AbortError") {
@@ -100,8 +108,6 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
   );
 
   // ── Patch specific records in-place by ExecutionId ────────────────────────
-  // Called by useProgressPolling when batch status poll returns.
-  // Only updates fields that came back — order and all other records untouched.
   const patchRecords = useCallback((updates) => {
     const updateMap = Object.fromEntries(
       updates.map((u) => [u.ExecutionId, u])
@@ -113,6 +119,13 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
           : record
       )
     );
+  }, []);
+
+  // ── Remove records that no longer match active filters ────────────────────
+  const removeRecords = useCallback((executionIds) => {
+    const idSet = new Set(executionIds);
+    setRecords((prev) => prev.filter((r) => !idSet.has(r.ExecutionId)));
+    setTotalRecords((prev) => Math.max(0, prev - executionIds.length));
   }, []);
 
   // ── Reset + refetch when search or extraParams change ────────────────────
@@ -154,7 +167,8 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
     retry,
     refresh,
     meta,
-    patchRecords,      // ← used by useProgressPolling to patch Stage in-place
-    isReady: isReadyRef, // ← ref (not state) so polling can read it without re-renders
+    patchRecords,
+    removeRecords,
+    isReadyState,  // ← boolean, triggers socket effect exactly once
   };
 }
