@@ -77,14 +77,16 @@ const AcceptConfirmDialog = ({ open, onClose, onConfirm, fieldName, isAccepting 
     </DialogContent>
     <Divider />
     <DialogActions sx={{ px: 3, py: 2 }}>
-      <Button variant="outlined" onClick={onClose} disabled={isAccepting}
+      <Button
+        variant="outlined"
+        onClick={onClose}
+        disabled={isAccepting}
         sx={{
           borderColor: "#000000",
           color: "#000000",
-          "&:hover": {
-            backgroundColor: "#eeeeee",
-          },
-        }}>
+          "&:hover": { backgroundColor: "#eeeeee" },
+        }}
+      >
         Cancel
       </Button>
       <Button
@@ -102,7 +104,7 @@ const AcceptConfirmDialog = ({ open, onClose, onConfirm, fieldName, isAccepting 
           backgroundColor: "#000000",
           "&:hover": { backgroundColor: "#333333" },
           ...(isAccepting && {
-            "&.Mui-disabled": { backgroundColor: "#334155", color: "white" },
+            "&.Mui-disabled": { backgroundColor: "#333333", color: "white" },
           }),
         }}
       >
@@ -157,13 +159,16 @@ const L0ConfirmDialog = ({ open, onClose, onConfirm, submitting }) => (
     </DialogContent>
     <Divider />
     <DialogActions sx={{ px: 3, py: 2 }}>
-      <Button variant="outlined" onClick={onClose} disabled={submitting} sx={{
-        borderColor: "#000000",
-        color: "#000000",
-        "&:hover": {
-          backgroundColor: "#eeeeee",
-        },
-      }}>
+      <Button
+        variant="outlined"
+        onClick={onClose}
+        disabled={submitting}
+        sx={{
+          borderColor: "#000000",
+          color: "#000000",
+          "&:hover": { backgroundColor: "#eeeeee" },
+        }}
+      >
         Cancel
       </Button>
       <Button
@@ -171,9 +176,7 @@ const L0ConfirmDialog = ({ open, onClose, onConfirm, submitting }) => (
         onClick={onConfirm}
         disabled={submitting}
         startIcon={submitting ? <CircularProgress size={14} color="inherit" /> : null}
-        sx={{
-          backgroundColor: "#000000"
-        }}
+        sx={{ backgroundColor: "#000000" }}
       >
         {submitting ? "Submitting..." : "Yes, Confirm"}
       </Button>
@@ -194,7 +197,6 @@ const DraftRecordDialog = ({
 }) => {
   const [formValues, setFormValues] = React.useState({});
 
-  // Reset form and pre-fill with initialValues every time the dialog opens
   React.useEffect(() => {
     if (open) {
       setFormValues(initialValues || {});
@@ -248,9 +250,9 @@ const DraftRecordDialog = ({
                 sx={{
                   "& .MuiOutlinedInput-root.Mui-focused fieldset": {
                     borderColor: "#000000",
-                  }, 
+                  },
                   "& .MuiInputLabel-root.Mui-focused": {
-                    color: "#000000", // 🔥 remove blue on focus
+                    color: "#000000",
                   },
                 }}
                 key={field.fieldname}
@@ -276,13 +278,16 @@ const DraftRecordDialog = ({
         <>
           <Divider />
           <DialogActions sx={{ px: 3, py: 2 }}>
-            <Button variant="outlined" onClick={onClose} disabled={submitting} sx={{
-              borderColor: "#000000",
-              color: "#000000",
-              "&:hover": {
-                backgroundColor: "#eeeeee",
-              },
-            }}>
+            <Button
+              variant="outlined"
+              onClick={onClose}
+              disabled={submitting}
+              sx={{
+                borderColor: "#000000",
+                color: "#000000",
+                "&:hover": { backgroundColor: "#eeeeee" },
+              }}
+            >
               Cancel
             </Button>
             <Button
@@ -293,7 +298,7 @@ const DraftRecordDialog = ({
               sx={{
                 color: "#ffffff",
                 backgroundColor: "#000000",
-                "&.Mui-disabled": { backgroundColor: "#efefef", color: "#888888" }
+                "&.Mui-disabled": { backgroundColor: "#efefef", color: "#888888" },
               }}
             >
               {submitting ? "Submitting..." : "Submit"}
@@ -353,6 +358,10 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
     [setAcceptConfirm]
   );
 
+  // Helper: check if selectedIdx is a custom record key
+  const isCustomSelected = (selectedIdx) =>
+    typeof selectedIdx === "string" && selectedIdx.startsWith("custom_");
+
   return (
     <>
       <Stack gap={0.5}>
@@ -370,7 +379,10 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
           const selectedIdx = selectedSuggestions[groupIdx];
           const canAccept = selectedIdx !== undefined;
           const fieldStatus = group.currentStatus?.toLowerCase();
-          const isPending = !fieldStatus || fieldStatus.toLowerCase() === STATUS.INVALID || fieldStatus.toLowerCase() === STATUS.PENDING;
+          const isPending =
+            !fieldStatus ||
+            fieldStatus.toLowerCase() === STATUS.INVALID ||
+            fieldStatus.toLowerCase() === STATUS.PENDING;
           const isAccepted =
             group.currentStatus === STATUS.ACCEPTED ||
             group.currentStatus === STATUS.APPROVED;
@@ -400,7 +412,6 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                   cursor: "pointer",
                   userSelect: "none",
                   backgroundColor: "#f2f2f2ff",
-
                   borderBottom: isExpanded ? "1px solid #e2e8f0" : "none",
                 }}
               >
@@ -474,9 +485,9 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                       />
                       <Chip
                         label={
-                          typeof selectedIdx === "number"
-                            ? "Suggestion Selected"
-                            : "Custom Masterlist Dropdown Value Selected"
+                          isCustomSelected(selectedIdx)
+                            ? "Custom Masterlist Dropdown Value Selected"
+                            : "Suggestion Selected"
                         }
                         size="small"
                         sx={{
@@ -506,31 +517,41 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                 <ExistingDataRow existingData={group.existing_data ?? []} />
 
                 <Stack gap={0.5} sx={{ p: 1.5 }}>
-                  {group.suggestions?.length > 0 ? <Typography
-                    sx={{
-                      fontSize: 10,
-                      fontWeight: 700,
-                      color: "#303030",
-                      textTransform: "uppercase",
-                      letterSpacing: 0.5,
-                      mb: 0,
-                    }}
-                  >
-                    Suggestions <Typography variant="caption" sx={{
-                      fontSize: 12,
-                      fontWeight: 300,
-                      fontStyle: "italic",
-                      textTransform: "LowerCase",
-                    }}>{(group.currentStatus === null || group.currentStatus.toLowerCase() === "pending" || group.currentStatus.toLowerCase() === "invalid") ? "( Hover over an option to see confidence score )" : ""}</Typography>
-                  </Typography> : ""}
+                  {group.suggestions?.length > 0 && (
+                    <Typography
+                      sx={{
+                        fontSize: 10,
+                        fontWeight: 700,
+                        color: "#303030",
+                        textTransform: "uppercase",
+                        letterSpacing: 0.5,
+                        mb: 0,
+                      }}
+                    >
+                      Suggestions{" "}
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          fontSize: 12,
+                          fontWeight: 300,
+                          fontStyle: "italic",
+                          textTransform: "LowerCase",
+                        }}
+                      >
+                        {isPending
+                          ? "( Hover over an option to see confidence score )"
+                          : ""}
+                      </Typography>
+                    </Typography>
+                  )}
 
                   {group.suggestions?.length > 0 ? (
                     group.suggestions.map((sugg, si) => {
                       const isSelected = selectedIdx === si;
                       const gStatus = group.currentStatus;
-                      const isAccepted =
+                      const isAcceptedRow =
                         gStatus === STATUS.ACCEPTED || gStatus === STATUS.APPROVED;
-                      const activeTheme = isAccepted ? ACCEPTED : SELECTED;
+                      const rowTheme = isAcceptedRow ? ACCEPTED : SELECTED;
 
                       const baseSugg = sugg;
                       const editedSugg = isSelected ? editedSuggestions[groupIdx] || {} : {};
@@ -539,10 +560,14 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                       // UI Override: Always show History CPU(s) value if it exists for VM
                       if (isSelected && sutType?.toLowerCase() === "vm") {
                         const historyArr = getHistoryChangesForField(group.invalid_field);
-                        const historyCpu = historyArr?.find(c => c.field?.toLowerCase() === "cpu(s)");
+                        const historyCpu = historyArr?.find(
+                          (c) => c.field?.toLowerCase() === "cpu(s)"
+                        );
                         if (historyCpu?.to !== undefined) {
-                          // Match the key casing used in suggestions (often lowercase in suggestions JSON)
-                          const cpuKey = Object.keys(mergedSugg).find(k => k.toLowerCase() === "cpu(s)") || "cpu(s)";
+                          const cpuKey =
+                            Object.keys(mergedSugg).find(
+                              (k) => k.toLowerCase() === "cpu(s)"
+                            ) || "cpu(s)";
                           mergedSugg[cpuKey] = historyCpu.to;
                         }
                       }
@@ -552,7 +577,7 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                           key={si}
                           suggestion={mergedSugg}
                           isSelected={isSelected}
-                          theme={activeTheme}
+                          theme={rowTheme}
                           onSelect={() => handleSelect(groupIdx, si)}
                           onEditField={(key, newVal) => handleEditField(groupIdx, key, newVal)}
                           sutType={sutType}
@@ -570,49 +595,55 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                 </Stack>
 
                 {/* ── Draft Record (populated when status is ON HOLD) ── */}
-                {group.draft_records && (() => {
-                  const draftSugg = { ...group.draft_records };
-                  if (sutType?.toLowerCase() === "vm") {
-                    const historyArr = getHistoryChangesForField(group.invalid_field);
-                    const historyCpu = historyArr?.find(c => c.field?.toLowerCase() === "cpu(s)");
-                    if (historyCpu?.to !== undefined) {
-                      const cpuKey = Object.keys(draftSugg).find(k => k.toLowerCase() === "cpu(s)") || "cpu(s)";
-                      draftSugg[cpuKey] = historyCpu.to;
+                {group.draft_records &&
+                  (() => {
+                    const draftSugg = { ...group.draft_records };
+                    if (sutType?.toLowerCase() === "vm") {
+                      const historyArr = getHistoryChangesForField(group.invalid_field);
+                      const historyCpu = historyArr?.find(
+                        (c) => c.field?.toLowerCase() === "cpu(s)"
+                      );
+                      if (historyCpu?.to !== undefined) {
+                        const cpuKey =
+                          Object.keys(draftSugg).find((k) => k.toLowerCase() === "cpu(s)") ||
+                          "cpu(s)";
+                        draftSugg[cpuKey] = historyCpu.to;
+                      }
                     }
-                  }
 
-                  return (
-                    <>
-                      <Typography
-                        sx={{
-                          fontSize: 10,
-                          fontWeight: 700,
-                          color: "#303030",
-                          textTransform: "uppercase",
-                          letterSpacing: 0.5,
-                          mt: 2,
-                          ml: 1.5,
-                        }}
-                      >
-                        Draft Record
-                      </Typography>
-                      <Box sx={{ mt: 1, px: 1.5 }}>
-                        <SuggestionRow
-                          suggestion={draftSugg}
-                          isSelected={fieldStatus === STATUS.ON_HOLD}
-                          theme={ON_HOLD_THEME}
-                          onSelect={() => { }}
-                          onEditField={() => { }}
-                          sutType={sutType}
-                          isPending={false}
-                          showRadio={false}
-                        />
-                      </Box>
-                    </>
-                  );
-                })()}
+                    return (
+                      <>
+                        <Typography
+                          sx={{
+                            fontSize: 10,
+                            fontWeight: 700,
+                            color: "#303030",
+                            textTransform: "uppercase",
+                            letterSpacing: 0.5,
+                            mt: 2,
+                            ml: 1.5,
+                          }}
+                        >
+                          Draft Record
+                        </Typography>
+                        <Box sx={{ mt: 1, px: 1.5 }}>
+                          <SuggestionRow
+                            suggestion={draftSugg}
+                            isSelected={fieldStatus === STATUS.ON_HOLD}
+                            theme={ON_HOLD_THEME}
+                            onSelect={() => {}}
+                            onEditField={() => {}}
+                            sutType={sutType}
+                            isPending={false}
+                            showRadio={false}
+                          />
+                        </Box>
+                      </>
+                    );
+                  })()}
 
-                {selectedIdx === "custom" && (
+                {/* ── "Custom Value" label — shown when a custom row is selected ── */}
+                {isCustomSelected(selectedIdx) && (
                   <Typography
                     sx={{
                       fontSize: 10,
@@ -628,54 +659,74 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                   </Typography>
                 )}
 
+                {/* ── Dropdown ── */}
                 <ChooseOtherValueDropdown
                   invalidField={group.invalid_field}
-                  isSelected={selectedIdx === "custom"}
-                  onSelectCustom={() => handleSelectCustom(groupIdx)}
+                  isSelected={isCustomSelected(selectedIdx)}
+                  onSelectCustom={() => {}} // no-op — selection happens via row click
                   onClearCustom={() => handleClearCustom(groupIdx)}
-                  onCustomMetadataFetch={(meta) => handleCustomMetadataFetch(groupIdx, meta)}
+                  onCustomMetadataFetch={(metaArray) =>
+                    handleCustomMetadataFetch(groupIdx, metaArray)
+                  }
                   isPending={isPending}
                   theme={activeTheme}
                 />
 
-                {customSuggestions[groupIdx] &&
-                  Object.keys(customSuggestions[groupIdx]).length > 0 &&
+                {/* ── Custom suggestion rows (one per metadata_record) ── */}
+                {customSuggestions[groupIdx]?.length > 0 &&
                   (() => {
-                    const isSelected = selectedIdx === "custom";
                     const gStatus = group.currentStatus;
-                    const isAccepted = gStatus === STATUS.ACCEPTED || gStatus === STATUS.APPROVED;
-                    const activeTheme = isAccepted ? ACCEPTED : SELECTED;
-
-                    const baseSugg = customSuggestions[groupIdx];
-                    const editedSugg = isSelected ? editedSuggestions[groupIdx] || {} : {};
-                    const mergedSugg = { ...baseSugg, ...editedSugg };
-
-                    // UI Override: Always show History CPU(s) value if it exists for VM
-                    if (isSelected && sutType?.toLowerCase() === "vm") {
-                      const historyArr = getHistoryChangesForField(group.invalid_field);
-                      const historyCpu = historyArr?.find(c => c.field?.toLowerCase() === "cpu(s)");
-                      if (historyCpu?.to !== undefined) {
-                        const cpuKey = Object.keys(mergedSugg).find(k => k.toLowerCase() === "cpu(s)") || "cpu(s)";
-                        mergedSugg[cpuKey] = historyCpu.to;
-                      }
-                    }
+                    const isAcceptedGroup =
+                      gStatus === STATUS.ACCEPTED || gStatus === STATUS.APPROVED;
+                    const rowTheme = isAcceptedGroup ? ACCEPTED : SELECTED;
 
                     return (
                       <Box sx={{ mt: 1, px: 1.5 }}>
-                        <SuggestionRow
-                          suggestion={mergedSugg}
-                          isSelected={isSelected}
-                          theme={activeTheme}
-                          onSelect={() => handleSelectCustom(groupIdx)}
-                          onEditField={(key, newVal) => handleEditField(groupIdx, key, newVal)}
-                          sutType={sutType}
-                          isPending={isPending}
-                        />
+                        <Stack gap={0.5}>
+                          {customSuggestions[groupIdx].map((baseSugg, ci) => {
+                            const key = `custom_${ci}`;
+                            const isSelected = selectedIdx === key;
+                            const editedSugg = isSelected
+                              ? editedSuggestions[groupIdx] || {}
+                              : {};
+                            const mergedSugg = { ...baseSugg, ...editedSugg };
+
+                            // UI Override: Always show History CPU(s) value if it exists for VM
+                            if (isSelected && sutType?.toLowerCase() === "vm") {
+                              const historyArr = getHistoryChangesForField(group.invalid_field);
+                              const historyCpu = historyArr?.find(
+                                (c) => c.field?.toLowerCase() === "cpu(s)"
+                              );
+                              if (historyCpu?.to !== undefined) {
+                                const cpuKey =
+                                  Object.keys(mergedSugg).find(
+                                    (k) => k.toLowerCase() === "cpu(s)"
+                                  ) || "cpu(s)";
+                                mergedSugg[cpuKey] = historyCpu.to;
+                              }
+                            }
+
+                            return (
+                              <SuggestionRow
+                                key={ci}
+                                suggestion={mergedSugg}
+                                isSelected={isSelected}
+                                theme={rowTheme}
+                                onSelect={() => handleSelectCustom(groupIdx, ci)}
+                                onEditField={(k, newVal) =>
+                                  handleEditField(groupIdx, k, newVal)
+                                }
+                                sutType={sutType}
+                                isPending={isPending}
+                              />
+                            );
+                          })}
+                        </Stack>
                       </Box>
                     );
                   })()}
 
-                {/* ── Action Buttons (Accept / Submit Draft / Send to L0) ── */}
+                {/* ── Action Buttons ── */}
                 {isPending && (
                   <Stack
                     direction="row"
@@ -689,7 +740,6 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                       backgroundColor: "#fafafa",
                     }}
                   >
-                    {/* Accept — enabled only when a suggestion is selected */}
                     <Button
                       variant="contained"
                       size="small"
@@ -702,13 +752,12 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                         backgroundColor: "#000000",
                         color: "#ffffff",
                         "&:hover": { backgroundColor: "#333333" },
-                        "&.Mui-disabled": { backgroundColor: "#efefef", color: "#888888" }
+                        "&.Mui-disabled": { backgroundColor: "#efefef", color: "#888888" },
                       }}
                     >
                       Accept
                     </Button>
 
-                    {/* Submit Draft Record — disabled when a suggestion IS selected (same logic as old Reject All) */}
                     <Button
                       variant="contained"
                       size="small"
@@ -721,13 +770,12 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                         backgroundColor: "#000000",
                         color: "#ffffff",
                         "&:hover": { backgroundColor: "#333333" },
-                        "&.Mui-disabled": { backgroundColor: "#efefef", color: "#888888" }
+                        "&.Mui-disabled": { backgroundColor: "#efefef", color: "#888888" },
                       }}
                     >
                       Submit Draft Record
                     </Button>
 
-                    {/* Send to L0 — disabled when a suggestion IS selected (same logic as old Reject All) */}
                     <Button
                       variant="contained"
                       size="small"
@@ -740,7 +788,7 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                         backgroundColor: "#000000",
                         color: "#ffffff",
                         "&:hover": { backgroundColor: "#333333" },
-                        "&.Mui-disabled": { backgroundColor: "#efefef", color: "#888888" }
+                        "&.Mui-disabled": { backgroundColor: "#efefef", color: "#888888" },
                       }}
                     >
                       Send to L0

@@ -19,7 +19,7 @@ const ChooseOtherValueDropdown = ({
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(null);
 
-  if (!isPending) return;
+  if (!isPending) return null;
 
   const handleOpen = () => {
     if (!isPending) return;
@@ -30,27 +30,40 @@ const ChooseOtherValueDropdown = ({
   const handleChange = async (newVal) => {
     if (!isPending) return;
     setValue(newVal);
+
     if (!newVal) {
       if (onClearCustom) onClearCustom();
       return;
     }
 
-    onSelectCustom();
+    // ── No auto-select on dropdown pick ──
+    // User must click a suggestion row to select it.
+
     setFetchingMeta(true);
     try {
-      const res = await fetch(`${API_URL}/metadata-values/${encodeURIComponent(primaryField)}/${encodeURIComponent(newVal)}`);
+      const res = await fetch(
+        `${API_URL}/metadata-values/${encodeURIComponent(primaryField)}/${encodeURIComponent(newVal)}`
+      );
       const json = await res.json();
 
-      let meta = json;
-      if (json?.metadata_records && Array.isArray(json.metadata_records) && json.metadata_records.length > 0) {
-        meta = json.metadata_records[0].metadata || json.metadata_records[0];
-      } else if (json?.data) {
-        meta = json.data;
-      } else if (json?.metadata) {
-        meta = json.metadata;
+      let allRecords;
+      if (
+        json?.metadata_records &&
+        Array.isArray(json.metadata_records) &&
+        json.metadata_records.length > 0
+      ) {
+        // Pass ALL records; ignore metadata_mappings, only use metadata
+        allRecords = json.metadata_records.map((record) => ({
+          [primaryField]: newVal,
+          ...(record.metadata || record),
+        }));
+      } else {
+        // Fallback for other response shapes
+        const meta = json?.data || json?.metadata || json;
+        allRecords = [{ [primaryField]: newVal, ...meta }];
       }
 
-      onCustomMetadataFetch({ [primaryField]: newVal, ...meta });
+      onCustomMetadataFetch(allRecords); // always an array now
     } catch (err) {
       console.error("metadata-values fetch error:", err);
     } finally {
@@ -75,8 +88,6 @@ const ChooseOtherValueDropdown = ({
         pointerEvents: isPending ? "auto" : "none",
       }}
     >
-      {/* Main Content */}
-
       <Box sx={{ flex: 1, px: 1.5, py: 0.5 }}>
         <Typography sx={{ fontSize: 11, fontWeight: 600, color: "#303030", mb: 0.5 }}>
           Choose other {invalidField}:
@@ -106,7 +117,9 @@ const ChooseOtherValueDropdown = ({
                   ...params.InputProps,
                   endAdornment: (
                     <React.Fragment>
-                      {loading || fetchingMeta ? <CircularProgress color="inherit" size={16} /> : null}
+                      {loading || fetchingMeta ? (
+                        <CircularProgress color="inherit" size={16} />
+                      ) : null}
                       {params.InputProps.endAdornment}
                     </React.Fragment>
                   ),

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { API_URL } from "../config";
 import { STATUS } from "../utils/correctionsTableConstants";
- 
+
 export const useCorrectionsTable = (data, history, execID, sutType, fetchData, showNotification) => {
   const [selectedSuggestions, setSelectedSuggestions] = useState({});
   const [editedSuggestions, setEditedSuggestions] = useState({});
@@ -30,34 +30,15 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
   const [submittingL0, setSubmittingL0] = useState(false);
 
   // ── History lookup helpers ─────────────────────────────────────
-  // Structure:
-  //   history.changes = [
-  //     {
-  //       field: "instanceType",
-  //       changes: [
-  //         { field: "CPUModel", from: "AMD Genoa", to: "7713" },
-  //         { field: "instanceType", from: "c3d-standard-16", to: "Standard_Dadsv5.256" },
-  //       ]
-  //     }, ...
-  //   ]
-
-  /**
-   * Find the history entry matching primaryField and return its changes array.
-   */
   const getHistoryChangesForField = useCallback((primaryField) => {
-    // Handle both { changes: [...] } and simply [...]
     const changesArr = Array.isArray(history) ? history : history?.changes;
     if (!Array.isArray(changesArr)) return null;
-    
+
     const entry = changesArr.find((e) => e.field?.toLowerCase() === primaryField?.toLowerCase());
     if (!entry?.changes?.length) return null;
     return entry.changes;
   }, [history]);
 
-  /**
-   * Convert a changes array into a display object { field: to }.
-   * Shows everything as-is, no filtering.
-   */
   const buildDisplayObjectFromChanges = useCallback((changesArr) => {
     if (!changesArr?.length) return null;
     return Object.fromEntries(changesArr.map((c) => [c.field, c.to]));
@@ -86,13 +67,13 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
         return;
       }
 
-      // 2. Second choice: History changes as custom selection
+      // 2. Second choice: History changes as custom selection (array with single record)
       const changesArr = getHistoryChangesForField(primaryField);
       if (changesArr) {
         const displayObj = buildDisplayObjectFromChanges(changesArr);
         if (displayObj && Object.keys(displayObj).length > 0) {
-          initialSelections[groupIdx] = "custom";
-          initialCustom[groupIdx] = displayObj;
+          initialSelections[groupIdx] = "custom_0";   // use new key format
+          initialCustom[groupIdx] = [displayObj];      // store as array
           return;
         }
       }
@@ -102,7 +83,7 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
     if (Object.keys(initialCustom).length > 0) setCustomSuggestions(initialCustom);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, history]);
- 
+
   const handleSelect = useCallback((groupIdx, suggIdx) => {
     setSelectedSuggestions((prev) => {
       if (prev[groupIdx] === suggIdx) {
@@ -118,14 +99,16 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
       return next;
     });
   }, []);
- 
-  const handleSelectCustom = useCallback((groupIdx) => {
+
+  // recordIdx is the index within customSuggestions[groupIdx] array
+  const handleSelectCustom = useCallback((groupIdx, recordIdx) => {
     setSelectedSuggestions((prev) => {
       const next = { ...prev };
-      if (next[groupIdx] === "custom") {
+      const key = `custom_${recordIdx}`;
+      if (next[groupIdx] === key) {
         delete next[groupIdx];
       } else {
-        next[groupIdx] = "custom";
+        next[groupIdx] = key;
       }
       return next;
     });
@@ -135,11 +118,13 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
       return next;
     });
   }, []);
- 
+
   const handleClearCustom = useCallback((groupIdx) => {
     setSelectedSuggestions((prev) => {
       const next = { ...prev };
-      if (next[groupIdx] === "custom") delete next[groupIdx];
+      if (typeof next[groupIdx] === "string" && next[groupIdx].startsWith("custom_")) {
+        delete next[groupIdx];
+      }
       return next;
     });
     setCustomSuggestions((prev) => {
@@ -148,11 +133,12 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
       return next;
     });
   }, []);
- 
-  const handleCustomMetadataFetch = useCallback((groupIdx, meta) => {
-    setCustomSuggestions((prev) => ({ ...prev, [groupIdx]: meta }));
+
+  // metaArray is now always an array of record objects
+  const handleCustomMetadataFetch = useCallback((groupIdx, metaArray) => {
+    setCustomSuggestions((prev) => ({ ...prev, [groupIdx]: metaArray }));
   }, []);
- 
+
   const handleEditField = useCallback((groupIdx, key, newValue) => {
     setEditedSuggestions((prev) => ({
       ...prev,
@@ -171,41 +157,53 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
     const suggIdx = selectedSuggestions[groupIdx];
     if (suggIdx === undefined) return;
 
-    const baseChosen =
-      suggIdx === "custom"
-        ? customSuggestions[groupIdx] || {}
-        : group.suggestions[suggIdx];
+    // Resolve the base suggestion — handles both normal and custom_N keys
+    const baseChosen = (() => {
+      if (typeof suggIdx === "string" && suggIdx.startsWith("custom_")) {
+        const recordIdx = parseInt(suggIdx.split("_")[1], 10);
+        return (customSuggestions[groupIdx] ?? [])[recordIdx] || {};
+      }
+      return group.suggestions[suggIdx];
+    })();
 
     const customEdits = editedSuggestions[groupIdx] || {};
     const merged = { ...baseChosen, ...customEdits };
     const primaryField = group.invalid_field;
     const value = merged?.[primaryField] || merged?.[primaryField?.toLowerCase()];
- 
+
     if (!value) return;
- 
+
+    // ── Build metadata object from all fields in merged, excluding internals ──
+    const internalKeys = [
+      "_id", "execution_id", "snapshot_id", "search_key",
+      "score", "status",
+      // also exclude the top-level payload fields to avoid duplication
+      primaryField, primaryField?.toLowerCase(),
+    ];
+    const metadata = Object.fromEntries(
+      Object.entries(merged).filter(
+        ([k]) => !internalKeys.includes(k) && !internalKeys.includes(k.toLowerCase())
+      )
+    );
+
     const payload = {
       execution_id: execID,
       field_name: primaryField,
       accepted_value: value,
       currentStatus: STATUS.ACCEPTED,
+      metadata,
     };
- 
-    if (sutType?.toLowerCase() === "vm") {
-      // Prioritize CPU(s) from history
-      const historyChanges = getHistoryChangesForField(primaryField);
-      const historyCpu = historyChanges?.find((c) => c.field?.toLowerCase() === "cpu(s)");
-      
-      let cpusVal = historyCpu?.to;
-      
-      // Fallback to merged suggestion/custom value if not in history
-      if (cpusVal === undefined) {
-        cpusVal = merged?.["cpu(s)"] || merged?.["CPU(s)"] || merged?.["CPU(S)"];
-      }
 
-      if (cpusVal !== undefined) {
-        // CPU(s) is an integer field, cast to number
-        payload["CPU(s)"] = isNaN(Number(cpusVal)) ? cpusVal : Number(cpusVal);
-      }
+    // ── CPU(s) — always inside metadata only; edited value takes priority ──
+    const cpusVal =
+      customEdits?.["CPU(s)"] ??
+      customEdits?.["cpu(s)"] ??
+      merged?.["CPU(s)"] ??
+      merged?.["cpu(s)"] ??
+      merged?.["CPU(S)"];
+
+    if (cpusVal !== undefined) {
+      payload.metadata["CPU(s)"] = isNaN(Number(cpusVal)) ? cpusVal : Number(cpusVal);
     }
 
     try {
@@ -226,7 +224,7 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
         delete next[groupIdx];
         return next;
       });
-      console.log(payload)
+      console.log(payload);
       setAcceptConfirm(null);
       fetchData();
       showNotification("Data accepted successfully", "success");
@@ -269,8 +267,7 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
     async (group, groupIdx) => {
       setDraftDialog({ group, groupIdx });
       setLoadingDraftFields(true);
-      
-      // Pre-fill from history
+
       const historyArr = getHistoryChangesForField(group.invalid_field);
       const historyObj = buildDisplayObjectFromChanges(historyArr) || {};
       setDraftInitialValues(historyObj);
@@ -291,17 +288,14 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
     [getHistoryChangesForField, buildDisplayObjectFromChanges]
   );
 
-
-
   const handleDraftSubmit = useCallback(async (formValues) => {
     const { group } = draftDialog;
 
-    // ── Validate integer fields before submitting ──────────────────
     const integerErrors = [];
     for (const field of draftFields) {
       if (field.datatype === "integer") {
         const val = formValues[field.fieldname];
-        if (val === undefined || val === "") continue; // let allFilled handle blank
+        if (val === undefined || val === "") continue;
         if (!Number.isInteger(Number(val)) || isNaN(Number(val)) || String(val).includes(".") || Number(val) < 0) {
           integerErrors.push(field.fieldname);
         }
@@ -315,7 +309,6 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
       return;
     }
 
-    // ── Build typed payload ────────────────────────────────────────
     const typedValues = {};
     for (const field of draftFields) {
       const raw = formValues[field.fieldname];
