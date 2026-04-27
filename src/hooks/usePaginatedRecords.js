@@ -124,6 +124,7 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
     const activeStages = extraParams?.stage || "";
     const activeStagesList = activeStages ? activeStages.split(",").map(s => s.trim().toLowerCase()) : [];
     const hasStageFilters = activeStagesList.length > 0;
+    const hasActionRequired = activeStagesList.includes("action required");
 
     let anyDismissed = false;
 
@@ -140,8 +141,11 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
             anyDismissed = true;
           }
 
-          // Special case: always dismiss 'standardization completed' if ANY stage filter is active
-          if (normalizedStage === "standardization completed" && hasStageFilters) {
+          // Special case: dismiss 'standardization completed' if stage filters are active,
+          // BUT keep them if 'action required' is one of the active filters —
+          // standardization completed is a precursor to action required, so those records
+          // should remain visible until they fully transition.
+          if (normalizedStage === "standardization completed" && hasStageFilters && !hasActionRequired) {
             merged.isDismissing = true;
             anyDismissed = true;
           }

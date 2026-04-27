@@ -1,15 +1,13 @@
 import { useEffect, useRef, useCallback } from "react";
 import { API_URL } from "../config";
 
-const POLL_MS = 1000;
+const POLL_MS = 2000;
 const BATCH_URL = `${API_URL}/invalid-summary/batch`;
 
 export function useProgressPolling({ visibleIds, patchRecords, removeRecords, isReady, extraParams }) {
   const visibleIdsRef = useRef([]);
-  const pollAbortRef = useRef(null);
+  const isFetchingRef = useRef(false); 
 
-  // Keep ref in sync so the interval always sees latest IDs
-  // without needing to re-register itself on every scroll
   useEffect(() => {
     visibleIdsRef.current = visibleIds;
   }, [visibleIds]);
@@ -19,29 +17,27 @@ export function useProgressPolling({ visibleIds, patchRecords, removeRecords, is
 
     if (!isReady || ids.length === 0) return;
 
-    if (pollAbortRef.current) pollAbortRef.current.abort();
-    const controller = new AbortController();
-    pollAbortRef.current = controller;
+    if (isFetchingRef.current) return;
+
+    isFetchingRef.current = true;
 
     try {
       const payload = { 
         execution_ids: ids,
         ...extraParams
       };
+
       console.log("[Batch Polling] POST Payload:", payload);
-      
+
       const res = await fetch(BATCH_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
-        signal: controller.signal,
       });
 
       if (!res.ok) return;
 
       const data = await res.json();
-
-      if (controller.signal.aborted) return;
 
       const updates = Array.isArray(data?.data) ? data.data : [];
 
@@ -52,9 +48,9 @@ export function useProgressPolling({ visibleIds, patchRecords, removeRecords, is
         removeRecords(ids);
       }
     } catch (err) {
-      if (err.name !== "AbortError") {
-        console.error("useProgressPolling:", err);
-      }
+      console.error("useProgressPolling:", err);
+    } finally {
+      isFetchingRef.current = false;
     }
   }, [isReady, patchRecords, removeRecords, extraParams]);
 
@@ -62,9 +58,9 @@ export function useProgressPolling({ visibleIds, patchRecords, removeRecords, is
     if (!isReady) return;
 
     const id = setInterval(poll, POLL_MS);
+
     return () => {
       clearInterval(id);
-      if (pollAbortRef.current) pollAbortRef.current.abort();
     };
   }, [poll, isReady]);
 }
