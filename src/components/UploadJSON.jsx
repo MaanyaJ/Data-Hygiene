@@ -181,6 +181,7 @@ const UploadJSON = () => {
             onDragLeave={() => setDragOver(false)}
             onDrop={handleDrop}
             sx={{
+              maxWidth: "50vw",
               border: `1.5px dashed ${loading ? "#e0e0e0" : dragOver ? "#555" : selectedFile ? "#4caf50" : "#ccc"}`,
               borderRadius: "10px",
               p: 3.5,
@@ -214,7 +215,7 @@ const UploadJSON = () => {
                     fontSize: "0.82rem",
                     fontWeight: 600,
                     color: loading ? "#aaa" : "#2e7d32",
-                    maxWidth: "100%",
+                    maxWidth: "70vw",
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                     whiteSpace: "nowrap",

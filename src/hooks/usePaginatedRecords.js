@@ -25,6 +25,10 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
   const abortRef = useRef(null);
   const fetchIdRef = useRef(0);
 
+  // Buffer for WS updates that arrive before the record is loaded via pagination.
+  // Map<ExecutionId, record> — applied when new records arrive, cleared on refresh.
+  const wsBufferRef = useRef({});
+
   const extraParamsKey = JSON.stringify(extraParams);
 
   // ── Abort on unmount ──────────────────────────────────────────────────────
@@ -40,6 +44,21 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
     return () => clearTimeout(t);
   }, [searchInput]);
 
+  // ── Apply buffered WS updates to a batch of records ───────────────────────
+  const applyBuffer = (incoming) => {
+    const buf = wsBufferRef.current;
+    if (Object.keys(buf).length === 0) return incoming;
+
+    return incoming.map((record) => {
+      const buffered = buf[record.ExecutionId];
+      if (buffered) {
+        delete buf[record.ExecutionId]; // consumed
+        return { ...record, ...buffered };
+      }
+      return record;
+    });
+  };
+
   // ── Core fetch ────────────────────────────────────────────────────────────
   const fetchRecords = useCallback(
     async (pageNum, isNew = false) => {
@@ -54,6 +73,7 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
         setTotalRecords(0);
         setTotalPages(0);
         setMeta({});
+        wsBufferRef.current = {}; // clear buffer on fresh fetch
         // ← intentionally NOT resetting isReadyState here
         //   socket stays connected through refreshes and uploads
       }
@@ -82,9 +102,12 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
         const incoming = Array.isArray(data?.data) ? data.data : [];
         const total = data?.total_invalid_records ?? incoming.length;
 
+        // Apply any buffered WS updates to the incoming records
+        const merged = applyBuffer(incoming);
+
         setTotalPages(Math.ceil(total / PAGE_SIZE));
         setTotalRecords(total);
-        setRecords((prev) => (isNew ? incoming : [...prev, ...incoming]));
+        setRecords((prev) => (isNew ? merged : [...prev, ...merged]));
 
         const { data: _d, total_invalid_records: _t, ...rest } = data;
         setMeta(rest);
@@ -108,24 +131,31 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
   );
 
   // ── Patch specific records in-place by ExecutionId ────────────────────────
+  // If a record isn't in the list yet, buffer it for when it loads.
   const patchRecords = useCallback((updates) => {
     const updateMap = Object.fromEntries(
       updates.map((u) => [u.ExecutionId, u])
     );
-    setRecords((prev) =>
-      prev.map((record) =>
-        updateMap[record.ExecutionId]
-          ? { ...record, ...updateMap[record.ExecutionId] }
-          : record
-      )
-    );
-  }, []);
 
-  // ── Remove records that no longer match active filters ────────────────────
-  const removeRecords = useCallback((executionIds) => {
-    const idSet = new Set(executionIds);
-    setRecords((prev) => prev.filter((r) => !idSet.has(r.ExecutionId)));
-    setTotalRecords((prev) => Math.max(0, prev - executionIds.length));
+    setRecords((prev) => {
+      const foundIds = new Set();
+      const next = prev.map((record) => {
+        if (updateMap[record.ExecutionId]) {
+          foundIds.add(record.ExecutionId);
+          return { ...record, ...updateMap[record.ExecutionId] };
+        }
+        return record;
+      });
+
+      // Buffer any updates for records not yet loaded
+      for (const update of updates) {
+        if (!foundIds.has(update.ExecutionId)) {
+          wsBufferRef.current[update.ExecutionId] = update;
+        }
+      }
+
+      return next;
+    });
   }, []);
 
   // ── Reset + refetch when search or extraParams change ────────────────────
@@ -168,7 +198,6 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
     refresh,
     meta,
     patchRecords,
-    removeRecords,
     isReadyState,  // ← boolean, triggers socket effect exactly once
   };
-}
+}

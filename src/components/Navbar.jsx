@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { AppBar, Toolbar, Typography, Box, Menu, MenuItem } from "@mui/material";
+import { AppBar, Toolbar, Typography, Box, Menu, MenuItem, Button } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import UploadJSON from "./UploadJSON";
+import UploadFileIcon from "@mui/icons-material/UploadFile";
 
 const NAV_LINKS = [
   { label: "Dashboard", path: "/" },
@@ -243,8 +243,32 @@ const Navbar = () => {
           </Menu>
         </Box>
 
-        {/* Right: Upload */}
-        <UploadJSON />
+        {/* Right: Upload button */}
+        <Button
+          onClick={() => navigate("/upload")}
+          startIcon={<UploadFileIcon sx={{ fontSize: "0.9rem !important" }} />}
+          sx={{
+            fontFamily: "'Inter', sans-serif",
+            fontWeight: 600,
+            fontSize: "0.75rem",
+            textTransform: "none",
+            letterSpacing: 0.3,
+            color: "#1a1a1a",
+            backgroundColor: "#f0f0f0",
+            border: "1px solid #d8d8d8",
+            px: 1.8,
+            py: 0.5,
+            minHeight: "30px",
+            borderRadius: "2px",
+            boxShadow: "none",
+            "&:hover": {
+              backgroundColor: "#e4e4e4",
+              boxShadow: "none",
+            },
+          }}
+        >
+          Upload
+        </Button>
       </Toolbar>
     </AppBar>
   );

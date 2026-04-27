@@ -21,7 +21,6 @@ const ListHeader = ({
   counts = {},
   showAgeFilters = false,
   showStatusFilters = false,
-  showStageFilters = false,
   allowedFilters,
   loading,
   totalRecords,
@@ -42,21 +41,11 @@ const ListHeader = ({
     { label: "ON HOLD", value: "On Hold" },
   ];
 
-  const STAGE_FILTERS = [
-    { label: "VALIDATION IN-PROGRESS", value: "validation_inprogress" },
-    { label: "STANDARDIZATION IN-PROGRESS", value: "standardization_inprogress" },
-  ];
-
-  let baseFilters = showAgeFilters
+  const baseFilters = showAgeFilters
     ? AGE_FILTERS
     : showStatusFilters
       ? STATUS_FILTERS
       : [];
-
-  // Add stage filters to the same list if requested
-  if (showStatusFilters && showStageFilters) {
-    baseFilters = [...baseFilters, ...STAGE_FILTERS];
-  }
 
   const visibleFilters = baseFilters.filter(
     (f) => !f.value || !allowedFilters || allowedFilters.includes(f.value)
@@ -160,7 +149,7 @@ const ListHeader = ({
             }}
           >
             <Typography sx={{ fontSize: 12, fontWeight: 600, color: "#111", letterSpacing: 0.5 }}>
-              {showAgeFilters ? "FILTER BY AGE" : "FILTER BY STATUS"}
+              {showAgeFilters ? "AGE" : "STATUS"}
               {filter.length > 0 && (
                 <Box component="span" sx={{ color: "#777", ml: 0.5, fontWeight: 400 }}>
                   ({filter.length})
@@ -189,57 +178,49 @@ const ListHeader = ({
             }}
           >
             <Stack sx={{ p: 1 }} gap={0.5}>
-              {visibleFilters.map((f, idx) => {
+              {visibleFilters.map((f) => {
                 const isActive = f.value === "" ? filter.length === 0 : filter.includes(f.value);
-                const isStage = f.value.includes("validation") || f.value.includes("standardization");
-                
-                // Add a small divider before stage filters for clarity
-                const showDivider = isStage && idx > 0 && !visibleFilters[idx-1].value.includes("validation") && !visibleFilters[idx-1].value.includes("standardization");
 
                 return (
-                  <React.Fragment key={f.value || "all"}>
-                    {showDivider && <Box sx={{ height: "1px", backgroundColor: "#eee", my: 0.5, mx: 1 }} />}
-                    <Box
-                      onClick={() => handleFilterClick(f.value)}
+                  <Box
+                    key={f.value || "all"}
+                    onClick={() => handleFilterClick(f.value)}
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      px: 1,
+                      py: 1,
+                      cursor: "pointer",
+                      borderRadius: "2px",
+                      "&:hover": { backgroundColor: "#f5f5f5" },
+                    }}
+                  >
+                    <Checkbox
+                      checked={isActive}
+                      size="small"
                       sx={{
+                        p: 0,
+                        color: "#999",
+                        "&.Mui-checked": { color: "#000" },
+                      }}
+                    />
+                    <Typography
+                      sx={{
+                        fontSize: 12,
+                        fontWeight: 550,
+                        color: "#111",
                         display: "flex",
                         alignItems: "center",
-                        gap: 1,
-                        px: 1,
-                        py: 1,
-                        cursor: "pointer",
-                        borderRadius: "2px",
-                        "&:hover": { backgroundColor: "#f5f5f5" },
+                        gap: 0.5,
                       }}
                     >
-                      <Checkbox
-                        checked={isActive}
-                        size="small"
-                        sx={{
-                          p: 0,
-                          color: "#999",
-                          "&.Mui-checked": { color: "#000" },
-                        }}
-                      />
-                      <Typography
-                        sx={{
-                          fontSize: 12,
-                          fontWeight: 550,
-                          color: "#111",
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 0.5,
-                        }}
-                      >
-                        {f.label}
-                        {!isStage && (
-                          <Box component="span" sx={{ fontSize: 11, fontWeight: 400, color: "#888" }}>
-                            ({loading ? "0" : getCount(f.value)?.toLocaleString() || "0"})
-                          </Box>
-                        )}
-                      </Typography>
-                    </Box>
-                  </React.Fragment>
+                      {f.label}
+                      <Box component="span" sx={{ fontSize: 11, fontWeight: 400, color: "#888" }}>
+                        ({loading ? "0" : getCount(f.value)?.toLocaleString() || "0"})
+                      </Box>
+                    </Typography>
+                  </Box>
                 );
               })}
             </Stack>

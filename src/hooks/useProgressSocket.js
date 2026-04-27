@@ -1,94 +1,77 @@
-import { useEffect, useRef } from "react";
-import { API_URL } from "../config";
+import { useEffect } from "react";
 
-const WS_URL = "ws://192.168.0.133:8000/ws"
+const WS_URL = "ws://192.168.0.158:8000/ws";
 
-const ALWAYS_HIDDEN_STAGES = new Set([
-  "validation failed",
-  "standardization failed",
-]);
-
-const FILTER_CONDITIONS = {
-  "validation inprogress":      (r) => r.Stage === "validation inprogress",
-  "validation completed":       (r) => r.Stage === "validation completed",
-  "standardization inprogress": (r) => r.Stage === "standardization inprogress",
-  "pending":  (r) => r.Stage === "standardization completed" && r.Status === "PENDING",
-  "accepted": (r) => r.Stage === "standardization completed" && r.Status === "ACCEPTED",
-  "on hold":  (r) => r.Stage === "standardization completed" && r.Status === "ON HOLD",
-  "l0 data":  (r) => r.Stage === "standardization completed" && r.Status === "L0 DATA",
-};
-
-// Expand comma-separated filter strings into individual normalized keys
-// "validation_inprogress,validation_completed" → ["validation inprogress", "validation completed"]
-const expandFilters = (activeFilters) => {
-  return activeFilters
-    .flatMap((f) => f.split(","))
-    .map((f) => f.trim().replace(/_/g, " ").toLowerCase());
-};
-
-const matchesActiveFilters = (record, activeFilters) => {
-  // Failed records never shown regardless of filters
-  if (ALWAYS_HIDDEN_STAGES.has(record.Stage)) return false;
-  // No filters → show everything non-failed
-  if (!activeFilters || activeFilters.length === 0) return true;
-  // Expand and apply OR logic
-  const expanded = expandFilters(activeFilters);
-  return expanded.some((f) => FILTER_CONDITIONS[f]?.(record));
-};
-
-export function useProgressSocket({
-  patchRecords,
-  removeRecords,
-  isReady,      // plain boolean — true after first fetch, never resets
-  activeFilters,
-}) {
-  const activeFiltersRef = useRef(activeFilters);
-
-  // Keep ref in sync so message handler always sees latest filters
-  // without needing to re-open the socket on every filter change
-  useEffect(() => {
-    activeFiltersRef.current = activeFilters;
-  }, [activeFilters]);
-
+export function useProgressSocket({ patchRecords, isReady }) {
   useEffect(() => {
     if (!isReady) return;
 
-    const ws = new WebSocket(WS_URL);
+    let ws = null;
+    let reconnectTimer = null;
+    let retryCount = 0;
+    let disposed = false;
 
-    ws.onopen = () => console.log("[WS] Connected");
+    const MAX_RETRY_DELAY = 30_000;
 
-    ws.onmessage = (event) => {
-      try {
-        const message = JSON.parse(event.data);
-        if (message.type !== "PIPELINE_UPDATE") return;
+    function connect() {
+      if (disposed) return;
 
-        // Map backend fields to match RecordCard's expected shape
-        const record = {
-          ExecutionId:       message.execution_id,
-          Stage:             message.stage,
-          Status:            message.status,
-          InvalidFields:     message.invalidFields    ?? [],
-          suggestionsCount:  message.suggestionsCount ?? false,
-          updatedOn:         message.updatedOn,
-          BenchmarkType:     message.benchmarkType,
-          BenchmarkCategory: message.benchmarkCategory,
-        };
+      console.log("[WS] Attempting connection to", WS_URL);
+      ws = new WebSocket(WS_URL);
 
-        if (matchesActiveFilters(record, activeFiltersRef.current)) {
+      ws.onopen = () => {
+        console.log("[WS] ✅ Connected successfully");
+        retryCount = 0;
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const message = JSON.parse(event.data);
+          console.log("[WS] 📩 Message received:", message.type, message);
+
+          if (message.type !== "PIPELINE_UPDATE") return;
+
+          const record = {
+            ExecutionId: message.execution_id,
+            Stage: message.stage,
+            Status: message.status,
+            InvalidFields: message.invalidFields ?? [],
+            suggestionsCount: message.suggestionsCount ?? false,
+            updatedOn: message.updatedOn,
+            BenchmarkType: message.benchmarkType,
+            BenchmarkCategory: message.benchmarkCategory,
+          };
+
+          console.log("[WS] 🔄 Patching record:", record.ExecutionId, "→ Stage:", record.Stage, "Status:", record.Status);
           patchRecords([record]);
-        } else {
-          removeRecords([record.ExecutionId]);
+        } catch (err) {
+          console.error("[WS] ❌ Failed to parse message:", err, "Raw:", event.data);
         }
-      } catch (err) {
-        console.error("[WS] Failed to parse message:", err);
-      }
+      };
+
+      ws.onerror = (err) => console.error("[WS] ❌ Error:", err);
+
+      ws.onclose = (event) => {
+        if (disposed) {
+          console.log("[WS] Closed (cleanup)");
+          return;
+        }
+
+        const delay = Math.min(1000 * 2 ** retryCount, MAX_RETRY_DELAY);
+        retryCount++;
+        console.log(
+          `[WS] ⚠️ Disconnected (code ${event.code}, reason: "${event.reason || "none"}"). Reconnecting in ${delay / 1000}s…`
+        );
+        reconnectTimer = setTimeout(connect, delay);
+      };
+    }
+
+    connect();
+
+    return () => {
+      disposed = true;
+      clearTimeout(reconnectTimer);
+      if (ws) ws.close();
     };
-
-    ws.onerror = (err) => console.error("[WS] Error:", err);
-    ws.onclose = () => console.log("[WS] Disconnected");
-
-    return () => ws.close();
-  }, [isReady, patchRecords, removeRecords]);
-  // isReady only ever goes false→true once, so this effect
-  // opens the socket once and keeps it open for the page lifetime
+  }, [isReady, patchRecords]);
 }
