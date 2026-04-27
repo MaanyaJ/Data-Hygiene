@@ -21,7 +21,6 @@ const RecordList = ({
   onLoadMore,
   patchRecords,
   isReady,
-  extraParams,
 }) => {
   const [visibleIds, setVisibleIds] = useState([]);
 
@@ -34,7 +33,6 @@ const RecordList = ({
     visibleIds,
     patchRecords,
     isReady: isReady.current,
-    extraParams,
   });
 
   // Clear stale IDs when the record list becomes empty (e.g. after a filter change)

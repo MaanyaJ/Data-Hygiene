@@ -18,28 +18,28 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 const getStageInfo = (stage, isValid) => {
   if (!stage) return null;
 
-  // Normalize: lowercase, trim, then collapse any run of spaces/underscores → single underscore
-  const s = stage.toLowerCase().trim().replace(/[\s_]+/g, "_");
+  // Normalize: lowercase, trim, then collapse any run of spaces/underscores → single space
+  const s = stage.toLowerCase().trim().replace(/[\s_]+/g, " ");
 
   console.debug("[RecordCard] Stage raw:", stage, "→ normalized:", s, "isValid:", isValid);
 
-  if (s === "validation_inprogress") {
+  if (s === "validation inprogress") {
     return { pct: 25, label: "Validation in progress…", color: "#f59e0b", isValid: null };
   }
-  if (s === "validation_completed") {
+  if (s === "validation completed") {
     if (isValid === true)
       return { pct: null, label: "This record is valid", color: "#22c55e", isValid: true };
     return { pct: 50, label: "Validation done — proceeding to standardization", color: "#f59e0b", isValid: false };
   }
-  if (s === "validation_failed") {
+  if (s === "validation failed") {
     return { pct: 50, label: "Validation failed — review required", color: "#ef4444", isValid: null };
   }
-  if (s === "standardization_inprogress") {
+  if (s === "standardization inprogress") {
     return { pct: 75, label: "Standardization in progress…", color: "#3b82f6", isValid: null };
   }
-  // standardization_completed → show normal Status + Inconsistent Fields
-  if (s === "standardization_completed") return null;
-  if (s === "standardization_failed") {
+  // standardization completed → show normal Status + Inconsistent Fields
+  if (s === "standardization completed") return null;
+  if (s === "standardization failed") {
     return { pct: 75, label: "Standardization failed — review required", color: "#ef4444", isValid: null };
   }
 
@@ -47,7 +47,7 @@ const getStageInfo = (stage, isValid) => {
   return null;
 };
 
-/** Animated progress bar with label (Commented for A/B testing) */
+/** Animated progress bar with label (Commented for A/B testing)
 const StageProgress = ({ pct, label, color, onDismiss }) => {
   const [mounted, setMounted] = useState(false);
 
@@ -76,8 +76,9 @@ const StageProgress = ({ pct, label, color, onDismiss }) => {
     </Box>
   );
 };
+*/
 
-/** Pipeline style progress (Commented for A/B testing) */
+/** Pipeline style progress */
 const PipelineProgress = ({ pct, label, color }) => {
   const segments = [
     { threshold: 25, name: "Validation InProgress" },
@@ -239,7 +240,7 @@ const RecordCard = ({ record, index = 0 }) => {
             </Box>
           ) : (
             /* 25 / 50 / 75 % bars */
-            <StageProgress pct={stageInfo.pct} label={stageInfo.label} color={stageInfo.color} />
+            <PipelineProgress pct={stageInfo.pct} label={stageInfo.label} color={stageInfo.color} />
           )}
         </Box>
       ) : (

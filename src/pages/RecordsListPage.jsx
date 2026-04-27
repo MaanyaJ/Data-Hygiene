@@ -110,9 +110,8 @@ const RecordsListPage = ({ mode = "landing" }) => {
           page={page}
           loading={loading}
           onLoadMore={loadMore}
-          patchRecords={patchRecords}
-          isReady={isReady}
-          extraParams={extraParams}
+          patchRecords={patchRecords} // ← new
+          isReady={isReady}           // ← new
         />
 
         {!loading && records.length === 0 && (
