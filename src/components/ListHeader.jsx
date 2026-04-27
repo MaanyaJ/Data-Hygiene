@@ -43,8 +43,8 @@ const ListHeader = ({
   ];
 
   const STAGE_FILTERS = [
-    { label: "VALIDATION IN-PROGRESS", value: "validation inprogress,validation completed,validation failed" },
-    { label: "STANDARDIZATION IN-PROGRESS", value: "standardization inprogress,standardization failed" },
+    { label: "VALIDATION IN-PROGRESS", value: "validation inprogress,validation failed" },
+    { label: "STANDARDIZATION IN-PROGRESS", value: "validation completed,standardization inprogress,standardization failed" },
   ];
 
   let baseFilters = showAgeFilters
@@ -72,8 +72,8 @@ const ListHeader = ({
     accepted: "ACCEPTED",
     rejected: "REJECTED",
     "On Hold": "ON HOLD",
-    "validation inprogress,validation completed,validation failed": "VALIDATION_IN_PROGRESS",
-    "standardization inprogress,standardization failed": "STANDARDIZATION_IN_PROGRESS",
+    "validation inprogress,validation failed": "VALIDATION_IN_PROGRESS",
+    "validation completed,standardization inprogress,standardization failed": "STANDARDIZATION_IN_PROGRESS",
   };
   const AGE_KEY_MAP = { "<3": "green", "3-6": "yellow", ">6": "red" };
 

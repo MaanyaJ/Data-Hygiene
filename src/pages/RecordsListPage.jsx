@@ -69,6 +69,7 @@ const RecordsListPage = ({ mode = "landing" }) => {
     refresh,
     meta,
     patchRecords, // ← new
+    removeRecords,
     isReady,      // ← new
   } = usePaginatedRecords({ extraParams });
 
@@ -111,7 +112,9 @@ const RecordsListPage = ({ mode = "landing" }) => {
           loading={loading}
           onLoadMore={loadMore}
           patchRecords={patchRecords} // ← new
+          removeRecords={removeRecords}
           isReady={isReady}           // ← new
+          extraParams={extraParams}
         />
 
         {!loading && records.length === 0 && (

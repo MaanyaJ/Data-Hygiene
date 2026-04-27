@@ -1,10 +1,10 @@
 import { useEffect, useRef, useCallback } from "react";
 import { API_URL } from "../config";
 
-const POLL_MS = 2000;
+const POLL_MS = 1000;
 const BATCH_URL = `${API_URL}/invalid-summary/batch`;
 
-export function useProgressPolling({ visibleIds, patchRecords, isReady }) {
+export function useProgressPolling({ visibleIds, patchRecords, removeRecords, isReady, extraParams }) {
   const visibleIdsRef = useRef([]);
   const pollAbortRef = useRef(null);
 
@@ -24,14 +24,20 @@ export function useProgressPolling({ visibleIds, patchRecords, isReady }) {
     pollAbortRef.current = controller;
 
     try {
+      const payload = { 
+        execution_ids: ids,
+        ...extraParams
+      };
+      console.log("[Batch Polling] POST Payload:", payload);
+      
       const res = await fetch(BATCH_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ execution_ids: ids }),
+        body: JSON.stringify(payload),
         signal: controller.signal,
       });
 
-      if (!res.ok) return; // silently skip failed polls
+      if (!res.ok) return;
 
       const data = await res.json();
 
@@ -41,14 +47,16 @@ export function useProgressPolling({ visibleIds, patchRecords, isReady }) {
 
       if (updates.length > 0) {
         patchRecords(updates);
+      } else if (data && Array.isArray(data.data) && data.data.length === 0) {
+        console.warn("[Batch Polling] Server returned empty data array. Removing records:", ids);
+        removeRecords(ids);
       }
     } catch (err) {
       if (err.name !== "AbortError") {
         console.error("useProgressPolling:", err);
       }
-      // Always swallow — polling errors must never disrupt the UI
     }
-  }, [isReady, patchRecords]);
+  }, [isReady, patchRecords, removeRecords, extraParams]);
 
   useEffect(() => {
     if (!isReady) return;

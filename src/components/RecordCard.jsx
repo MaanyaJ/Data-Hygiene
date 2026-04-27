@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import InconsistentFieldsList from "./InconsistentFieldsList";
 import { useNavigate } from "react-router-dom";
 import { Box, Typography, IconButton } from "@mui/material";
@@ -15,13 +15,25 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
  *   standardization_inprogress     → 75 %
  *   standardization_completed      → 100 % then auto-dismiss after 3 s
  */
-const getStageInfo = (stage, isValid) => {
+const getStageInfo = (record, extraParams) => {
+  const stage = record.Stage;
+  const isValid = record.isValid;
   if (!stage) return null;
 
   // Normalize: lowercase, trim, then collapse any run of spaces/underscores → single space
   const s = stage.toLowerCase().trim().replace(/[\s_]+/g, " ");
 
-  console.debug("[RecordCard] Stage raw:", stage, "→ normalized:", s, "isValid:", isValid);
+  const activeStages = extraParams?.stage || "";
+  const isValidationFilterActive = activeStages.includes("validation inprogress");
+  const isStandardizationFilterActive = activeStages.includes("standardization inprogress");
+  const isOnlyStandardization = isStandardizationFilterActive && !isValidationFilterActive;
+
+  console.debug("[RecordCard] Stage raw:", stage, "→ normalized:", s, "isValid:", isValid, "isOnlyStandardization:", isOnlyStandardization);
+
+  // Requirement: if dismissing, always show 100% "Standardization completed"
+  if (record.isDismissing) {
+    return { pct: 100, label: "Standardization completed", color: "#22c55e", isValid: null };
+  }
 
   if (s === "validation inprogress") {
     return { pct: 25, label: "Validation in progress…", color: "#f59e0b", isValid: null };
@@ -29,6 +41,13 @@ const getStageInfo = (stage, isValid) => {
   if (s === "validation completed") {
     if (isValid === true)
       return { pct: null, label: "This record is valid", color: "#22c55e", isValid: true };
+    
+    // Requirement: If ONLY standardization filter is active, validation completed 
+    // is combined with standardization inprogress stage in the UI.
+    if (isOnlyStandardization) {
+      return { pct: 75, label: "Standardization in progress…", color: "#3b82f6", isValid: false };
+    }
+
     return { pct: 50, label: "Validation done — proceeding to standardization", color: "#f59e0b", isValid: false };
   }
   if (s === "validation failed") {
@@ -37,8 +56,13 @@ const getStageInfo = (stage, isValid) => {
   if (s === "standardization inprogress") {
     return { pct: 75, label: "Standardization in progress…", color: "#3b82f6", isValid: null };
   }
-  // standardization completed → show normal Status + Inconsistent Fields
-  if (s === "standardization completed") return null;
+  // standardization completed → show bar ONLY while dismissing (animating fill)
+  if (s === "standardization completed") {
+    if (record.isDismissing) {
+      return { pct: 100, label: "Standardization completed", color: "#22c55e", isValid: null };
+    }
+    return null;
+  }
   if (s === "standardization failed") {
     return { pct: 75, label: "Standardization failed — review required", color: "#ef4444", isValid: null };
   }
@@ -47,15 +71,15 @@ const getStageInfo = (stage, isValid) => {
   return null;
 };
 
-/** Animated progress bar with label (Commented for A/B testing)
+/** Animated progress bar with label (Reverted from A/B testing) */
 const StageProgress = ({ pct, label, color, onDismiss }) => {
-  const [mounted, setMounted] = useState(false);
+  const prevPctRef = useRef(pct);
+  const isShrinking = pct < prevPctRef.current;
 
+  // Update ref AFTER the render check above
   useEffect(() => {
-    // Small delay so the CSS width transition plays on first render
-    const t = setTimeout(() => setMounted(true), 30);
-    return () => clearTimeout(t);
-  }, []);
+    prevPctRef.current = pct;
+  }, [pct]);
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "center", width: "60%", maxWidth: 200 }}>
@@ -68,17 +92,17 @@ const StageProgress = ({ pct, label, color, onDismiss }) => {
             height: "100%",
             borderRadius: 99,
             backgroundColor: color,
-            width: mounted ? `${pct}%` : "0%",
-            transition: "width 0.7s cubic-bezier(0.4,0,0.2,1)",
+            width: `${pct}%`,
+            transition: isShrinking ? "none" : "width 0.7s cubic-bezier(0.4,0,0.2,1)",
           }}
         />
       </Box>
     </Box>
   );
 };
-*/
 
-/** Pipeline style progress */
+/* 
+/** Pipeline style progress (Commented for A/B testing)
 const PipelineProgress = ({ pct, label, color }) => {
   const segments = [
     { threshold: 25, name: "Validation InProgress" },
@@ -91,27 +115,39 @@ const PipelineProgress = ({ pct, label, color }) => {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "center", width: "100%", maxWidth: 320 }}>
-      {/* 4 Pipes */}
+      {/* 4 Pipes }
       <Box sx={{ display: "flex", gap: 0.8, height: 8, mb: 0.8 }}>
         {segments.map((seg) => {
           const isPassed = pct >= seg.threshold;
           const isCurrent = pct === seg.threshold;
           return (
             <Box
-              key={seg.threshold}
+              key={seg.name}
               sx={{
                 flex: 1,
-                borderRadius: 99,
-                backgroundColor: isPassed ? themeColor : "#e5e7eb",
-                opacity: isPassed && !isCurrent ? 0.6 : 1, // dims previous completed pipes slightly
-                transition: "background-color 0.4s ease, opacity 0.4s ease",
+                borderRadius: "2px",
+                backgroundColor: isPassed ? (isCurrent ? color : "#3b82f6") : "#e5e7eb",
+                transition: "all 0.5s ease",
+                position: "relative",
+                overflow: "hidden",
+                "&::after": isCurrent ? {
+                  content: '""',
+                  position: "absolute",
+                  top: 0, left: 0, right: 0, bottom: 0,
+                  background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)",
+                  animation: "shimmer 1.5s infinite",
+                } : {},
+                "@keyframes shimmer": {
+                  "0%": { transform: "translateX(-100%)" },
+                  "100%": { transform: "translateX(100%)" },
+                }
               }}
             />
           );
         })}
       </Box>
       
-      {/* Pipe Labels */}
+      {/* Pipe Labels }
       <Box sx={{ display: "flex", gap: 0.8 }}>
         {segments.map((seg) => {
           const isPassed = pct >= seg.threshold;
@@ -136,8 +172,9 @@ const PipelineProgress = ({ pct, label, color }) => {
     </Box>
   );
 };
+*/
 
-const RecordCard = ({ record, index = 0 }) => {
+const RecordCard = ({ record, index = 0, extraParams }) => {
   const [isClicked, setIsClicked] = useState(false);
   const invalidFields = record["InvalidFields"];
   const navigate = useNavigate();
@@ -145,7 +182,7 @@ const RecordCard = ({ record, index = 0 }) => {
   const isCompleted = status === "accepted" || status === "approved";
   const isEven = index % 2 === 0;
 
-  const stageInfo = getStageInfo(record.Stage, record.isValid);
+  const stageInfo = getStageInfo(record, extraParams);
 
   // Show the stage panel only when there is actionable stage info
   const showStagePanelInsteadOfStatus = !!stageInfo;
@@ -240,7 +277,7 @@ const RecordCard = ({ record, index = 0 }) => {
             </Box>
           ) : (
             /* 25 / 50 / 75 % bars */
-            <PipelineProgress pct={stageInfo.pct} label={stageInfo.label} color={stageInfo.color} />
+            <StageProgress pct={stageInfo.pct} label={stageInfo.label} color={stageInfo.color} />
           )}
         </Box>
       ) : (
