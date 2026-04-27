@@ -42,13 +42,7 @@ const getStageInfo = (record, extraParams) => {
     if (isValid === true)
       return { pct: null, label: "This record is valid", color: "#22c55e", isValid: true };
     
-    // Requirement: If ONLY standardization filter is active, validation completed 
-    // is combined with standardization inprogress stage in the UI.
-    if (isOnlyStandardization) {
-      return { pct: 75, label: "Standardization in progress…", color: "#3b82f6", isValid: false };
-    }
-
-    return { pct: 50, label: "Validation done — proceeding to standardization", color: "#f59e0b", isValid: false };
+    return { pct: 60, label: "Standardization initiated", color: "#3b82f6", isValid: false };
   }
   if (s === "validation failed") {
     return { pct: 50, label: "Validation failed — review required", color: "#ef4444", isValid: null };

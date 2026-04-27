@@ -84,7 +84,11 @@ const DetailsPage = () => {
         throw new Error(json.message);
       }
       
-      setExecutionData(json.execution_details);
+      const details = json.execution_details || {};
+      if (details.Stage && details.Stage.toLowerCase().trim().replace(/[\s_]+/g, " ") === "validation completed") {
+        details.Stage = "Standardization initiated";
+      }
+      setExecutionData(details);
       setHistory(json.history);
 
       if (
