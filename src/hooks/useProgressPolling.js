@@ -6,8 +6,9 @@ const BATCH_URL = `${API_URL}/invalid-summary/batch`;
 
 export function useProgressPolling({ visibleIds, patchRecords, removeRecords, isReady, extraParams }) {
   const visibleIdsRef = useRef([]);
-  const isFetchingRef = useRef(false); 
+  const isFetchingRef = useRef(false); // ✅ new
 
+  // Keep ref in sync so the interval always sees latest IDs
   useEffect(() => {
     visibleIdsRef.current = visibleIds;
   }, [visibleIds]);
@@ -17,14 +18,14 @@ export function useProgressPolling({ visibleIds, patchRecords, removeRecords, is
 
     if (!isReady || ids.length === 0) return;
 
+    // 🚫 Don't start a new request if one is already running
     if (isFetchingRef.current) return;
 
     isFetchingRef.current = true;
 
     try {
-      const payload = { 
-        execution_ids: ids,
-        ...extraParams
+      const payload = {
+        execution_ids: ids
       };
 
       console.log("[Batch Polling] POST Payload:", payload);
@@ -50,6 +51,7 @@ export function useProgressPolling({ visibleIds, patchRecords, removeRecords, is
     } catch (err) {
       console.error("useProgressPolling:", err);
     } finally {
+      // ✅ allow next poll
       isFetchingRef.current = false;
     }
   }, [isReady, patchRecords, removeRecords, extraParams]);
