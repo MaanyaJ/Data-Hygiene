@@ -125,6 +125,10 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
     const activeStagesList = activeStages ? activeStages.split(",").map(s => s.trim().toLowerCase()) : [];
     const hasStageFilters = activeStagesList.length > 0;
 
+    const activeStatus = extraParams?.status || "";
+    const activeStatusList = activeStatus ? activeStatus.split(",").map(s => s.trim().toLowerCase()) : [];
+    const isPendingFilterActive = activeStatusList.includes("pending");
+
     let anyDismissed = false;
 
     setRecords((prev) => {
@@ -133,17 +137,23 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
         if (update) {
           const merged = { ...record, ...update };
           
-          // If stage filters are active, and the new stage doesn't match them, mark for dismissal
           const normalizedStage = merged.Stage?.toLowerCase().trim().replace(/[\s_]+/g, " ");
-          if (hasStageFilters && !activeStagesList.includes(normalizedStage)) {
-            merged.isDismissing = true;
-            anyDismissed = true;
-          }
+          const currentStatus = merged.Status?.toLowerCase();
 
-          // Special case: always dismiss 'standardization completed' if ANY stage filter is active
-          if (normalizedStage === "standardization completed" && hasStageFilters) {
-            merged.isDismissing = true;
-            anyDismissed = true;
+          if (hasStageFilters) {
+            const matchesStage = activeStagesList.includes(normalizedStage);
+            const isCompleted = normalizedStage === "standardization completed";
+
+            if (!matchesStage || isCompleted) {
+              // Exception: if 'Action Required' (pending) filter is active AND record is pending, 
+              // keep it visible (don't dismiss).
+              if (isPendingFilterActive && currentStatus === "pending") {
+                // keep it
+              } else {
+                merged.isDismissing = true;
+                anyDismissed = true;
+              }
+            }
           }
 
           return merged;
@@ -153,7 +163,7 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
     });
 
     if (anyDismissed) triggerDismissal();
-  }, [extraParams?.stage, triggerDismissal]);
+  }, [extraParams?.stage, extraParams?.status, triggerDismissal]);
 
   const removeRecords = useCallback((idsToRemove) => {
     if (!idsToRemove || idsToRemove.length === 0) return;

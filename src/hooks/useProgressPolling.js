@@ -25,8 +25,7 @@ export function useProgressPolling({ visibleIds, patchRecords, removeRecords, is
 
     try {
       const payload = {
-        execution_ids: ids,
-        ...extraParams
+        execution_ids: ids
       };
 
       console.log("[Batch Polling] POST Payload:", payload);
