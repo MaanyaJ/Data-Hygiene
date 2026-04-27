@@ -99,6 +99,19 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
     [search, extraParamsKey]
   );
 
+  const triggerDismissal = useCallback(() => {
+    setTimeout(() => {
+      setRecords((prev) => {
+        const remaining = prev.filter(r => !r.isDismissing);
+        const removedCount = prev.length - remaining.length;
+        if (removedCount > 0) {
+          setTotalRecords(t => Math.max(0, t - removedCount));
+        }
+        return remaining;
+      });
+    }, 1200);
+  }, []);
+
   // ── Patch specific records in-place by ExecutionId ────────────────────────
   // Called by useProgressPolling when batch status poll returns.
   // Only updates fields that came back — order and all other records untouched.
@@ -106,14 +119,54 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
     const updateMap = Object.fromEntries(
       updates.map((u) => [u.ExecutionId, u])
     );
-    setRecords((prev) =>
-      prev.map((record) =>
-        updateMap[record.ExecutionId]
-          ? { ...record, ...updateMap[record.ExecutionId] }
-          : record
-      )
-    );
-  }, []);
+
+    // Check if we should dismiss records that no longer match active filters
+    const activeStages = extraParams?.stage || "";
+    const activeStagesList = activeStages ? activeStages.split(",").map(s => s.trim().toLowerCase()) : [];
+    const hasStageFilters = activeStagesList.length > 0;
+
+    let anyDismissed = false;
+
+    setRecords((prev) => {
+      return prev.map((record) => {
+        const update = updateMap[record.ExecutionId];
+        if (update) {
+          const merged = { ...record, ...update };
+          
+          // If stage filters are active, and the new stage doesn't match them, mark for dismissal
+          const normalizedStage = merged.Stage?.toLowerCase().trim().replace(/[\s_]+/g, " ");
+          if (hasStageFilters && !activeStagesList.includes(normalizedStage)) {
+            merged.isDismissing = true;
+            anyDismissed = true;
+          }
+
+          // Special case: always dismiss 'standardization completed' if ANY stage filter is active
+          if (normalizedStage === "standardization completed" && hasStageFilters) {
+            merged.isDismissing = true;
+            anyDismissed = true;
+          }
+
+          return merged;
+        }
+        return record;
+      });
+    });
+
+    if (anyDismissed) triggerDismissal();
+  }, [extraParams?.stage, triggerDismissal]);
+
+  const removeRecords = useCallback((idsToRemove) => {
+    if (!idsToRemove || idsToRemove.length === 0) return;
+    setRecords((prev) => {
+      return prev.map((r) => {
+        if (idsToRemove.includes(r.ExecutionId)) {
+          return { ...r, isDismissing: true };
+        }
+        return r;
+      });
+    });
+    triggerDismissal();
+  }, [triggerDismissal]);
 
   // ── Reset + refetch when search or extraParams change ────────────────────
   useEffect(() => {
@@ -155,6 +208,7 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
     refresh,
     meta,
     patchRecords,      // ← used by useProgressPolling to patch Stage in-place
+    removeRecords,
     isReady: isReadyRef, // ← ref (not state) so polling can read it without re-renders
   };
 }

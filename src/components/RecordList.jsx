@@ -20,7 +20,9 @@ const RecordList = ({
   loading,
   onLoadMore,
   patchRecords,
+  removeRecords,
   isReady,
+  extraParams,
 }) => {
   const [visibleIds, setVisibleIds] = useState([]);
 
@@ -32,7 +34,9 @@ const RecordList = ({
   useProgressPolling({
     visibleIds,
     patchRecords,
+    removeRecords,
     isReady: isReady.current,
+    extraParams,
   });
 
   // Clear stale IDs when the record list becomes empty (e.g. after a filter change)
@@ -63,7 +67,7 @@ const RecordList = ({
     }
     return (
       <div key={key} style={style}>
-        <RecordCard record={record} index={index} />
+        <RecordCard record={record} index={index} extraParams={extraParams} />
       </div>
     );
   };
@@ -103,7 +107,7 @@ const RecordList = ({
                     }}
                     ref={registerChild}
                     rowRenderer={rowRenderer}
-                    overscanRowCount={4}
+                    overscanRowCount={12}
                   />
                 )}
               </AutoSizer>
