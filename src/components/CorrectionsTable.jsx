@@ -104,7 +104,7 @@ const AcceptConfirmDialog = ({ open, onClose, onConfirm, fieldName, isAccepting 
           backgroundColor: "#000000",
           "&:hover": { backgroundColor: "#333333" },
           ...(isAccepting && {
-            "&.Mui-disabled": { backgroundColor: "#333333", color: "white" },
+            "&.Mui-disabled": { backgroundColor: "#4a4a4a", color: "white" },
           }),
         }}
       >
@@ -298,7 +298,7 @@ const DraftRecordDialog = ({
               sx={{
                 color: "#ffffff",
                 backgroundColor: "#000000",
-                "&.Mui-disabled": { backgroundColor: "#efefef", color: "#888888" },
+                "&.Mui-disabled": { backgroundColor: "#efefef", color: "#4a4a4a" },
               }}
             >
               {submitting ? "Submitting..." : "Submit"}
@@ -770,7 +770,7 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                         backgroundColor: "#000000",
                         color: "#ffffff",
                         "&:hover": { backgroundColor: "#333333" },
-                        "&.Mui-disabled": { backgroundColor: "#efefef", color: "#888888" },
+                        "&.Mui-disabled": { backgroundColor: "#efefef", color: "#4a4a4a" },
                       }}
                     >
                       Submit Draft Record
@@ -788,7 +788,7 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                         backgroundColor: "#000000",
                         color: "#ffffff",
                         "&:hover": { backgroundColor: "#333333" },
-                        "&.Mui-disabled": { backgroundColor: "#efefef", color: "#888888" },
+                        "&.Mui-disabled": { backgroundColor: "#efefef", color: "#4a4a4a" },
                       }}
                     >
                       Send to L0
