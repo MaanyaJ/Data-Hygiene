@@ -40,17 +40,12 @@ const RecordsListPage = ({ mode = "landing" }) => {
       return params;
     }
 
-    // Status/stage-filtered pages
+    // Status-filtered pages (landing, completed, all)
+    // defaultStage is always sent as-is — no stage filters exist on these pages
     const params = {};
-    if (config.defaultStage) params.stage = config.defaultStage; // baseline: e.g. standardization_completed
+    if (config.defaultStage)  params.stage  = config.defaultStage;
     if (config.defaultStatus) params.status = config.defaultStatus;
-
-    if (filter.length > 0) {
-      const statuses = filter.filter((v) => !v.includes("validation") && !v.includes("standardization"));
-      const stages   = filter.filter((v) =>  v.includes("validation") ||  v.includes("standardization"));
-      if (statuses.length > 0) params.status = statuses.join(",");
-      if (stages.length   > 0) params.stage  = stages.join(",");  // user pick overrides default
-    }
+    if (filter.length > 0)    params.status = filter.join(","); // user-selected status overrides default
 
     return params;
   }, [mode, filter, config.showStatusFilters, config.defaultStage, config.defaultStatus]);

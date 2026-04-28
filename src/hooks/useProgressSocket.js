@@ -5,8 +5,7 @@ const WS_URL = `${API_URL.replace(/^http/, "ws")}/ws`;
 
 export function useProgressSocket({
   patchRecords,
-  removeRecords,  // UploadPage: evict records that have left the pipeline
-  onNewRecord,    // UploadPage only — silent refresh when a new record arrives
+  removeRecords,  // UploadPage: evict records that have reached standardization_completed
   currentRecords,
   isReady,
 }) {
@@ -42,6 +41,7 @@ export function useProgressSocket({
         try {
           const message = JSON.parse(event.data);
           if (message.type !== "PIPELINE_UPDATE") return;
+          console.log(message)
 
           const record = {
             ExecutionId: message.execution_id,
@@ -66,12 +66,9 @@ export function useProgressSocket({
               // Still in pipeline — update stage/status in place
               patchRecords([record]);
             }
-          } else {
-            // Record not on screen yet
-            // UploadPage: silent refresh to fetch it with full data
-            // All other pages: onNewRecord is undefined, so this is a no-op
-            onNewRecord?.();
           }
+          // Record not on screen: ignore — all records start as validation_initiated
+          // and are fetched on initial load, so this case shouldn't normally occur
         } catch (err) {
           console.error("[WS] ❌ Failed to parse message:", err, "Raw:", event.data);
         }
@@ -98,5 +95,5 @@ export function useProgressSocket({
       clearTimeout(reconnectTimer);
       if (ws) ws.close();
     };
-  }, [isReady, patchRecords, removeRecords, onNewRecord]);
+  }, [isReady, patchRecords, removeRecords]);
 }

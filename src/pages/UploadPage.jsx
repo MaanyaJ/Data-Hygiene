@@ -18,6 +18,7 @@ import { usePaginatedRecords } from "../hooks/usePaginatedRecords";
 import { API_URL } from "../config";
 
 const PIPELINE_STAGES = [
+  "validation_initiated",
   "validation_inprogress",
   "validation_completed",
   "validation_failed",
@@ -71,7 +72,6 @@ const UploadPage = () => {
     refresh,
     patchRecords,
     removeRecords,
-    silentRefreshPage1, // ← triggers when new unknown record arrives via WS
     isReadyState,
   } = usePaginatedRecords({ extraParams });
 
@@ -242,7 +242,6 @@ const UploadPage = () => {
           onLoadMore={loadMore}
           patchRecords={patchRecords}
           removeRecords={removeRecords}
-          onNewRecord={silentRefreshPage1} // ← fires silent refresh for new records
           isReadyState={isReadyState}
           // no activeFilters — show everything on UploadPage
         />

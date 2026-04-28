@@ -24,8 +24,6 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
 
   const abortRef = useRef(null);
   const fetchIdRef = useRef(0);
-  const silentRefreshInFlight = useRef(false);
-  const silentRefreshTimer = useRef(null);
 
   const extraParamsKey = JSON.stringify(extraParams);
 
@@ -129,53 +127,6 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
     setTotalRecords((prev) => Math.max(0, prev - executionIds.length));
   }, []);
 
-  // ── Silent page 1 refresh ─────────────────────────────────────────────────
-  // Called by WebSocket on UploadPage when an unknown record enters pipeline.
-  // Debounced (300 ms) so a burst of WS messages collapses into one call.
-  // Guarded so a new call never starts before the previous one finishes.
-  const silentRefreshPage1 = useCallback(() => {
-    // Debounce: reset the timer on every call
-    clearTimeout(silentRefreshTimer.current);
-    silentRefreshTimer.current = setTimeout(async () => {
-      // Inflight guard: skip if a refresh is already running
-      if (silentRefreshInFlight.current) return;
-      silentRefreshInFlight.current = true;
-
-      try {
-        const parsed = JSON.parse(extraParamsKey);
-        const qs = new URLSearchParams({
-          page: 1,
-          size: PAGE_SIZE,
-          search: search || "",
-          ...parsed,
-        });
-
-        const res = await fetch(`${BASE_URL}?${qs}`);
-        if (!res.ok) return;
-        const data = await res.json();
-
-        const incoming = Array.isArray(data?.data) ? data.data : [];
-        const total = data?.total_invalid_records ?? incoming.length;
-
-        setTotalPages(Math.ceil(total / PAGE_SIZE));
-        setTotalRecords(total);
-
-        // Replace page 1 slice only, preserve pages 2+ already loaded
-        setRecords((prev) => {
-          const beyond = prev.slice(PAGE_SIZE);
-          return [...incoming, ...beyond];
-        });
-
-        const { data: _d, total_invalid_records: _t, ...rest } = data;
-        setMeta(rest);
-      } catch (err) {
-        console.error("[silentRefreshPage1]:", err);
-        // Swallow silently — never disrupt the UI
-      } finally {
-        silentRefreshInFlight.current = false;
-      }
-    }, 300);
-  }, [search, extraParamsKey]);
 
   // ── Reset + refetch when search or extraParams change ────────────────────
   useEffect(() => {
@@ -218,7 +169,6 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
     meta,
     patchRecords,
     removeRecords,
-    silentRefreshPage1,
     isReadyState,
   };
 }

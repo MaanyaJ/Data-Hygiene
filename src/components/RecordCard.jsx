@@ -23,8 +23,8 @@ const getStageInfo = (stage, isValid) => {
 
   console.debug("[RecordCard] Stage raw:", stage, "→ normalized:", s, "isValid:", isValid);
 
-  if (s === "validation_inprogress") {
-    return { pct: 25, label: "Validation in progress…", color: "#f59e0b", isValid: null };
+  if (s === "validation_initiated" || s === "validation_inprogress") {
+    return { pct: 25, label: "Validation in progress", color: "#f59e0b", isValid: null };
   }
   if (s === "validation_completed") {
     if (isValid === true)
@@ -53,7 +53,7 @@ const PipelineProgress = ({ pct, label, color }) => {
   const segments = [
     { threshold: 25, name: "Validation In Progress" },
     { threshold: 50, name: "Validation Completed" },
-    { threshold: 75, name: "Standardization In Progreess" },
+    { threshold: 75, name: "Standardization In Progress" },
     { threshold: 100, name: "Standardization Completed" },
   ];
 
