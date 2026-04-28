@@ -120,11 +120,24 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
       updates.map((u) => [u.ExecutionId, u])
     );
 
-    // Check if we should dismiss records that no longer match active filters
+    // Derive active stage/status filter lists once, outside the record loop
     const activeStages = extraParams?.stage || "";
     const activeStagesList = activeStages ? activeStages.split(",").map(s => s.trim().toLowerCase()) : [];
     const hasStageFilters = activeStagesList.length > 0;
-    const hasActionRequired = activeStagesList.includes("action required");
+
+    // No filters applied → never dismiss anything, just patch in-place
+    if (!hasStageFilters) {
+      setRecords((prev) =>
+        prev.map((record) => {
+          const update = updateMap[record.ExecutionId];
+          return update ? { ...record, ...update } : record;
+        })
+      );
+      return;
+    }
+
+    const hasActionRequired            = activeStagesList.includes("action required");
+    const hasStandardizationInProgress = activeStagesList.includes("standardization in progress");
 
     const activeStatus = extraParams?.status || "";
     const activeStatusList = activeStatus ? activeStatus.split(",").map(s => s.trim().toLowerCase()) : [];
@@ -137,23 +150,35 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
         const update = updateMap[record.ExecutionId];
         if (update) {
           const merged = { ...record, ...update };
-          
+
           const normalizedStage = merged.Stage?.toLowerCase().trim().replace(/[\s_]+/g, " ");
-          const currentStatus = merged.Status?.toLowerCase();
+          const currentStatus   = merged.Status?.toLowerCase();
 
-          if (hasStageFilters) {
-            const matchesStage = activeStagesList.includes(normalizedStage);
-            const isCompleted = normalizedStage === "standardization completed";
+          const matchesStage = activeStagesList.includes(normalizedStage);
 
-            if (!matchesStage || isCompleted) {
-              // Exception: if 'Action Required' (pending) filter is active AND record is pending, 
-              // keep it visible (don't dismiss).
-              if (isPendingFilterActive && currentStatus === "pending") {
-                // keep it
-              } else {
-                merged.isDismissing = true;
-                anyDismissed = true;
-              }
+          // Records whose stage no longer matches the active filters should be
+          // dismissed — with two special cases where we keep them because they
+          // are a natural next-step of a filtered stage:
+          //
+          //  standardization completed → keep if 'action required' filter is active
+          //                              (it's the stage right before action required)
+          //
+          //  validation completed      → keep if 'standardization in progress' filter is active
+          //                              (it's the stage right after standardization in progress)
+          if (!matchesStage) {
+            const keepForActionRequired =
+              normalizedStage === "standardization completed" && hasActionRequired;
+
+            const keepForStandardizationInProgress =
+              normalizedStage === "validation completed" && hasStandardizationInProgress;
+
+            // Also keep pending-status records when the pending filter is active
+            const keepForPendingStatus =
+              isPendingFilterActive && currentStatus === "pending";
+
+            if (!keepForActionRequired && !keepForStandardizationInProgress && !keepForPendingStatus) {
+              merged.isDismissing = true;
+              anyDismissed = true;
             }
           }
 
