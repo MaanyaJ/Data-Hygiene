@@ -124,7 +124,6 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
   const removeRecords = useCallback((executionIds) => {
     const idSet = new Set(executionIds);
     setRecords((prev) => prev.filter((r) => !idSet.has(r.ExecutionId)));
-    setTotalRecords((prev) => Math.max(0, prev - executionIds.length));
   }, []);
 
 

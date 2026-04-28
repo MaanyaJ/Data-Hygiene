@@ -25,7 +25,6 @@ const RecordList = ({
   useProgressSocket({
     patchRecords,
     removeRecords,
-    currentRecords: records,
     isReady: isReadyState,
   });
 
