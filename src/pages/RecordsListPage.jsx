@@ -7,7 +7,7 @@ import { usePaginatedRecords } from "../hooks/usePaginatedRecords";
 import { useRefresh } from "../context/RefreshContext";
 
 const MODE_CONFIG = {
-  landing:   { title: "Data Hygiene Dashboard", showStatusFilters: true, showStageFilters: true },
+  landing:   { title: "Data Hygiene Dashboard", showStatusFilters: true, showStageFilters: true, defaultStage: "standardization_completed" },
   active:    { title: "My Active List",          defaultStatus: "pending",           showAgeFilters: true },
   completed: { title: "My Completed List",       defaultStatus: "accepted,rejected", showStatusFilters: true, allowedFilters: ["accepted", "rejected"] },
   onhold:    { title: "On Hold Records",         defaultStatus: "On Hold",           showAgeFilters: true },
@@ -33,22 +33,27 @@ const RecordsListPage = ({ mode = "landing" }) => {
   };
 
   const extraParams = useMemo(() => {
+    // Age-filtered pages (active, onhold)
     if (!config.showStatusFilters) {
       const params = { status: config.defaultStatus };
       if (filter.length > 0) params.age = filter.map((f) => AGE_TO_SERVER[f] || f).join(",");
       return params;
     }
+
+    // Status/stage-filtered pages
+    const params = {};
+    if (config.defaultStage) params.stage = config.defaultStage; // baseline: e.g. standardization_completed
+    if (config.defaultStatus) params.status = config.defaultStatus;
+
     if (filter.length > 0) {
       const statuses = filter.filter((v) => !v.includes("validation") && !v.includes("standardization"));
       const stages   = filter.filter((v) =>  v.includes("validation") ||  v.includes("standardization"));
-      const params = {};
       if (statuses.length > 0) params.status = statuses.join(",");
-      if (stages.length   > 0) params.stage  = stages.join(",");
-      return params;
+      if (stages.length   > 0) params.stage  = stages.join(",");  // user pick overrides default
     }
-    if (config.defaultStatus) return { status: config.defaultStatus };
-    return {};
-  }, [mode, filter, config.showStatusFilters, config.defaultStatus]);
+
+    return params;
+  }, [mode, filter, config.showStatusFilters, config.defaultStage, config.defaultStatus]);
 
   const {
     records,

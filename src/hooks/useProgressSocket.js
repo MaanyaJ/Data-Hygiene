@@ -3,51 +3,17 @@ import { API_URL } from "../config";
 
 const WS_URL = `${API_URL.replace(/^http/, "ws")}/ws`;
 
-const ALWAYS_HIDDEN_STAGES = new Set([
-  "validation failed",
-  "standardization failed",
-]);
-
-const FILTER_CONDITIONS = {
-  "validation inprogress":      (r) => r.Stage === "validation inprogress",
-  "validation completed":       (r) => r.Stage === "validation completed",
-  "standardization inprogress": (r) => r.Stage === "standardization inprogress",
-  "pending":  (r) => r.Stage === "standardization completed" && r.Status === "PENDING",
-  "accepted": (r) => r.Stage === "standardization completed" && r.Status === "ACCEPTED",
-  "on hold":  (r) => r.Stage === "standardization completed" && r.Status === "ON HOLD",
-  "l0 data":  (r) => r.Stage === "standardization completed" && r.Status === "L0 DATA",
-};
-
-const expandFilters = (activeFilters) => {
-  return activeFilters
-    .flatMap((f) => f.split(","))
-    .map((f) => f.trim().replace(/_/g, " ").toLowerCase());
-};
-
-const matchesActiveFilters = (record, activeFilters) => {
-  if (ALWAYS_HIDDEN_STAGES.has(record.Stage)) return false;
-  if (!activeFilters || activeFilters.length === 0) return true;
-  const expanded = expandFilters(activeFilters);
-  return expanded.some((f) => FILTER_CONDITIONS[f]?.(record));
-};
-
 export function useProgressSocket({
   patchRecords,
-  removeRecords,    // used by RecordsListPage — remove records that no longer match filters
-  onNewRecord,      // used by UploadPage — silent refresh when unknown record arrives
+  removeRecords,  // UploadPage: evict records that have left the pipeline
+  onNewRecord,    // UploadPage only — silent refresh when a new record arrives
   currentRecords,
   isReady,
-  activeFilters = [], // defaults to [] — no filters means show everything (UploadPage)
 }) {
-  const activeFiltersRef = useRef(activeFilters);
   const currentRecordsRef = useRef(currentRecords);
 
-  // Keep refs in sync so message handler always sees latest values
+  // Keep ref in sync so the message handler always sees the latest list
   // without ever needing to re-open the WebSocket
-  useEffect(() => {
-    activeFiltersRef.current = activeFilters;
-  }, [activeFilters]);
-
   useEffect(() => {
     currentRecordsRef.current = currentRecords;
   }, [currentRecords]);
@@ -78,13 +44,13 @@ export function useProgressSocket({
           if (message.type !== "PIPELINE_UPDATE") return;
 
           const record = {
-            ExecutionId:       message.execution_id,
-            Stage:             message.stage,
-            Status:            message.status,
-            InvalidFields:     message.invalidFields    ?? [],
-            suggestionsCount:  message.suggestionsCount ?? false,
-            updatedOn:         message.updatedOn,
-            BenchmarkType:     message.benchmarkType,
+            ExecutionId: message.execution_id,
+            Stage: message.stage,
+            Status: message.status,
+            InvalidFields: message.invalidFields ?? [],
+            suggestionsCount: message.suggestionsCount ?? false,
+            updatedOn: message.updatedOn,
+            BenchmarkType: message.benchmarkType,
             BenchmarkCategory: message.benchmarkCategory,
           };
 
@@ -92,26 +58,19 @@ export function useProgressSocket({
             (r) => r.ExecutionId === record.ExecutionId
           );
 
-          const shouldBeVisible = matchesActiveFilters(
-            record,
-            activeFiltersRef.current
-          );
-
           if (existsInList) {
-            // Record already on screen
-            if (shouldBeVisible) {
-              patchRecords([record]); // update stage/status in place
+            if (record.Stage === "standardization completed") {
+              // Record has exited the pipeline — remove it from the UploadPage list
+              removeRecords?.([record.ExecutionId]);
             } else {
-              removeRecords?.([record.ExecutionId]); // no longer matches filter
+              // Still in pipeline — update stage/status in place
+              patchRecords([record]);
             }
           } else {
             // Record not on screen yet
-            if (shouldBeVisible) {
-              // UploadPage: silent refresh to fetch it with full data
-              // RecordsListPage: onNewRecord is undefined, so this is a no-op
-              onNewRecord?.();
-            }
-            // Doesn't match and not on screen — ignore completely
+            // UploadPage: silent refresh to fetch it with full data
+            // All other pages: onNewRecord is undefined, so this is a no-op
+            onNewRecord?.();
           }
         } catch (err) {
           console.error("[WS] ❌ Failed to parse message:", err, "Raw:", event.data);

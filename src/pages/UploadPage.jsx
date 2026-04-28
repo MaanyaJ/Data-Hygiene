@@ -228,7 +228,7 @@ const UploadPage = () => {
           }}
         />
         <Typography sx={{ fontSize: 12, fontWeight: 600, color: "#000", mt: 1 }}>
-          Pipeline Records: {totalRecords}
+          Records in Pipeline: {totalRecords}
         </Typography>
       </Box>
 
