@@ -7,7 +7,7 @@ import { usePaginatedRecords } from "../hooks/usePaginatedRecords";
 import { useRefresh } from "../context/RefreshContext";
 
 const MODE_CONFIG = {
-  landing:   { title: "Data Hygiene Dashboard", showStatusFilters: true },
+  landing:   { title: "Data Hygiene Dashboard", showStatusFilters: true, showStageFilters: true },
   active:    { title: "My Active List",          defaultStatus: "pending",           showAgeFilters: true },
   completed: { title: "My Completed List",       defaultStatus: "accepted,rejected", showStatusFilters: true, allowedFilters: ["accepted", "rejected"] },
   onhold:    { title: "On Hold Records",         defaultStatus: "On Hold",           showAgeFilters: true },
@@ -33,25 +33,21 @@ const RecordsListPage = ({ mode = "landing" }) => {
   };
 
   const extraParams = useMemo(() => {
-    const params = { stage: "standardization_completed" };
-
     if (!config.showStatusFilters) {
-      // Age-filter pages (active, onhold): always have a fixed status
-      params.status = config.defaultStatus;
-      if (filter.length > 0) {
-        params.age = filter.map((f) => AGE_TO_SERVER[f] || f).join(",");
-      }
+      const params = { status: config.defaultStatus };
+      if (filter.length > 0) params.age = filter.map((f) => AGE_TO_SERVER[f] || f).join(",");
       return params;
     }
-
-    // Status-filter pages (landing, completed, all)
     if (filter.length > 0) {
-      params.status = filter.join(",");
-    } else if (config.defaultStatus) {
-      params.status = config.defaultStatus;
+      const statuses = filter.filter((v) => !v.includes("validation") && !v.includes("standardization"));
+      const stages   = filter.filter((v) =>  v.includes("validation") ||  v.includes("standardization"));
+      const params = {};
+      if (statuses.length > 0) params.status = statuses.join(",");
+      if (stages.length   > 0) params.stage  = stages.join(",");
+      return params;
     }
-
-    return params;
+    if (config.defaultStatus) return { status: config.defaultStatus };
+    return {};
   }, [mode, filter, config.showStatusFilters, config.defaultStatus]);
 
   const {
@@ -69,7 +65,9 @@ const RecordsListPage = ({ mode = "landing" }) => {
     refresh,
     meta,
     patchRecords,
+    removeRecords,
     isReadyState,
+    // silentRefreshPage1 not needed here — RecordsListPage doesn't add new records via WS
   } = usePaginatedRecords({ extraParams });
 
   useEffect(() => {
@@ -93,6 +91,7 @@ const RecordsListPage = ({ mode = "landing" }) => {
         counts={meta}
         showAgeFilters={config.showAgeFilters}
         showStatusFilters={config.showStatusFilters}
+        showStageFilters={config.showStageFilters}
         allowedFilters={config.allowedFilters}
         loading={isSearching}
         totalRecords={totalRecords}
@@ -110,19 +109,14 @@ const RecordsListPage = ({ mode = "landing" }) => {
           loading={loading}
           onLoadMore={loadMore}
           patchRecords={patchRecords}
+          removeRecords={removeRecords}
+          // onNewRecord not passed — RecordsListPage doesn't need to add new records
           isReadyState={isReadyState}
+          activeFilters={filter}
         />
 
         {!loading && records.length === 0 && (
-          <Box
-            sx={{
-              textAlign: "center",
-              py: 8,
-              backgroundColor: "#ebebebff",
-              border: "1px solid #e0e0e0",
-              borderTop: "none",
-            }}
-          >
+          <Box sx={{ textAlign: "center", py: 8, backgroundColor: "#ebebebff", border: "1px solid #e0e0e0", borderTop: "none" }}>
             <Typography variant="h6" color="text.secondary" sx={{ fontSize: 14 }}>
               {filter.length > 0
                 ? "No records match the selected filter."

@@ -19,11 +19,18 @@ const RecordList = ({
   loading,
   onLoadMore,
   patchRecords,
+  removeRecords,  // RecordsListPage only
+  onNewRecord,    // UploadPage only
   isReadyState,
+  activeFilters,  // RecordsListPage only
 }) => {
   useProgressSocket({
     patchRecords,
+    removeRecords,
+    onNewRecord,
+    currentRecords: records,
     isReady: isReadyState,
+    activeFilters,
   });
 
   const isRowLoaded = ({ index }) => !!records[index];

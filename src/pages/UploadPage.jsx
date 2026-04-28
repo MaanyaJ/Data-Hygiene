@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import {
   Box,
   Typography,
@@ -17,7 +17,6 @@ import ErrorPage from "../components/ErrorPage";
 import { usePaginatedRecords } from "../hooks/usePaginatedRecords";
 import { API_URL } from "../config";
 
-// All pipeline stages that are NOT yet "standardization completed"
 const PIPELINE_STAGES = [
   "validation_inprogress",
   "validation_completed",
@@ -38,7 +37,6 @@ const UploadPage = () => {
   const showNotification = (message, severity) =>
     setSnackbar({ open: true, message, severity });
 
-  // ── File handling ──────────────────────────────────────────────────────────
   const acceptFile = (file) => {
     if (!file) return;
     if (file.type === "application/json" || file.name.endsWith(".json")) {
@@ -56,7 +54,6 @@ const UploadPage = () => {
     if (!uploading) acceptFile(e.dataTransfer.files[0]);
   };
 
-  // ── Records hook — fetch pipeline-stage records ────────────────────────────
   const extraParams = { stage: PIPELINE_STAGES };
 
   const {
@@ -73,12 +70,13 @@ const UploadPage = () => {
     retry,
     refresh,
     patchRecords,
+    removeRecords,
+    silentRefreshPage1, // ← triggers when new unknown record arrives via WS
     isReadyState,
   } = usePaginatedRecords({ extraParams });
 
   const isSearching = loading && searchInput !== search;
 
-  // ── Upload handler ─────────────────────────────────────────────────────────
   const handleUpload = async () => {
     if (!selectedFile) return;
     const formData = new FormData();
@@ -95,7 +93,7 @@ const UploadPage = () => {
       }
       showNotification("File uploaded successfully!", "success");
       setSelectedFile(null);
-      refresh(); // refetch all pipeline records
+      refresh();
     } catch (err) {
       showNotification(err.message || "Upload failed. Please try again.", "error");
     } finally {
@@ -103,7 +101,6 @@ const UploadPage = () => {
     }
   };
 
-  // ── Error state ────────────────────────────────────────────────────────────
   if (error) {
     return <ErrorPage message={error?.message || "Something went wrong"} onRetry={retry} />;
   }
@@ -112,14 +109,13 @@ const UploadPage = () => {
     <Box sx={{ backgroundColor: "#ebebebff", minHeight: "100vh" }}>
       <Navbar />
 
-      {/* Page Header */}
       <Box sx={{ px: 3, pt: 10, pb: 1.5, backgroundColor: "#ebebebff" }}>
         <Typography sx={{ fontSize: 20, fontWeight: 700, color: "#000", lineHeight: 1.2 }}>
           Upload Execution Data
         </Typography>
       </Box>
 
-      {/* ── Inline Upload Area ────────────────────────────────────────────── */}
+      {/* Upload Area */}
       <Box sx={{ px: 3, py: 2 }}>
         <Box
           onClick={() => { if (!uploading) fileInputRef.current?.click(); }}
@@ -136,10 +132,7 @@ const UploadPage = () => {
             opacity: uploading ? 0.6 : 1,
             transition: "all 0.15s ease",
             pointerEvents: uploading ? "none" : "auto",
-            "&:hover": !uploading ? {
-              borderColor: "#999",
-              backgroundColor: "#f5f5f5",
-            } : {},
+            "&:hover": !uploading ? { borderColor: "#999", backgroundColor: "#f5f5f5" } : {},
           }}
         >
           <input
@@ -152,43 +145,27 @@ const UploadPage = () => {
           />
 
           {selectedFile ? (
-            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 0.8}}>
+            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 0.8 }}>
               <InsertDriveFileOutlinedIcon sx={{ color: uploading ? "#bbb" : "#4caf50", fontSize: "2rem" }} />
-              <Typography
-                sx={{
-                  fontFamily: "'Inter', sans-serif",
-                  fontSize: "0.82rem",
-                  fontWeight: 600,
-                  color: uploading ? "#aaa" : "#2e7d32",
-                  maxWidth: "100%",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
-                }}
-              >
+              <Typography sx={{ fontSize: "0.82rem", fontWeight: 600, color: uploading ? "#aaa" : "#2e7d32", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "100%" }}>
                 {selectedFile.name}
               </Typography>
-              <Typography sx={{ fontFamily: "'Inter', sans-serif", fontSize: "0.7rem", color: "#aaa" }}>
+              <Typography sx={{ fontSize: "0.7rem", color: "#aaa" }}>
                 {(selectedFile.size / 1024).toFixed(1)} KB {!uploading && "· Click to change file"}
               </Typography>
             </Box>
           ) : (
             <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 0.8 }}>
               <UploadFileIcon sx={{ color: "#ccc", fontSize: "2rem" }} />
-              <Typography sx={{ fontFamily: "'Inter', sans-serif", fontSize: "0.82rem", color: "#555" }}>
+              <Typography sx={{ fontSize: "0.82rem", color: "#555" }}>
                 Drag & drop or{" "}
-                <span style={{ color: "#1a1a1a", fontWeight: 600, textDecoration: "underline" }}>
-                  browse
-                </span>
+                <span style={{ color: "#1a1a1a", fontWeight: 600, textDecoration: "underline" }}>browse</span>
               </Typography>
-              <Typography sx={{ fontFamily: "'Inter', sans-serif", fontSize: "0.7rem", color: "#bbb" }}>
-                JSON files only
-              </Typography>
+              <Typography sx={{ fontSize: "0.7rem", color: "#bbb" }}>JSON files only</Typography>
             </Box>
           )}
         </Box>
 
-        {/* Upload Button */}
         {selectedFile && (
           <Box sx={{ mt: 1.5, display: "flex", justifyContent: "flex-end" }}>
             <Button
@@ -197,7 +174,6 @@ const UploadPage = () => {
               variant="contained"
               disableElevation
               sx={{
-                fontFamily: "'Inter', sans-serif",
                 fontWeight: 700,
                 fontSize: "0.78rem",
                 textTransform: "none",
@@ -214,15 +190,13 @@ const UploadPage = () => {
                   <CircularProgress size={12} sx={{ color: "#aaa" }} />
                   Uploading...
                 </Box>
-              ) : (
-                "Upload"
-              )}
+              ) : "Upload"}
             </Button>
           </Box>
         )}
       </Box>
 
-      {/* ── Search + Records ──────────────────────────────────────────────── */}
+      {/* Search + Records */}
       <Box sx={{ px: 3, pb: 0.75 }}>
         <TextField
           placeholder="Search for an ExecutionID / BenchmarkType / BenchmarkCategory"
@@ -253,7 +227,6 @@ const UploadPage = () => {
             },
           }}
         />
-
         <Typography sx={{ fontSize: 12, fontWeight: 600, color: "#000", mt: 1 }}>
           Pipeline Records: {totalRecords}
         </Typography>
@@ -268,19 +241,14 @@ const UploadPage = () => {
           loading={loading}
           onLoadMore={loadMore}
           patchRecords={patchRecords}
+          removeRecords={removeRecords}
+          onNewRecord={silentRefreshPage1} // ← fires silent refresh for new records
           isReadyState={isReadyState}
+          // no activeFilters — show everything on UploadPage
         />
 
         {!loading && records.length === 0 && (
-          <Box
-            sx={{
-              textAlign: "center",
-              py: 8,
-              backgroundColor: "#ebebebff",
-              border: "1px solid #e0e0e0",
-              borderTop: "none",
-            }}
-          >
+          <Box sx={{ textAlign: "center", py: 8, backgroundColor: "#ebebebff", border: "1px solid #e0e0e0", borderTop: "none" }}>
             <Typography variant="h6" color="text.secondary" sx={{ fontSize: 14 }}>
               No records currently in the pipeline.
             </Typography>
@@ -288,7 +256,6 @@ const UploadPage = () => {
         )}
       </Box>
 
-      {/* ── Snackbar ──────────────────────────────────────────────────────── */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={5000}
@@ -296,12 +263,7 @@ const UploadPage = () => {
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
         sx={{ zIndex: 9999 }}
       >
-        <Alert
-          onClose={handleSnackbarClose}
-          severity={snackbar.severity}
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
+        <Alert onClose={handleSnackbarClose} severity={snackbar.severity} variant="filled" sx={{ width: "100%" }}>
           {snackbar.message}
         </Alert>
       </Snackbar>

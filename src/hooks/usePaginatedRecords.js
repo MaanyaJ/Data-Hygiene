@@ -18,16 +18,12 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
 
-  // Triggers WebSocket effect exactly once when first fetch succeeds
-  // Never resets — socket stays alive through refreshes and uploads
+  // Flips true after first successful fetch, never resets
+  // Socket connects once and stays alive through refreshes
   const [isReadyState, setIsReadyState] = useState(false);
 
   const abortRef = useRef(null);
   const fetchIdRef = useRef(0);
-
-  // Buffer for WS updates that arrive before the record is loaded via pagination.
-  // Map<ExecutionId, record> — applied when new records arrive, cleared on refresh.
-  const wsBufferRef = useRef({});
 
   const extraParamsKey = JSON.stringify(extraParams);
 
@@ -44,21 +40,6 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
     return () => clearTimeout(t);
   }, [searchInput]);
 
-  // ── Apply buffered WS updates to a batch of records ───────────────────────
-  const applyBuffer = (incoming) => {
-    const buf = wsBufferRef.current;
-    if (Object.keys(buf).length === 0) return incoming;
-
-    return incoming.map((record) => {
-      const buffered = buf[record.ExecutionId];
-      if (buffered) {
-        delete buf[record.ExecutionId]; // consumed
-        return { ...record, ...buffered };
-      }
-      return record;
-    });
-  };
-
   // ── Core fetch ────────────────────────────────────────────────────────────
   const fetchRecords = useCallback(
     async (pageNum, isNew = false) => {
@@ -73,9 +54,8 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
         setTotalRecords(0);
         setTotalPages(0);
         setMeta({});
-        wsBufferRef.current = {}; // clear buffer on fresh fetch
-        // ← intentionally NOT resetting isReadyState here
-        //   socket stays connected through refreshes and uploads
+        // intentionally NOT resetting isReadyState
+        // socket stays connected through refreshes and uploads
       }
 
       setLoading(true);
@@ -102,21 +82,15 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
         const incoming = Array.isArray(data?.data) ? data.data : [];
         const total = data?.total_invalid_records ?? incoming.length;
 
-        // Apply any buffered WS updates to the incoming records
-        const merged = applyBuffer(incoming);
-
         setTotalPages(Math.ceil(total / PAGE_SIZE));
         setTotalRecords(total);
-        setRecords((prev) => (isNew ? merged : [...prev, ...merged]));
+        setRecords((prev) => (isNew ? incoming : [...prev, ...incoming]));
 
         const { data: _d, total_invalid_records: _t, ...rest } = data;
         setMeta(rest);
 
-        // Flip once — after this the WebSocket connects and stays connected
-        setIsReadyState((prev) => {
-          if (!prev) return true;
-          return prev;
-        });
+        // Flip once — never resets
+        setIsReadyState((prev) => prev || true);
       } catch (err) {
         if (fetchId !== fetchIdRef.current) return;
         if (err.name !== "AbortError") {
@@ -130,33 +104,65 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
     [search, extraParamsKey]
   );
 
-  // ── Patch specific records in-place by ExecutionId ────────────────────────
-  // If a record isn't in the list yet, buffer it for when it loads.
+  // ── Patch records in-place by ExecutionId ─────────────────────────────────
+  // Called by WebSocket when a known record changes stage
   const patchRecords = useCallback((updates) => {
     const updateMap = Object.fromEntries(
       updates.map((u) => [u.ExecutionId, u])
     );
+    setRecords((prev) =>
+      prev.map((record) =>
+        updateMap[record.ExecutionId]
+          ? { ...record, ...updateMap[record.ExecutionId] }
+          : record
+      )
+    );
+  }, []);
 
-    setRecords((prev) => {
-      const foundIds = new Set();
-      const next = prev.map((record) => {
-        if (updateMap[record.ExecutionId]) {
-          foundIds.add(record.ExecutionId);
-          return { ...record, ...updateMap[record.ExecutionId] };
-        }
-        return record;
+  // ── Remove records that no longer match active filters ────────────────────
+  // Called by WebSocket on RecordsListPage when stage change breaks filter match
+  const removeRecords = useCallback((executionIds) => {
+    const idSet = new Set(executionIds);
+    setRecords((prev) => prev.filter((r) => !idSet.has(r.ExecutionId)));
+    setTotalRecords((prev) => Math.max(0, prev - executionIds.length));
+  }, []);
+
+  // ── Silent page 1 refresh ─────────────────────────────────────────────────
+  // Called by WebSocket on UploadPage when an unknown record enters pipeline
+  // No loader shown, no state wipe — just replaces page 1 slice quietly
+  const silentRefreshPage1 = useCallback(async () => {
+    const parsed = JSON.parse(extraParamsKey);
+    const qs = new URLSearchParams({
+      page: 1,
+      size: PAGE_SIZE,
+      search: search || "",
+      ...parsed,
+    });
+
+    try {
+      const res = await fetch(`${BASE_URL}?${qs}`);
+      if (!res.ok) return;
+      const data = await res.json();
+
+      const incoming = Array.isArray(data?.data) ? data.data : [];
+      const total = data?.total_invalid_records ?? incoming.length;
+
+      setTotalPages(Math.ceil(total / PAGE_SIZE));
+      setTotalRecords(total);
+
+      // Replace page 1 slice only, preserve pages 2+ already loaded
+      setRecords((prev) => {
+        const beyond = prev.slice(PAGE_SIZE);
+        return [...incoming, ...beyond];
       });
 
-      // Buffer any updates for records not yet loaded
-      for (const update of updates) {
-        if (!foundIds.has(update.ExecutionId)) {
-          wsBufferRef.current[update.ExecutionId] = update;
-        }
-      }
-
-      return next;
-    });
-  }, []);
+      const { data: _d, total_invalid_records: _t, ...rest } = data;
+      setMeta(rest);
+    } catch (err) {
+      console.error("[silentRefreshPage1]:", err);
+      // Swallow silently — never disrupt the UI
+    }
+  }, [search, extraParamsKey]);
 
   // ── Reset + refetch when search or extraParams change ────────────────────
   useEffect(() => {
@@ -198,6 +204,8 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
     refresh,
     meta,
     patchRecords,
-    isReadyState,  // ← boolean, triggers socket effect exactly once
+    removeRecords,
+    silentRefreshPage1,
+    isReadyState,
   };
-}
+}
