@@ -30,11 +30,11 @@ const getStageInfo = (record, extraParams) => {
 
   console.debug("[RecordCard] Stage raw:", stage, "→ normalized:", s, "isValid:", isValid, "isOnlyStandardization:", isOnlyStandardization);
 
-  // Requirement: if dismissing, always show 100% "Standardization completed"
-  if (record.isDismissing) {
-    return { pct: 100, label: "Standardization completed", color: "#22c55e", isValid: null };
-  }
 
+
+  if (s === "validation initiated") {
+    return { pct: 15, label: "Validation initiated…", color: "#f59e0b", isValid: null };
+  }
   if (s === "validation inprogress") {
     return { pct: 25, label: "Validation in progress…", color: "#f59e0b", isValid: null };
   }
@@ -220,7 +220,7 @@ const RecordCard = ({ record, index = 0, extraParams }) => {
           Updated On
         </Typography>
         <Typography sx={{ fontSize: 12, fontWeight: 600, color: "#111", lineHeight: 1.2 }}>
-          {new Date(record.updatedOn).toLocaleDateString()}
+          {new Date(record.updatedOn).toLocaleString()}
         </Typography>
       </Box>
 

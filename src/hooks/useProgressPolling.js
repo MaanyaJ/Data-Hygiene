@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback } from "react";
 import { API_URL } from "../config";
 
-const POLL_MS = 2000;
+const POLL_MS = 1000;
 const BATCH_URL = `${API_URL}/invalid-summary/batch`;
 
 export function useProgressPolling({ visibleIds, patchRecords, removeRecords, isReady, extraParams }) {
