@@ -25,7 +25,12 @@ function shouldRemove(normalizedStage, activeFilters) {
     return normalizedStage === "standardization_completed";
   }
 
-  // Dashboard, no filters → never remove
+  // Terminal failure stages: always remove from dashboard pipeline view
+  if (normalizedStage === "validation_failed" || normalizedStage === "standardization_failed") {
+    return true;
+  }
+
+  // Dashboard, no filters → never remove normal completions
   if (activeFilters.length === 0) return false;
 
   const hasValidation = activeFilters.includes("validation inprogress");
@@ -122,14 +127,12 @@ export function useProgressSocket({
               clearTimeout(pendingRemovals.get(idKey));
             }
 
-            // 1. Patch with a SYNTHETIC stage so RecordCard briefly shows the
-            //    completed progress bar (100% green) instead of the normal status view.
-            //    "standardization_completing" and "validation_completing" are not real
-            //    backend values — they only exist in the UI for this 1.5s flash.
-            const flashStage = ns.startsWith("validation")
-              ? "validation_completing"
-              : "standardization_completing";
-            patchRecords([{ ...record, Stage: flashStage }]);
+            // 1. Patch with the stage so RecordCard shows the state (green flash or red failure).
+            let displayStage = ns;
+            if (ns === "validation_completed") displayStage = "validation_completing";
+            if (ns === "standardization_completed") displayStage = "standardization_completing";
+            
+            patchRecords([{ ...record, Stage: displayStage }]);
 
             // 2. Remove the card after the flash delay
             const timer = setTimeout(() => {

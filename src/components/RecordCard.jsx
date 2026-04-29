@@ -24,33 +24,33 @@ const getStageInfo = (stage, isValid) => {
   console.debug("[RecordCard] Stage raw:", stage, "→ normalized:", s, "isValid:", isValid);
 
   if (s === "validation_initiated" || s === "validation_inprogress") {
-    return { pct: 25, label: "Validation in progress", color: "#f59e0b", isValid: null };
+    return { pct: 25, label: "Validation in progress", isValid: null };
   }
   if (s === "validation_completed") {
     if (isValid === true)
-      return { pct: null, label: "This record is valid", color: "#22c55e", isValid: true };
-    return { pct: 50, label: "Validation done — proceeding to standardization", color: "#f59e0b", isValid: false };
+      return { pct: null, label: "This record is valid", isValid: true };
+    return { pct: 50, label: "Validation done — proceeding to standardization", isValid: false };
   }
   // Synthetic flash stage — shown for 1.5s before record is removed when validation filter active
   if (s === "validation_completing") {
-    return { pct: 50, label: "Validation complete ✓", color: "#22c55e", isValid: null };
+    return { pct: 50, label: "Validation complete ✓", isValid: null };
   }
   if (s === "validation_failed") {
-    return { pct: 50, label: "Validation failed — review required", color: "#ef4444", isValid: null };
+    return { pct: null, label: "Validation failed", isValid: null };
   }
   if (s === "standardization_inprogress") {
-    return { pct: 75, label: "Standardization in progress…", color: "#3b82f6", isValid: null };
+    return { pct: 75, label: "Standardization in progress…", isValid: null };
   }
   // standardization_completing is a synthetic stage set by the WS hook just
   // before removing a card — gives a 1.5s flash of the completed bar.
   if (s === "standardization_completing") {
-    return { pct: 100, label: "Standardization complete ✓", color: "#22c55e", isValid: null };
+    return { pct: 100, label: "Standardization complete ✓", isValid: null };
   }
   // standardization_completed = record is fully done and came from the API.
   // Show the normal Status + Inconsistent Fields panel (no progress bar).
   if (s === "standardization_completed") return null;
   if (s === "standardization_failed") {
-    return { pct: 75, label: "Standardization failed — review required", color: "#ef4444", isValid: null };
+    return { pct: null, label: "Standardization failed", color: "#ef4444", isValid: null };
   }
 
   console.warn("[RecordCard] Unrecognised stage value:", stage);
@@ -59,7 +59,7 @@ const getStageInfo = (stage, isValid) => {
 
 
 /** Pipeline style progress */
-const PipelineProgress = ({ pct, label, color }) => {
+const PipelineProgress = ({ pct, label }) => {
   const segments = [
     { threshold: 25, name: "Validation In Progress" },
     { threshold: 50, name: "Validation Completed" },
@@ -220,7 +220,7 @@ const RecordCard = ({ record, index = 0 }) => {
             </Box>
           ) : (
             /* 25 / 50 / 75 % bars */
-            <PipelineProgress pct={stageInfo.pct} label={stageInfo.label} color={stageInfo.color} />
+            <PipelineProgress pct={stageInfo.pct} label={stageInfo.label} />
           )}
         </Box>
       ) : (

@@ -168,7 +168,7 @@ const ListHeader = ({
             }}
           >
             <Typography sx={{ fontSize: 12, fontWeight: 600, color: "#111", letterSpacing: 0.5 }}>
-              {showAgeFilters ? "AGE" : "STATUS"}
+              {showAgeFilters ? "AGE" : "STATE"}
               {filter.length > 0 && (
                 <Box component="span" sx={{ color: "#777", ml: 0.5, fontWeight: 400 }}>
                   ({filter.length})
