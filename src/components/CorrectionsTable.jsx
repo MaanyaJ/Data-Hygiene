@@ -93,7 +93,7 @@ const AcceptConfirmDialog = ({ open, onClose, onConfirm, fieldName, isAccepting 
         disabled={isAccepting}
         startIcon={
           isAccepting ? (
-            <CircularProgress size={14} color="inherit" />
+            <CircularProgress size={18} sx={{ color: "#fff" }} />
           ) : (
             <CheckCircleOutlineIcon />
           )
@@ -170,7 +170,7 @@ const L0ConfirmDialog = ({ open, onClose, onConfirm, submitting }) => (
         variant="contained"
         onClick={onConfirm}
         disabled={submitting}
-        startIcon={submitting ? <CircularProgress size={14} color="inherit" /> : null}
+        startIcon={submitting ? <CircularProgress size={18} sx={{ color: "#fff" }} /> : null}
         sx={{
           backgroundColor: "#000000"
         }}
@@ -289,7 +289,7 @@ const DraftRecordDialog = ({
               variant="contained"
               onClick={() => onSubmit(formValues)}
               disabled={!allFilled || submitting}
-              startIcon={submitting ? <CircularProgress size={14} color="inherit" /> : null}
+              startIcon={submitting ? <CircularProgress size={18} sx={{ color: "#fff" }} /> : null}
               sx={{
                 color: "#ffffff",
                 backgroundColor: "#000000",
@@ -612,7 +612,7 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                   );
                 })()}
 
-                {selectedIdx === "custom" && (
+                {String(selectedIdx).startsWith("custom_") && (
                   <Typography
                     sx={{
                       fontSize: 10,
@@ -630,23 +630,25 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
 
                 <ChooseOtherValueDropdown
                   invalidField={group.invalid_field}
-                  isSelected={selectedIdx === "custom"}
-                  onSelectCustom={() => handleSelectCustom(groupIdx)}
+                  isSelected={String(selectedIdx).startsWith("custom_")}
+                  onSelectCustom={(idx) => handleSelectCustom(groupIdx, idx)}
                   onClearCustom={() => handleClearCustom(groupIdx)}
                   onCustomMetadataFetch={(meta) => handleCustomMetadataFetch(groupIdx, meta)}
                   isPending={isPending}
                   theme={activeTheme}
                 />
 
-                {customSuggestions[groupIdx] &&
-                  Object.keys(customSuggestions[groupIdx]).length > 0 &&
-                  (() => {
-                    const isSelected = selectedIdx === "custom";
+                {customSuggestions[groupIdx]?.records?.length > 0 &&
+                  customSuggestions[groupIdx].records.map((recordObj, ri) => {
+                    const isSelected = selectedIdx === `custom_${ri}`;
                     const gStatus = group.currentStatus;
                     const isAccepted = gStatus === STATUS.ACCEPTED || gStatus === STATUS.APPROVED;
                     const activeTheme = isAccepted ? ACCEPTED : SELECTED;
 
-                    const baseSugg = customSuggestions[groupIdx];
+                    const baseSugg = { 
+                      [group.invalid_field]: customSuggestions[groupIdx].value, 
+                      ...(recordObj.metadata || recordObj) 
+                    };
                     const editedSugg = isSelected ? editedSuggestions[groupIdx] || {} : {};
                     const mergedSugg = { ...baseSugg, ...editedSugg };
 
@@ -661,19 +663,19 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                     }
 
                     return (
-                      <Box sx={{ mt: 1, px: 1.5 }}>
+                      <Box key={ri} sx={{ mt: 1, px: 1.5 }}>
                         <SuggestionRow
                           suggestion={mergedSugg}
                           isSelected={isSelected}
                           theme={activeTheme}
-                          onSelect={() => handleSelectCustom(groupIdx)}
+                          onSelect={() => handleSelectCustom(groupIdx, ri)}
                           onEditField={(key, newVal) => handleEditField(groupIdx, key, newVal)}
                           sutType={sutType}
                           isPending={isPending}
                         />
                       </Box>
                     );
-                  })()}
+                  })}
 
                 {/* ── Action Buttons (Accept / Submit Draft / Send to L0) ── */}
                 {isPending && (

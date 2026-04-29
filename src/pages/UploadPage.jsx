@@ -18,12 +18,12 @@ import { usePaginatedRecords } from "../hooks/usePaginatedRecords";
 import { API_URL } from "../config";
 
 const PIPELINE_STAGES = [
-  "validation_initiated",
-  "validation_inprogress",
-  "validation_completed",
-  "validation_failed",
-  "standardization_inprogress",
-  "standardization_failed",
+  "validation initiated",
+  "validation inprogress",
+  "validation completed",
+  "validation failed",
+  "standardization inprogress",
+  "standardization failed",
 ].join(",");
 
 const UploadPage = () => {

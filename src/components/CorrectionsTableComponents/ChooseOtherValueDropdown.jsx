@@ -35,22 +35,23 @@ const ChooseOtherValueDropdown = ({
       return;
     }
 
-    onSelectCustom();
     setFetchingMeta(true);
     try {
       const res = await fetch(`${API_URL}/metadata-values/${encodeURIComponent(primaryField)}/${encodeURIComponent(newVal)}`);
       const json = await res.json();
 
-      let meta = json;
-      if (json?.metadata_records && Array.isArray(json.metadata_records) && json.metadata_records.length > 0) {
-        meta = json.metadata_records[0].metadata || json.metadata_records[0];
+      let records = [];
+      if (json?.metadata_records && Array.isArray(json.metadata_records)) {
+        records = json.metadata_records;
       } else if (json?.data) {
-        meta = json.data;
+        records = [{ metadata: json.data }];
       } else if (json?.metadata) {
-        meta = json.metadata;
+        records = [{ metadata: json.metadata }];
+      } else {
+        records = [{ metadata: json }];
       }
 
-      onCustomMetadataFetch({ [primaryField]: newVal, ...meta });
+      onCustomMetadataFetch({ value: newVal, records });
     } catch (err) {
       console.error("metadata-values fetch error:", err);
     } finally {
@@ -75,7 +76,6 @@ const ChooseOtherValueDropdown = ({
         pointerEvents: isPending ? "auto" : "none",
       }}
     >
-      {/* Main Content */}
 
       <Box sx={{ flex: 1, px: 1.5, py: 0.5 }}>
         <Typography sx={{ fontSize: 11, fontWeight: 600, color: "#303030", mb: 0.5 }}>
@@ -106,7 +106,9 @@ const ChooseOtherValueDropdown = ({
                   ...params.InputProps,
                   endAdornment: (
                     <React.Fragment>
-                      {loading || fetchingMeta ? <CircularProgress color="inherit" size={16} /> : null}
+                      {loading || fetchingMeta ? (
+                        <CircularProgress sx={{ color: "#000" }} size={20} />
+                      ) : null}
                       {params.InputProps.endAdornment}
                     </React.Fragment>
                   ),

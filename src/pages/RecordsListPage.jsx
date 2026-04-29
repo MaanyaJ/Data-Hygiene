@@ -7,7 +7,7 @@ import { usePaginatedRecords } from "../hooks/usePaginatedRecords";
 import { useRefresh } from "../context/RefreshContext";
 
 const MODE_CONFIG = {
-  landing:   { title: "Data Hygiene Dashboard", showStatusFilters: true, showStageFilters: true, defaultStage: "standardization_completed" },
+  landing:   { title: "Data Hygiene Dashboard", showStatusFilters: true, showStageFilters: true },
   active:    { title: "My Active List",          defaultStatus: "pending",           showAgeFilters: true },
   completed: { title: "My Completed List",       defaultStatus: "accepted,rejected", showStatusFilters: true, allowedFilters: ["accepted", "rejected"] },
   onhold:    { title: "On Hold Records",         defaultStatus: "On Hold",           showAgeFilters: true },
@@ -32,6 +32,8 @@ const RecordsListPage = ({ mode = "landing" }) => {
     }
   };
 
+  const STAGE_FILTER_VALUES = ["validation inprogress", "standardization inprogress"];
+
   const extraParams = useMemo(() => {
     // Age-filtered pages (active, onhold)
     if (!config.showStatusFilters) {
@@ -40,12 +42,17 @@ const RecordsListPage = ({ mode = "landing" }) => {
       return params;
     }
 
-    // Status-filtered pages (landing, completed, all)
-    // defaultStage is always sent as-is — no stage filters exist on these pages
+    // Status/stage-filtered pages (landing, completed, all)
     const params = {};
     if (config.defaultStage)  params.stage  = config.defaultStage;
     if (config.defaultStatus) params.status = config.defaultStatus;
-    if (filter.length > 0)    params.status = filter.join(","); // user-selected status overrides default
+
+    if (filter.length > 0) {
+      const statuses = filter.filter((v) => !STAGE_FILTER_VALUES.includes(v));
+      const stages   = filter.filter((v) =>  STAGE_FILTER_VALUES.includes(v));
+      if (statuses.length > 0) params.status = statuses.join(",");
+      if (stages.length   > 0) params.stage  = stages.join(",");
+    }
 
     return params;
   }, [mode, filter, config.showStatusFilters, config.defaultStage, config.defaultStatus]);
@@ -66,9 +73,47 @@ const RecordsListPage = ({ mode = "landing" }) => {
     meta,
     patchRecords,
     removeRecords,
+    updateCounts,
     isReadyState,
-    // silentRefreshPage1 not needed here — RecordsListPage doesn't add new records via WS
   } = usePaginatedRecords({ extraParams });
+
+  // Calculate dynamic total based on active filters and summary counts
+  const displayTotal = useMemo(() => {
+    if (!meta) return totalRecords;
+
+    const STATUS_MAP = {
+      pending: "PENDING",
+      accepted: "ACCEPTED",
+      rejected: "REJECTED",
+      "On Hold": "ON HOLD",
+      "standardization inprogress": "STANDARDIZATION_IN_PROGRESS"
+    };
+    const AGE_MAP = { "<3": "green", "3-6": "yellow", ">6": "red" };
+
+    const getFilterCount = (f) => {
+      if (f === "validation inprogress") {
+        return (meta.VALIDATION_INITIATED || 0) + (meta.VALIDATION_IN_PROGRESS || 0);
+      }
+      const key = STATUS_MAP[f] ?? AGE_MAP[f];
+      return meta[key] || 0;
+    };
+
+    if (filter.length === 0) {
+      // Sum all pipeline categories when no filters applied
+      return (
+        (meta.PENDING || 0) +
+        (meta.ACCEPTED || 0) +
+        (meta["ON HOLD"] || 0) +
+        (meta.REJECTED || 0) +
+        (meta.VALIDATION_INITIATED || 0) +
+        (meta.VALIDATION_IN_PROGRESS || 0) +
+        (meta.STANDARDIZATION_IN_PROGRESS || 0)
+      );
+    }
+
+    // Sum counts for each active filter
+    return filter.reduce((acc, f) => acc + getFilterCount(f), 0);
+  }, [filter, meta, totalRecords]);
 
   useEffect(() => {
     registerRefresh(refresh);
@@ -94,8 +139,8 @@ const RecordsListPage = ({ mode = "landing" }) => {
         showStageFilters={config.showStageFilters}
         allowedFilters={config.allowedFilters}
         loading={isSearching}
-        totalRecords={totalRecords}
-        countLabel={String(totalRecords)}
+        totalRecords={displayTotal}
+        countLabel={String(displayTotal)}
         onRefresh={refresh}
       />
 
@@ -110,9 +155,9 @@ const RecordsListPage = ({ mode = "landing" }) => {
           onLoadMore={loadMore}
           patchRecords={patchRecords}
           removeRecords={removeRecords}
-          // onNewRecord not passed — RecordsListPage doesn't need to add new records
-          isReadyState={isReadyState}
+          updateCounts={updateCounts}
           activeFilters={filter}
+          isReadyState={isReadyState}
         />
 
         {!loading && records.length === 0 && (

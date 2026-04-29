@@ -2,7 +2,6 @@ import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 import RecordsListPage from './pages/RecordsListPage'
 import DetailsPage from './pages/DetailsPage'
-import UploadPage from './pages/UploadPage'
 import { RefreshProvider } from './context/RefreshContext'
 
 const App = () => {
@@ -15,7 +14,6 @@ const App = () => {
         <Route path="/completed" element={<RecordsListPage key="completed" mode="completed" />} />
         <Route path="/on-hold" element={<RecordsListPage key="onhold" mode="onhold" />} />
         <Route path="/all" element={<RecordsListPage key="all" mode="all" />} />
-        <Route path="/upload" element={<UploadPage />} />
         <Route path="/:id" element={<DetailsPage />} />
       </Routes>
       </RefreshProvider>

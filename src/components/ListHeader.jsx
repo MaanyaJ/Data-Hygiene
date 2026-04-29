@@ -8,6 +8,7 @@ import {
   InputAdornment,
   Checkbox,
   Popover,
+  Divider,
 } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import Navbar from "./Navbar";
@@ -21,6 +22,7 @@ const ListHeader = ({
   counts = {},
   showAgeFilters = false,
   showStatusFilters = false,
+  showStageFilters = false,
   allowedFilters,
   loading,
   totalRecords,
@@ -41,6 +43,11 @@ const ListHeader = ({
     { label: "ON HOLD", value: "On Hold" },
   ];
 
+  const STAGE_FILTERS = [
+    { label: "VALIDATION IN PROGRESS",     value: "validation inprogress" },
+    { label: "STANDARDIZATION IN PROGRESS", value: "standardization inprogress" },
+  ];
+
   const baseFilters = showAgeFilters
     ? AGE_FILTERS
     : showStatusFilters
@@ -55,20 +62,32 @@ const ListHeader = ({
     onFilterChange(value);
   };
 
-  // Map filter value → summary key from API response
+  // Map filter value → summary key from API / WS response
   const STATUS_KEY_MAP = {
-    pending: "PENDING",
-    accepted: "ACCEPTED",
-    rejected: "REJECTED",
-    "On Hold": "ON HOLD",
+    pending:    "PENDING",
+    accepted:   "ACCEPTED",
+    rejected:   "REJECTED",
+    "On Hold":  "ON HOLD",
+    "validation inprogress":      "VALIDATION_IN_PROGRESS",
+    "standardization inprogress": "STANDARDIZATION_IN_PROGRESS",
   };
   const AGE_KEY_MAP = { "<3": "green", "3-6": "yellow", ">6": "red" };
 
   const getCount = (filterValue) => {
-    const summary = counts?.summary;
-    if (!summary) return null;
+    if (!counts) return null;
+
+    if (filterValue === "validation inprogress") {
+      const init = counts.VALIDATION_INITIATED || 0;
+      const prog = counts.VALIDATION_IN_PROGRESS || 0;
+      // If both are 0, might mean the keys aren't in this message; 
+      // but usually we want to show 0 if explicitly present.
+      // We'll return the sum if either exists.
+      if (counts.VALIDATION_INITIATED === undefined && counts.VALIDATION_IN_PROGRESS === undefined) return null;
+      return init + prog;
+    }
+
     const key = STATUS_KEY_MAP[filterValue] ?? AGE_KEY_MAP[filterValue];
-    const val = key !== undefined ? summary[key] : undefined;
+    const val = key !== undefined ? counts[key] : undefined;
     return val !== undefined ? val : null;
   };
 
@@ -180,7 +199,6 @@ const ListHeader = ({
             <Stack sx={{ p: 1 }} gap={0.5}>
               {visibleFilters.map((f) => {
                 const isActive = f.value === "" ? filter.length === 0 : filter.includes(f.value);
-
                 return (
                   <Box
                     key={f.value || "all"}
@@ -199,22 +217,9 @@ const ListHeader = ({
                     <Checkbox
                       checked={isActive}
                       size="small"
-                      sx={{
-                        p: 0,
-                        color: "#999",
-                        "&.Mui-checked": { color: "#000" },
-                      }}
+                      sx={{ p: 0, color: "#999", "&.Mui-checked": { color: "#000" } }}
                     />
-                    <Typography
-                      sx={{
-                        fontSize: 12,
-                        fontWeight: 550,
-                        color: "#111",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 0.5,
-                      }}
-                    >
+                    <Typography sx={{ fontSize: 12, fontWeight: 550, color: "#111", display: "flex", alignItems: "center", gap: 0.5 }}>
                       {f.label}
                       <Box component="span" sx={{ fontSize: 11, fontWeight: 400, color: "#888" }}>
                         ({loading ? "0" : getCount(f.value)?.toLocaleString() || "0"})
@@ -223,6 +228,44 @@ const ListHeader = ({
                   </Box>
                 );
               })}
+
+              {/* Stage filters — only on pages that opt in (landing/dashboard) */}
+              {showStageFilters && (
+                <>
+                  <Divider sx={{ my: 0.5 }} />
+                  {STAGE_FILTERS.map((f) => {
+                    const isActive = filter.includes(f.value);
+                    return (
+                      <Box
+                        key={f.value}
+                        onClick={() => handleFilterClick(f.value)}
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                          px: 1,
+                          py: 1,
+                          cursor: "pointer",
+                          borderRadius: "2px",
+                          "&:hover": { backgroundColor: "#f5f5f5" },
+                        }}
+                      >
+                        <Checkbox
+                          checked={isActive}
+                          size="small"
+                          sx={{ p: 0, color: "#999", "&.Mui-checked": { color: "#000" } }}
+                        />
+                        <Typography sx={{ fontSize: 12, fontWeight: 550, color: "#111", display: "flex", alignItems: "center", gap: 0.5 }}>
+                          {f.label}
+                          <Box component="span" sx={{ fontSize: 11, fontWeight: 400, color: "#888" }}>
+                            ({loading ? "0" : getCount(f.value)?.toLocaleString() || "0"})
+                          </Box>
+                        </Typography>
+                      </Box>
+                    );
+                  })}
+                </>
+              )}
             </Stack>
           </Popover>
         </Box>

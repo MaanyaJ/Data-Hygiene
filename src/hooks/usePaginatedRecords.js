@@ -79,15 +79,18 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
 
         if (fetchId !== fetchIdRef.current) return;
 
-        const incoming = Array.isArray(data?.data) ? data.data : [];
+        const incoming = (Array.isArray(data?.data) ? data.data : []).map((r) => ({
+          ...r,
+          ExecutionId: String(r.ExecutionId || r.execution_id || r.executionId || ""),
+        }));
         const total = data?.total_invalid_records ?? incoming.length;
 
         setTotalPages(Math.ceil(total / PAGE_SIZE));
         setTotalRecords(total);
         setRecords((prev) => (isNew ? incoming : [...prev, ...incoming]));
 
-        const { data: _d, total_invalid_records: _t, ...rest } = data;
-        setMeta(rest);
+        const { data: _d, total_invalid_records: _t, summary, ...rest } = data;
+        setMeta({ ...rest, ...(summary || {}) });
 
         // Flip once — never resets
         setIsReadyState((prev) => prev || true);
@@ -107,23 +110,33 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
   // ── Patch records in-place by ExecutionId ─────────────────────────────────
   // Called by WebSocket when a known record changes stage
   const patchRecords = useCallback((updates) => {
-    const updateMap = Object.fromEntries(
-      updates.map((u) => [u.ExecutionId, u])
-    );
+    // Normalize updates to use string ExecutionId
+    const normalizedUpdates = updates.map((u) => ({
+      ...u,
+      ExecutionId: String(u.ExecutionId || u.execution_id || u.executionId || ""),
+    }));
+    const updateMap = new Map(normalizedUpdates.map((u) => [u.ExecutionId, u]));
+
     setRecords((prev) =>
-      prev.map((record) =>
-        updateMap[record.ExecutionId]
-          ? { ...record, ...updateMap[record.ExecutionId] }
-          : record
-      )
+      prev.map((r) => {
+        const id = String(r.ExecutionId || r.execution_id || r.executionId || "");
+        const up = updateMap.get(id);
+        return up ? { ...r, ...up } : r;
+      })
     );
   }, []);
 
-  // ── Remove records that no longer match active filters ────────────────────
-  // Called by WebSocket on RecordsListPage when stage change breaks filter match
+  // ── Remove records from the list ─────────────────────────────────────────
+  // Called by WebSocket when a record reaches standardization_completed.
+  // Fixes:
+  //   1. totalRecords is decremented so InfiniteLoader doesn't auto-fetch more pages.
+  //   2. String() coercion on both sides — WS may send execution_id as a number
+  //      while the REST API returns ExecutionId as a string; Set uses strict equality
+  //      so without coercion the lookup silently fails and the record stays on screen.
   const removeRecords = useCallback((executionIds) => {
-    const idSet = new Set(executionIds);
-    setRecords((prev) => prev.filter((r) => !idSet.has(r.ExecutionId)));
+    const idSet = new Set(executionIds.map(String));
+    setRecords((prev) => prev.filter((r) => !idSet.has(String(r.ExecutionId))));
+    setTotalRecords((prev) => Math.max(0, prev - executionIds.length));
   }, []);
 
 
@@ -139,6 +152,14 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
     if (page > 1) fetchRecords(page, false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
+
+  const updateCounts = useCallback((summary) => {
+    if (!summary) return;
+    setMeta((prev) => ({ ...prev, ...summary }));
+    if (summary.TOTAL_INVALID_RECORDS !== undefined) {
+      setTotalRecords(summary.TOTAL_INVALID_RECORDS);
+    }
+  }, []);
 
   const loadMore = useCallback(() => setPage((p) => p + 1), []);
 
@@ -168,6 +189,7 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
     meta,
     patchRecords,
     removeRecords,
+    updateCounts,
     isReadyState,
   };
 }

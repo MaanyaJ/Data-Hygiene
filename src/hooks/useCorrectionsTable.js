@@ -91,8 +91,9 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
       if (changesArr) {
         const displayObj = buildDisplayObjectFromChanges(changesArr);
         if (displayObj && Object.keys(displayObj).length > 0) {
-          initialSelections[groupIdx] = "custom";
-          initialCustom[groupIdx] = displayObj;
+          const val = displayObj[primaryField] || displayObj[primaryField.toLowerCase()] || "";
+          initialSelections[groupIdx] = "custom_0";
+          initialCustom[groupIdx] = { value: val, records: [{ metadata: displayObj }] };
           return;
         }
       }
@@ -119,13 +120,14 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
     });
   }, []);
  
-  const handleSelectCustom = useCallback((groupIdx) => {
+  const handleSelectCustom = useCallback((groupIdx, recordIdx = 0) => {
+    const key = `custom_${recordIdx}`;
     setSelectedSuggestions((prev) => {
       const next = { ...prev };
-      if (next[groupIdx] === "custom") {
+      if (next[groupIdx] === key) {
         delete next[groupIdx];
       } else {
-        next[groupIdx] = "custom";
+        next[groupIdx] = key;
       }
       return next;
     });
@@ -171,10 +173,18 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
     const suggIdx = selectedSuggestions[groupIdx];
     if (suggIdx === undefined) return;
 
-    const baseChosen =
-      suggIdx === "custom"
-        ? customSuggestions[groupIdx] || {}
-        : group.suggestions[suggIdx];
+    let baseChosen = {};
+    if (String(suggIdx).startsWith("custom_")) {
+      const customData = customSuggestions[groupIdx];
+      const recIdx = parseInt(suggIdx.split("_")[1], 10);
+      const recordObj = customData?.records?.[recIdx];
+      baseChosen = { 
+        [group.invalid_field]: customData?.value, 
+        ...(recordObj?.metadata || recordObj || {}) 
+      };
+    } else {
+      baseChosen = group.suggestions[suggIdx];
+    }
 
     const customEdits = editedSuggestions[groupIdx] || {};
     const merged = { ...baseChosen, ...customEdits };

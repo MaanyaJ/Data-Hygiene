@@ -31,13 +31,23 @@ const getStageInfo = (stage, isValid) => {
       return { pct: null, label: "This record is valid", color: "#22c55e", isValid: true };
     return { pct: 50, label: "Validation done — proceeding to standardization", color: "#f59e0b", isValid: false };
   }
+  // Synthetic flash stage — shown for 1.5s before record is removed when validation filter active
+  if (s === "validation_completing") {
+    return { pct: 50, label: "Validation complete ✓", color: "#22c55e", isValid: null };
+  }
   if (s === "validation_failed") {
     return { pct: 50, label: "Validation failed — review required", color: "#ef4444", isValid: null };
   }
   if (s === "standardization_inprogress") {
     return { pct: 75, label: "Standardization in progress…", color: "#3b82f6", isValid: null };
   }
-  // standardization_completed → show normal Status + Inconsistent Fields
+  // standardization_completing is a synthetic stage set by the WS hook just
+  // before removing a card — gives a 1.5s flash of the completed bar.
+  if (s === "standardization_completing") {
+    return { pct: 100, label: "Standardization complete ✓", color: "#22c55e", isValid: null };
+  }
+  // standardization_completed = record is fully done and came from the API.
+  // Show the normal Status + Inconsistent Fields panel (no progress bar).
   if (s === "standardization_completed") return null;
   if (s === "standardization_failed") {
     return { pct: 75, label: "Standardization failed — review required", color: "#ef4444", isValid: null };

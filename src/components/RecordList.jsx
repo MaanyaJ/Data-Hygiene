@@ -20,11 +20,15 @@ const RecordList = ({
   onLoadMore,
   patchRecords,
   removeRecords,
+  updateCounts,   // live count updates from WS summary
+  activeFilters,  // undefined = UploadPage (always remove on std_completed); [] or [...] = dashboard
   isReadyState,
 }) => {
   useProgressSocket({
     patchRecords,
     removeRecords,
+    updateCounts,
+    activeFilters,
     isReady: isReadyState,
   });
 
