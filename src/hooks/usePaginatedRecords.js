@@ -81,9 +81,7 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
 
         const incoming = (Array.isArray(data?.data) ? data.data : []).map((r) => ({
           ...r,
-          ExecutionId: String(r.ExecutionId || r.execution_id || r.executionId || r.ExecutionID || "")
-            .trim()
-            .replace(/\s+/g, "-"),
+          ExecutionId: String(r.ExecutionId || r.execution_id || r.executionId || ""),
         }));
         const total = data?.total_invalid_records ?? incoming.length;
 
@@ -115,17 +113,13 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
     // Normalize updates to use string ExecutionId
     const normalizedUpdates = updates.map((u) => ({
       ...u,
-      ExecutionId: String(u.ExecutionId || u.execution_id || u.executionId || u.ExecutionID || "")
-        .trim()
-        .replace(/\s+/g, "-"),
+      ExecutionId: String(u.ExecutionId || u.execution_id || u.executionId || ""),
     }));
     const updateMap = new Map(normalizedUpdates.map((u) => [u.ExecutionId, u]));
 
     setRecords((prev) =>
       prev.map((r) => {
-        const id = String(r.ExecutionId || r.execution_id || r.executionId || r.ExecutionID || "")
-          .trim()
-          .replace(/\s+/g, "-");
+        const id = String(r.ExecutionId || r.execution_id || r.executionId || "");
         const up = updateMap.get(id);
         return up ? { ...r, ...up } : r;
       })

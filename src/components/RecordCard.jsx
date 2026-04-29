@@ -21,10 +21,6 @@ const getStageInfo = (stage, isValid) => {
   // Normalize: lowercase, trim, then collapse any run of spaces/underscores → single underscore
   const s = stage.toLowerCase().trim().replace(/[\s_]+/g, "_");
 
-  // standardization_completed = record is fully done and came from the API.
-  // Show the normal Status + Inconsistent Fields panel (no progress bar).
-  if (s === "standardization_completed") return null;
-
   console.debug("[RecordCard] Stage raw:", stage, "→ normalized:", s, "isValid:", isValid);
 
   if (s === "validation_initiated" || s === "validation_inprogress") {

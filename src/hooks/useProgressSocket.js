@@ -34,9 +34,9 @@ function shouldRemove(normalizedStage, activeFilters) {
   if (activeFilters.length === 0) return false;
 
   const hasValidation = activeFilters.includes("validation inprogress");
-  const hasStd = activeFilters.includes("standardization inprogress");
-  const hasPending = activeFilters.includes("pending");
-  const hasAnyStage = hasValidation || hasStd;
+  const hasStd        = activeFilters.includes("standardization inprogress");
+  const hasPending    = activeFilters.includes("pending");
+  const hasAnyStage   = hasValidation || hasStd;
 
   // No stage filters selected (only status filters like accepted/rejected/on hold)
   // → just patch, never remove
@@ -108,15 +108,13 @@ export function useProgressSocket({
           const ns = normalizeStage(message.stage);
 
           const record = {
-            ExecutionId: String(message.execution_id || message.ExecutionId || message.ExecutionID || "")
-              .trim()
-              .replace(/\s+/g, "-"),
-            Stage: message.stage,
-            Status: message.status || message.Status,
-            InvalidFields: message.invalidFields || message.invalid_fields || [],
-            suggestionsCount: message.suggestionsCount || message.suggestions_count || false,
-            updatedOn: message.updatedOn || message.updated_on,
-            BenchmarkType: message.benchmarkType || message.benchmark_type,
+            ExecutionId:       String(message.execution_id || message.ExecutionId),
+            Stage:             message.stage,
+            Status:            message.status || message.Status,
+            InvalidFields:     message.invalidFields    || message.invalid_fields || [],
+            suggestionsCount:  message.suggestionsCount || message.suggestions_count || false,
+            updatedOn:         message.updatedOn        || message.updated_on,
+            BenchmarkType:     message.benchmarkType    || message.benchmark_type,
             BenchmarkCategory: message.benchmarkCategory || message.benchmark_category,
           };
 
@@ -133,7 +131,7 @@ export function useProgressSocket({
             let displayStage = ns;
             if (ns === "validation_completed") displayStage = "validation_completing";
             if (ns === "standardization_completed") displayStage = "standardization_completing";
-
+            
             patchRecords([{ ...record, Stage: displayStage }]);
 
             // 2. Remove the card after the flash delay
