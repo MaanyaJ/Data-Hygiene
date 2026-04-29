@@ -52,7 +52,7 @@ function shouldRemove(normalizedStage, activeFilters) {
 }
 
 // Delay in ms between patching the final stage and removing the card
-const REMOVAL_FLASH_DELAY_MS = 1000;
+const REMOVAL_FLASH_DELAY_MS = 500;
 
 export function useProgressSocket({
   patchRecords,
