@@ -199,23 +199,34 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
       accepted_value: value,
       currentStatus: STATUS.ACCEPTED,
     };
- 
+
+    // ── Build metadata object from all fields in merged, excluding internals ──
+    const internalKeys = [
+      "_id", "execution_id", "snapshot_id", "search_key",
+      "score", "status",
+      primaryField, primaryField?.toLowerCase(),
+    ];
+    const metadata = Object.fromEntries(
+      Object.entries(merged).filter(
+        ([k]) => !internalKeys.includes(k) && !internalKeys.includes(k.toLowerCase())
+      )
+    );
+    payload.metadata = metadata;
+
+    // ── CPU(s) handling — put inside metadata, prioritized by history if VM ──
+    let cpusVal = undefined;
     if (sutType?.toLowerCase() === "vm") {
-      // Prioritize CPU(s) from history
       const historyChanges = getHistoryChangesForField(primaryField);
       const historyCpu = historyChanges?.find((c) => c.field?.toLowerCase() === "cpu(s)");
-      
-      let cpusVal = historyCpu?.to;
-      
-      // Fallback to merged suggestion/custom value if not in history
-      if (cpusVal === undefined) {
-        cpusVal = merged?.["cpu(s)"] || merged?.["CPU(s)"] || merged?.["CPU(S)"];
-      }
+      cpusVal = historyCpu?.to;
+    }
 
-      if (cpusVal !== undefined) {
-        // CPU(s) is an integer field, cast to number
-        payload["CPU(s)"] = isNaN(Number(cpusVal)) ? cpusVal : Number(cpusVal);
-      }
+    if (cpusVal === undefined) {
+      cpusVal = merged?.["cpu(s)"] || merged?.["CPU(s)"] || merged?.["CPU(S)"];
+    }
+
+    if (cpusVal !== undefined) {
+      payload.metadata["CPU(s)"] = isNaN(Number(cpusVal)) ? cpusVal : Number(cpusVal);
     }
 
     try {

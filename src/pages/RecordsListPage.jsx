@@ -7,11 +7,11 @@ import { usePaginatedRecords } from "../hooks/usePaginatedRecords";
 import { useRefresh } from "../context/RefreshContext";
 
 const MODE_CONFIG = {
-  landing:   { title: "Data Hygiene Dashboard", showStatusFilters: true, showStageFilters: true },
-  active:    { title: "My Active List",          defaultStatus: "pending",           showAgeFilters: true },
-  completed: { title: "My Completed List",       defaultStatus: "accepted,rejected", showStatusFilters: true, allowedFilters: ["accepted", "rejected"] },
-  onhold:    { title: "On Hold Records",         defaultStatus: "On Hold",           showAgeFilters: true },
-  all:       { title: "All Records",             showStatusFilters: true },
+  landing: { title: "Data Hygiene Dashboard", showStatusFilters: true, showStageFilters: true },
+  active: { title: "My Active List", defaultStatus: "pending", showAgeFilters: true },
+  completed: { title: "My Completed List", defaultStatus: "accepted,rejected", showStatusFilters: true, allowedFilters: ["accepted", "rejected"] },
+  onhold: { title: "On Hold Records", defaultStatus: "On Hold", showAgeFilters: true },
+  all: { title: "All Records", showStatusFilters: true },
 };
 
 const AGE_TO_SERVER = { "<3": "green", "3-6": "yellow", ">6": "red" };
@@ -32,7 +32,7 @@ const RecordsListPage = ({ mode = "landing" }) => {
     }
   };
 
-  const STAGE_FILTER_VALUES = ["validation inprogress", "standardization inprogress"];
+  const STAGE_FILTER_VALUES = ["validation inprogress,validation initiated", "standardization inprogress"];
 
   const extraParams = useMemo(() => {
     // Age-filtered pages (active, onhold)
@@ -44,14 +44,14 @@ const RecordsListPage = ({ mode = "landing" }) => {
 
     // Status/stage-filtered pages (landing, completed, all)
     const params = {};
-    if (config.defaultStage)  params.stage  = config.defaultStage;
+    if (config.defaultStage) params.stage = config.defaultStage;
     if (config.defaultStatus) params.status = config.defaultStatus;
 
     if (filter.length > 0) {
       const statuses = filter.filter((v) => !STAGE_FILTER_VALUES.includes(v));
-      const stages   = filter.filter((v) =>  STAGE_FILTER_VALUES.includes(v));
+      const stages = filter.filter((v) => STAGE_FILTER_VALUES.includes(v));
       if (statuses.length > 0) params.status = statuses.join(",");
-      if (stages.length   > 0) params.stage  = stages.join(",");
+      if (stages.length > 0) params.stage = stages.join(",");
     }
 
     return params;
@@ -91,7 +91,7 @@ const RecordsListPage = ({ mode = "landing" }) => {
     const AGE_MAP = { "<3": "green", "3-6": "yellow", ">6": "red" };
 
     const getFilterCount = (f) => {
-      if (f === "validation inprogress") {
+      if (f === "validation inprogress,validation initiated") {
         return (meta.VALIDATION_INITIATED || 0) + (meta.VALIDATION_IN_PROGRESS || 0);
       }
       const key = STATUS_MAP[f] ?? AGE_MAP[f];

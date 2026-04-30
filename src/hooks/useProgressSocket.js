@@ -33,7 +33,7 @@ function shouldRemove(normalizedStage, activeFilters) {
   // Dashboard, no filters → never remove normal completions
   if (activeFilters.length === 0) return false;
 
-  const hasValidation = activeFilters.includes("validation inprogress");
+  const hasValidation = activeFilters.includes("validation inprogress,validation initiated");
   const hasStd = activeFilters.includes("standardization inprogress");
   const hasPending = activeFilters.includes("pending");
   const hasAnyStage = hasValidation || hasStd;

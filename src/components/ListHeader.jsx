@@ -44,7 +44,7 @@ const ListHeader = ({
   ];
 
   const STAGE_FILTERS = [
-    { label: "VALIDATION IN PROGRESS",     value: "validation inprogress" },
+    { label: "VALIDATION IN PROGRESS", value: "validation inprogress,validation initiated" },
     { label: "STANDARDIZATION IN PROGRESS", value: "standardization inprogress" },
   ];
 
@@ -64,11 +64,11 @@ const ListHeader = ({
 
   // Map filter value → summary key from API / WS response
   const STATUS_KEY_MAP = {
-    pending:    "PENDING",
-    accepted:   "ACCEPTED",
-    rejected:   "REJECTED",
-    "On Hold":  "ON HOLD",
-    "validation inprogress":      "VALIDATION_IN_PROGRESS",
+    pending: "PENDING",
+    accepted: "ACCEPTED",
+    rejected: "REJECTED",
+    "On Hold": "ON HOLD",
+    "validation inprogress,validation initiated": "VALIDATION_IN_PROGRESS",
     "standardization inprogress": "STANDARDIZATION_IN_PROGRESS",
   };
   const AGE_KEY_MAP = { "<3": "green", "3-6": "yellow", ">6": "red" };
@@ -76,7 +76,7 @@ const ListHeader = ({
   const getCount = (filterValue) => {
     if (!counts) return null;
 
-    if (filterValue === "validation inprogress") {
+    if (filterValue === "validation inprogress,validation initiated") {
       const init = counts.VALIDATION_INITIATED || 0;
       const prog = counts.VALIDATION_IN_PROGRESS || 0;
       // If both are 0, might mean the keys aren't in this message; 
@@ -96,7 +96,7 @@ const ListHeader = ({
       <Navbar />
 
       {/* Page Header */}
-      <Box sx={{ px: 3, pt: 10, pb: 1.5, backgroundColor: "#ebebebff"}}>
+      <Box sx={{ px: 3, pt: 10, pb: 1.5, backgroundColor: "#ebebebff" }}>
         <Typography
           sx={{ fontSize: 20, fontWeight: 700, color: "#000", lineHeight: 1.2 }}
         >
@@ -135,7 +135,7 @@ const ListHeader = ({
               "&:hover fieldset": { borderColor: "#555" },
               "&.Mui-focused fieldset": { borderColor: "#000", borderWidth: "1px" },
             },
-            "& input": { px: 1, py: 0.5, fontSize: 12},
+            "& input": { px: 1, py: 0.5, fontSize: 12 },
           }}
           slotProps={{
             input: {
