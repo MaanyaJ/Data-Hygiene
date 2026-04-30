@@ -53,10 +53,23 @@ export function useBackgroundPolling({ refresh, mode, filter, loading, recordsCo
           conditionMet = Number(s?.to) > Number(s?.from);
           relevantToCount = Number(s?.to);
         } else if (mode === "landing") {
+          // 2. General landing page logic (monitors requested core stages)
           const v = counts?.VALIDATION_IN_PROGRESS;
-          const s = counts?.STANDARDIZATION_IN_PROGRESS;
-          conditionMet = (Number(v?.to) > Number(v?.from)) || (Number(s?.to) > Number(s?.from));
-          relevantToCount = Number(v?.to) + Number(s?.to);
+          const a = counts?.ACCEPTED;
+          const r = counts?.REJECTED;
+          const o = counts?.ON_HOLD;
+
+          const vTo = Number(v?.to || 0);
+          const vFrom = Number(v?.from || 0);
+          const aTo = Number(a?.to || 0);
+          const aFrom = Number(a?.from || 0);
+          const rTo = Number(r?.to || 0);
+          const rFrom = Number(r?.from || 0);
+          const oTo = Number(o?.to || 0);
+          const oFrom = Number(o?.from || 0);
+
+          conditionMet = (vTo > vFrom) || (aTo > aFrom) || (rTo > rFrom) || (oTo > oFrom);
+          relevantToCount = vTo + aTo + rTo + oTo;
         }
 
         // Secondary check: Use the DOM to see if any record cards are actually rendered or if the "No match" message is shown
