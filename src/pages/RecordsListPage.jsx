@@ -9,11 +9,11 @@ import { useRefresh } from "../context/RefreshContext";
 import { useBackgroundPolling } from "../hooks/useBackgroundPolling";
 
 const MODE_CONFIG = {
-  landing:   { title: "Data Hygiene Dashboard",  showStatusFilters: true, showStageFilters: true },
-  active:    { title: "My Active List",           defaultStatus: "pending",           showAgeFilters: true },
-  completed: { title: "My Completed List",        defaultStatus: "accepted,rejected", showStatusFilters: true, allowedFilters: ["accepted", "rejected"] },
-  onhold:    { title: "On Hold Records",          defaultStatus: "On Hold",           showAgeFilters: true },
-  all:       { title: "All Records",              showStatusFilters: true },
+  landing: { title: "Data Hygiene Dashboard", showStatusFilters: true, showStageFilters: true },
+  active: { title: "My Active List", defaultStatus: "pending", showAgeFilters: true },
+  completed: { title: "My Completed List", defaultStatus: "accepted,rejected", showStatusFilters: true, allowedFilters: ["accepted", "rejected"] },
+  onhold: { title: "On Hold Records", defaultStatus: "On Hold", showAgeFilters: true },
+  all: { title: "All Records", showStatusFilters: true },
 };
 
 const AGE_TO_SERVER = { "<3": "green", "3-6": "yellow", ">6": "red" };
@@ -45,10 +45,10 @@ const RecordsListPage = ({ mode = "landing" }) => {
 
     if (filter.length > 0) {
       const statuses = filter.filter((v) => !v.includes("validation") && !v.includes("standardization"));
-      const stages   = filter.filter((v) =>  v.includes("validation") ||  v.includes("standardization"));
+      const stages = filter.filter((v) => v.includes("validation") || v.includes("standardization"));
       const params = {};
       if (statuses.length > 0) params.status = statuses.join(",");
-      if (stages.length   > 0) params.stage  = stages.join(",");
+      if (stages.length > 0) params.stage = stages.join(",");
       return params;
     }
 
@@ -79,16 +79,16 @@ const RecordsListPage = ({ mode = "landing" }) => {
     registerRefresh(refresh);
   }, [refresh, registerRefresh]);
 
-  const { 
-    newRecordsAvailable, 
-    isBackgroundLoading, 
-    handleManualRefresh 
-  } = useBackgroundPolling({ 
-    refresh, 
-    mode, 
-    filter, 
-    loading, 
-    recordsCount: records.length 
+  const {
+    newRecordsAvailable,
+    isBackgroundLoading,
+    handleManualRefresh
+  } = useBackgroundPolling({
+    refresh,
+    mode,
+    filter,
+    loading,
+    recordsCount: records.length
   });
 
   const isSearching = loading && searchInput !== search;

@@ -7,13 +7,25 @@ const POLL_GAP_MS = 5000; // 5 seconds gap between polls
 export function useBackgroundPolling({ refresh, mode, filter, loading, recordsCount }) {
   const [newRecordsAvailable, setNewRecordsAvailable] = useState(false);
   const [isBackgroundLoading, setIsBackgroundLoading] = useState(false);
-  
+
   const timerRef = useRef(null);
   const lastLoadingState = useRef(loading);
+  const lastAutoRefreshCount = useRef(null);
+  const isFirstPollAfterLoad = useRef(true);
 
   const checkConditions = useCallback(async () => {
     // If a manual fetch started while we were waiting, don't do anything
     if (loading) return;
+
+    // Skip the very first poll after a manual fetch/reload ONLY if we already have records.
+    // If the screen is empty, we want to check immediately (in 5s) to populate it.
+    if (isFirstPollAfterLoad.current) {
+      isFirstPollAfterLoad.current = false;
+      if (recordsCount > 0) {
+        scheduleNextPoll();
+        return;
+      }
+    }
 
     try {
       const res = await fetch(COUNTS_URL);
@@ -22,34 +34,54 @@ export function useBackgroundPolling({ refresh, mode, filter, loading, recordsCo
 
       if (data.status === "success") {
         const counts = data.counts;
-        const v = counts?.VALIDATION_IN_PROGRESS;
-        const s = counts?.STANDARDIZATION_IN_PROGRESS;
-
-        const filterStr = filter.join(",");
-        const isValidationActive = filterStr.includes("validation") || mode === "active" || filter.includes("pending");
-        const isStandardizationOnly = (filterStr.includes("standardization") && !filterStr.includes("validation")) || 
-                                      filter.includes("accepted") || 
-                                      filter.includes("rejected") || 
-                                      filter.includes("On Hold");
+        const filterStr = filter.join(",").toLowerCase();
 
         let conditionMet = false;
-        if (mode === "landing") {
-          conditionMet = (v?.to > v?.from) || (s?.to > s?.from);
-        } else if (isStandardizationOnly) {
-          conditionMet = s?.to > 0;
-        } else if (isValidationActive) {
-          conditionMet = v?.to > v?.from;
+        let relevantToCount = 0;
+
+        // 1. Determine conditions and the 'relevant' count based on active filters
+        if (filter.includes("pending") || mode === "active") {
+          const p = counts?.PENDING;
+          conditionMet = Number(p?.to) > Number(p?.from);
+          relevantToCount = Number(p?.to);
+        } else if (filterStr.includes("validation")) {
+          const v = counts?.VALIDATION_IN_PROGRESS;
+          conditionMet = Number(v?.to) > Number(v?.from);
+          relevantToCount = Number(v?.to);
+        } else if (filterStr.includes("standardization") || filter.includes("accepted") || filter.includes("rejected")) {
+          const s = counts?.STANDARDIZATION_IN_PROGRESS;
+          conditionMet = Number(s?.to) > Number(s?.from);
+          relevantToCount = Number(s?.to);
+        } else if (mode === "landing") {
+          const v = counts?.VALIDATION_IN_PROGRESS;
+          const s = counts?.STANDARDIZATION_IN_PROGRESS;
+          conditionMet = (Number(v?.to) > Number(v?.from)) || (Number(s?.to) > Number(s?.from));
+          relevantToCount = Number(v?.to) + Number(s?.to);
         }
 
-        if (conditionMet) {
-          if (recordsCount === 0) {
-            // Auto-loader type refetch: Refresh immediately if list is empty
-            setIsBackgroundLoading(true);
-            refresh();
-          } else {
-            // Twitter style: Show button if records already exist
-            setNewRecordsAvailable(true);
-          }
+        // Secondary check: Use the DOM to see if any record cards are actually rendered or if the "No match" message is shown
+        const domRecordCount = document.querySelectorAll('.record-card').length;
+        const isNoMatchTextVisible = document.body.innerText.includes("No records match the selected filter");
+        const isActuallyEmpty = recordsCount === 0 || domRecordCount === 0 || isNoMatchTextVisible;
+
+        // Empty screen logic: Auto-refresh if screen is empty but server has records (relevantToCount > 0)
+        // Safety: only refresh if the count has CHANGED since the last auto-refresh attempt to avoid infinite loops
+        if (isActuallyEmpty && relevantToCount > 0 && relevantToCount !== lastAutoRefreshCount.current) {
+          lastAutoRefreshCount.current = relevantToCount;
+          setIsBackgroundLoading(true);
+          refresh();
+        } else if (conditionMet && !isActuallyEmpty) {
+          // Populated screen: Show notification button on increase
+          setNewRecordsAvailable(true);
+        } else if (conditionMet && isActuallyEmpty && relevantToCount > (lastAutoRefreshCount.current || 0)) {
+          // If we already tried an auto-refresh and it still resulted in 0, 
+          // but now the count has increased AGAIN, try one more time.
+          lastAutoRefreshCount.current = relevantToCount;
+          setIsBackgroundLoading(true);
+          refresh();
+        } else if (!conditionMet) {
+          // Hide button if no longer increasing
+          setNewRecordsAvailable(false);
         }
       }
     } catch (err) {
@@ -62,23 +94,24 @@ export function useBackgroundPolling({ refresh, mode, filter, loading, recordsCo
 
   const scheduleNextPoll = useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
-    
-    // Don't schedule if a manual fetch is active
-    if (loading) return;
+
+    // Don't schedule if manual fetch is active OR if mode is restricted (completed/onhold)
+    if (loading || mode === "completed" || mode === "onhold") return;
 
     timerRef.current = setTimeout(() => {
       checkConditions();
     }, POLL_GAP_MS);
-  }, [checkConditions, loading]);
+  }, [checkConditions, loading, mode]);
 
   useEffect(() => {
     // When manual loading finishes (or on mount), start the polling sequence
     if (lastLoadingState.current === true && loading === false) {
       setIsBackgroundLoading(false);
       setNewRecordsAvailable(false);
+      isFirstPollAfterLoad.current = true; // Reset the skip flag
       scheduleNextPoll();
     }
-    
+
     // If manual loading starts, kill any active timer immediately
     if (loading) {
       if (timerRef.current) clearTimeout(timerRef.current);
@@ -89,7 +122,7 @@ export function useBackgroundPolling({ refresh, mode, filter, loading, recordsCo
 
   // Initial Mount
   useEffect(() => {
-    if (!loading) {
+    if (!loading && mode !== "completed" && mode !== "onhold") {
       scheduleNextPoll();
     }
     return () => {
@@ -97,9 +130,9 @@ export function useBackgroundPolling({ refresh, mode, filter, loading, recordsCo
     };
   }, []);
 
-  return { 
-    newRecordsAvailable, 
-    isBackgroundLoading, 
+  return {
+    newRecordsAvailable,
+    isBackgroundLoading,
     handleManualRefresh: () => {
       setNewRecordsAvailable(false);
       refresh();

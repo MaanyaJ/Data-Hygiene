@@ -189,6 +189,7 @@ const RecordCard = ({ record, index = 0, extraParams }) => {
 
   return (
     <Box
+      className="record-card"
       sx={{
         display: "flex",
         justifyContent: "space-between",
