@@ -6,7 +6,44 @@ const DEBOUNCE_MS = 500;
 
 export const BASE_URL = `${API_URL}/invalid-summary`;
 
-export function usePaginatedRecords({ extraParams = {} } = {}) {
+// Compute display total from a summary object + active filters
+// No filters → sum all pipeline categories
+// Filters → sum only the relevant keys
+const VALIDATION_FILTER_KEY = "validation inprogress,validation initiated";
+const STD_FILTER_KEY = "standardization inprogress";
+
+function computeTotalFromSummary(summary, filters) {
+  const get = (key) => summary[key] || 0;
+
+  const getForFilter = (f) => {
+    if (f === VALIDATION_FILTER_KEY) return get("VALIDATION_INITIATED") + get("VALIDATION_IN_PROGRESS");
+    if (f === STD_FILTER_KEY)        return get("STANDARDIZATION_IN_PROGRESS");
+    if (f === "pending")             return get("PENDING");
+    if (f === "accepted")            return get("ACCEPTED");
+    if (f === "rejected")            return get("REJECTED"); // L0 data = rejected
+    if (f === "On Hold")             return get("ON HOLD");
+    if (f === "<3")                  return get("green");
+    if (f === "3-6")                 return get("yellow");
+    if (f === ">6")                  return get("red");
+    return 0;
+  };
+
+  if (!filters || filters.length === 0) {
+    return (
+      get("PENDING") +
+      get("REJECTED") +
+      get("ACCEPTED") +
+      get("ON HOLD") +
+      get("VALIDATION_INITIATED") +
+      get("VALIDATION_IN_PROGRESS") +
+      get("STANDARDIZATION_IN_PROGRESS")
+    );
+  }
+
+  return filters.reduce((acc, f) => acc + getForFilter(f), 0);
+}
+
+export function usePaginatedRecords({ extraParams = {}, activeFilters = [] } = {}) {
   const [page, setPage] = useState(1);
   const [records, setRecords] = useState([]);
   const [totalRecords, setTotalRecords] = useState(0);
@@ -18,29 +55,27 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
 
-  // Flips true after first successful fetch, never resets
-  // Socket connects once and stays alive through refreshes
   const [isReadyState, setIsReadyState] = useState(false);
 
   const abortRef = useRef(null);
   const fetchIdRef = useRef(0);
+  const activeFiltersRef = useRef(activeFilters);
+
+  useEffect(() => {
+    activeFiltersRef.current = activeFilters;
+  }, [activeFilters]);
 
   const extraParamsKey = JSON.stringify(extraParams);
 
-  // ── Abort on unmount ──────────────────────────────────────────────────────
   useEffect(() => {
-    return () => {
-      if (abortRef.current) abortRef.current.abort();
-    };
+    return () => { if (abortRef.current) abortRef.current.abort(); };
   }, []);
 
-  // ── Debounce search input ─────────────────────────────────────────────────
   useEffect(() => {
     const t = setTimeout(() => setSearch(searchInput), DEBOUNCE_MS);
     return () => clearTimeout(t);
   }, [searchInput]);
 
-  // ── Core fetch ────────────────────────────────────────────────────────────
   const fetchRecords = useCallback(
     async (pageNum, isNew = false) => {
       if (abortRef.current) abortRef.current.abort();
@@ -54,8 +89,6 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
         setTotalRecords(0);
         setTotalPages(0);
         setMeta({});
-        // intentionally NOT resetting isReadyState
-        // socket stays connected through refreshes and uploads
       }
 
       setLoading(true);
@@ -63,13 +96,7 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
 
       try {
         const parsed = JSON.parse(extraParamsKey);
-        const baseParams = {
-          page: pageNum,
-          size: PAGE_SIZE,
-          search: search || "",
-          ...parsed,
-        };
-
+        const baseParams = { page: pageNum, size: PAGE_SIZE, search: search || "", ...parsed };
         const qs = new URLSearchParams();
         Object.entries(baseParams).forEach(([k, v]) => qs.set(k, v));
 
@@ -83,17 +110,18 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
           ...r,
           ExecutionId: String(r.ExecutionId || r.execution_id || r.executionId || ""),
         }));
-        const total = data?.total_invalid_records ?? incoming.length;
+
+        // Always use total_records from the API as the source of truth
+        const total = data?.total_records ?? incoming.length;
 
         setTotalPages(Math.ceil(total / PAGE_SIZE));
         setTotalRecords(total);
         setRecords((prev) => (isNew ? incoming : [...prev, ...incoming]));
 
-        const { data: _d, total_invalid_records: _t, summary, ...rest } = data;
+        const { data: _d, total_records: _t, summary, ...rest } = data;
         setMeta({ ...rest, ...(summary || {}) });
 
-        // Flip once — never resets
-        setIsReadyState((prev) => prev || true);
+        setIsReadyState(true);
       } catch (err) {
         if (fetchId !== fetchIdRef.current) return;
         if (err.name !== "AbortError") {
@@ -107,16 +135,12 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
     [search, extraParamsKey]
   );
 
-  // ── Patch records in-place by ExecutionId ─────────────────────────────────
-  // Called by WebSocket when a known record changes stage
   const patchRecords = useCallback((updates) => {
-    // Normalize updates to use string ExecutionId
     const normalizedUpdates = updates.map((u) => ({
       ...u,
       ExecutionId: String(u.ExecutionId || u.execution_id || u.executionId || ""),
     }));
     const updateMap = new Map(normalizedUpdates.map((u) => [u.ExecutionId, u]));
-
     setRecords((prev) =>
       prev.map((r) => {
         const id = String(r.ExecutionId || r.execution_id || r.executionId || "");
@@ -126,70 +150,42 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
     );
   }, []);
 
-  // ── Remove records from the list ─────────────────────────────────────────
-  // Called by WebSocket when a record reaches standardization_completed.
-  // Fixes:
-  //   1. totalRecords is decremented so InfiniteLoader doesn't auto-fetch more pages.
-  //   2. String() coercion on both sides — WS may send execution_id as a number
-  //      while the REST API returns ExecutionId as a string; Set uses strict equality
-  //      so without coercion the lookup silently fails and the record stays on screen.
   const removeRecords = useCallback((executionIds) => {
     const idSet = new Set(executionIds.map(String));
     setRecords((prev) => prev.filter((r) => !idSet.has(String(r.ExecutionId))));
     setTotalRecords((prev) => Math.max(0, prev - executionIds.length));
   }, []);
 
+  // updateCounts: called on every WS summary message.
+  // Updates meta, then recomputes totalRecords from the summary
+  // using the currently active filters.
+  const updateCounts = useCallback((summary) => {
+    if (!summary) return;
+    setMeta((prev) => ({ ...prev, ...summary }));
 
-  // ── Reset + refetch when search or extraParams change ────────────────────
+    const newTotal = computeTotalFromSummary(summary, activeFiltersRef.current);
+    setTotalRecords(newTotal);
+  }, []);
+
   useEffect(() => {
     setPage(1);
     fetchRecords(1, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, extraParamsKey]);
 
-  // ── Load next page ────────────────────────────────────────────────────────
   useEffect(() => {
     if (page > 1) fetchRecords(page, false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
 
-  const updateCounts = useCallback((summary) => {
-    if (!summary) return;
-    setMeta((prev) => ({ ...prev, ...summary }));
-    if (summary.TOTAL_INVALID_RECORDS !== undefined) {
-      setTotalRecords(summary.TOTAL_INVALID_RECORDS);
-    }
-  }, []);
-
   const loadMore = useCallback(() => setPage((p) => p + 1), []);
-
-  const retry = useCallback(
-    () => fetchRecords(page, page === 1),
-    [fetchRecords, page]
-  );
-
-  const refresh = useCallback(() => {
-    setPage(1);
-    fetchRecords(1, true);
-  }, [fetchRecords]);
+  const retry = useCallback(() => fetchRecords(page, page === 1), [fetchRecords, page]);
+  const refresh = useCallback(() => { setPage(1); fetchRecords(1, true); }, [fetchRecords]);
 
   return {
-    records,
-    totalRecords,
-    totalPages,
-    page,
-    loading,
-    error,
-    searchInput,
-    setSearchInput,
-    search,
-    loadMore,
-    retry,
-    refresh,
-    meta,
-    patchRecords,
-    removeRecords,
-    updateCounts,
-    isReadyState,
+    records, totalRecords, totalPages, page, loading, error,
+    searchInput, setSearchInput, search,
+    loadMore, retry, refresh, meta,
+    patchRecords, removeRecords, updateCounts, isReadyState,
   };
 }

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Typography } from "@mui/material";
 import ListHeader from "../components/ListHeader";
 import RecordList from "../components/RecordList";
@@ -7,14 +7,15 @@ import { usePaginatedRecords } from "../hooks/usePaginatedRecords";
 import { useRefresh } from "../context/RefreshContext";
 
 const MODE_CONFIG = {
-  landing: { title: "Data Hygiene Dashboard", showStatusFilters: true, showStageFilters: true },
-  active: { title: "My Active List", defaultStatus: "pending", showAgeFilters: true },
-  completed: { title: "My Completed List", defaultStatus: "accepted,rejected", showStatusFilters: true, allowedFilters: ["accepted", "rejected"] },
-  onhold: { title: "On Hold Records", defaultStatus: "On Hold", showAgeFilters: true },
-  all: { title: "All Records", showStatusFilters: true },
+  landing:   { title: "Data Hygiene Dashboard", showStatusFilters: true,  showStageFilters: true },
+  active:    { title: "My Active List",          defaultStatus: "pending",            showAgeFilters: true },
+  completed: { title: "My Completed List",       defaultStatus: "accepted,rejected",  showStatusFilters: true, allowedFilters: ["accepted", "rejected"] },
+  onhold:    { title: "On Hold Records",         defaultStatus: "On Hold",            showAgeFilters: true },
+  all:       { title: "All Records",             showStatusFilters: true },
 };
 
 const AGE_TO_SERVER = { "<3": "green", "3-6": "yellow", ">6": "red" };
+const STAGE_FILTER_VALUES = ["validation inprogress,validation initiated", "standardization inprogress"];
 
 const RecordsListPage = ({ mode = "landing" }) => {
   const config = MODE_CONFIG[mode] || MODE_CONFIG.landing;
@@ -32,104 +33,40 @@ const RecordsListPage = ({ mode = "landing" }) => {
     }
   };
 
-  const STAGE_FILTER_VALUES = ["validation inprogress,validation initiated", "standardization inprogress"];
-
-  const extraParams = useMemo(() => {
-    // Age-filtered pages (active, onhold)
+  const extraParams = React.useMemo(() => {
     if (!config.showStatusFilters) {
       const params = { status: config.defaultStatus };
       if (filter.length > 0) params.age = filter.map((f) => AGE_TO_SERVER[f] || f).join(",");
       return params;
     }
 
-    // Status/stage-filtered pages (landing, completed, all)
     const params = {};
-    if (config.defaultStage) params.stage = config.defaultStage;
+    if (config.defaultStage)  params.stage  = config.defaultStage;
     if (config.defaultStatus) params.status = config.defaultStatus;
 
     if (filter.length > 0) {
       const statuses = filter.filter((v) => !STAGE_FILTER_VALUES.includes(v));
-      const stages = filter.filter((v) => STAGE_FILTER_VALUES.includes(v));
+      const stages   = filter.filter((v) =>  STAGE_FILTER_VALUES.includes(v));
       if (statuses.length > 0) params.status = statuses.join(",");
-      if (stages.length > 0) params.stage = stages.join(",");
+      if (stages.length   > 0) params.stage  = stages.join(",");
     }
 
     return params;
   }, [mode, filter, config.showStatusFilters, config.defaultStage, config.defaultStatus]);
 
   const {
-    records,
-    totalRecords,
-    totalPages,
-    page,
-    loading,
-    error,
-    searchInput,
-    setSearchInput,
-    search,
-    loadMore,
-    retry,
-    refresh,
-    meta,
-    patchRecords,
-    removeRecords,
-    updateCounts,
-    isReadyState,
-  } = usePaginatedRecords({ extraParams });
+    records, totalRecords, totalPages, page, loading, error,
+    searchInput, setSearchInput, search,
+    loadMore, retry, refresh, meta,
+    patchRecords, removeRecords, updateCounts, isReadyState,
+  } = usePaginatedRecords({ extraParams, activeFilters: filter });
 
-  // Calculate dynamic total based on active filters and summary counts
-  const displayTotal = useMemo(() => {
-    if (!meta) return totalRecords;
-
-    const STATUS_MAP = {
-      pending: "PENDING",
-      accepted: "ACCEPTED",
-      rejected: "REJECTED",
-      "On Hold": "ON HOLD",
-      "standardization inprogress": "STANDARDIZATION_IN_PROGRESS"
-    };
-    const AGE_MAP = { "<3": "green", "3-6": "yellow", ">6": "red" };
-
-    const getFilterCount = (f) => {
-      if (f === "validation inprogress,validation initiated") {
-        return (meta.VALIDATION_INITIATED || 0) + (meta.VALIDATION_IN_PROGRESS || 0);
-      }
-      const key = STATUS_MAP[f] ?? AGE_MAP[f];
-      return meta[key] || 0;
-    };
-
-    if (filter.length === 0) {
-      // Sum all pipeline categories when no filters applied
-      return (
-        (meta.PENDING || 0) +
-        (meta.ACCEPTED || 0) +
-        (meta["ON HOLD"] || 0) +
-        (meta.REJECTED || 0) +
-        (meta.VALIDATION_INITIATED || 0) +
-        (meta.VALIDATION_IN_PROGRESS || 0) +
-        (meta.STANDARDIZATION_IN_PROGRESS || 0)
-      );
-    }
-
-    // Sum counts for each active filter
-    return filter.reduce((acc, f) => acc + getFilterCount(f), 0);
-  }, [meta, filter, totalRecords]);
-
-  // ── Auto-refresh when local list is empty but server has records ──────────
-  // This bridges the gap during batch processing: when one batch finishes and
-  // vanishes, but the server has already pushed more records into the stage.
-  // Strict Logic: Only triggers if Standardization is the ONLY active filter.
+  // Auto-refresh when std-only filter is active but local list is empty
   useEffect(() => {
     if (loading || !isReadyState) return;
-
     const isOnlyStd = filter.length === 1 && filter[0] === "standardization inprogress";
     if (!isOnlyStd) return;
-
-    const stdCount = meta?.STANDARDIZATION_IN_PROGRESS || 0;
-
-    // If the server says there are records but our local list is empty, trigger a refresh
-    if (stdCount > 0 && records.length === 0) {
-      console.log("[AutoRefresh] Server has standardization records but local list is empty. Fetching...");
+    if ((meta?.STANDARDIZATION_IN_PROGRESS || 0) > 0 && records.length === 0) {
       refresh();
     }
   }, [meta, records.length, filter, loading, refresh, isReadyState]);
@@ -158,8 +95,7 @@ const RecordsListPage = ({ mode = "landing" }) => {
         showStageFilters={config.showStageFilters}
         allowedFilters={config.allowedFilters}
         loading={isSearching}
-        totalRecords={displayTotal}
-        countLabel={String(displayTotal)}
+        totalRecords={totalRecords}
         onRefresh={refresh}
       />
 
@@ -167,7 +103,6 @@ const RecordsListPage = ({ mode = "landing" }) => {
         <RecordList
           records={records}
           totalRecords={totalRecords}
-          countLabel={String(totalRecords)}
           totalPages={totalPages}
           page={page}
           loading={loading}
@@ -185,21 +120,11 @@ const RecordsListPage = ({ mode = "landing" }) => {
               {(() => {
                 const hasVal = filter.includes("validation inprogress,validation initiated");
                 const hasStd = filter.includes("standardization inprogress");
-                // Check if any filters other than Val/Std are selected
-                const otherFilters = filter.length > ((hasVal ? 1 : 0) + (hasStd ? 1 : 0));
-
-                if (hasVal && hasStd && !otherFilters) {
-                  return "No records left for validation or standardization.";
-                }
-                if (hasVal && !otherFilters) {
-                  return "Validation completed. No records left to validate.";
-                }
-                if (hasStd && !otherFilters) {
-                  return "Standardization completed. No records left to standardize.";
-                }
-                return filter.length > 0
-                  ? "No records match the selected filter."
-                  : "No records found in this category.";
+                const otherCount = filter.length - (hasVal ? 1 : 0) - (hasStd ? 1 : 0);
+                if (hasVal && hasStd && otherCount === 0) return "No records left for validation or standardization.";
+                if (hasVal && otherCount === 0) return "Validation completed. No records left to validate.";
+                if (hasStd && otherCount === 0) return "Standardization completed. No records left to standardize.";
+                return filter.length > 0 ? "No records match the selected filter." : "No records found in this category.";
               })()}
             </Typography>
           </Box>
