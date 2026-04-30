@@ -163,9 +163,25 @@ const RecordsListPage = ({ mode = "landing" }) => {
         {!loading && records.length === 0 && (
           <Box sx={{ textAlign: "center", py: 8, backgroundColor: "#ebebebff", border: "1px solid #e0e0e0", borderTop: "none" }}>
             <Typography variant="h6" color="text.secondary" sx={{ fontSize: 14 }}>
-              {filter.length > 0
-                ? "No records match the selected filter."
-                : "No records found in this category."}
+              {(() => {
+                const hasVal = filter.includes("validation inprogress,validation initiated");
+                const hasStd = filter.includes("standardization inprogress");
+                // Check if any filters other than Val/Std are selected
+                const otherFilters = filter.length > ((hasVal ? 1 : 0) + (hasStd ? 1 : 0));
+
+                if (hasVal && hasStd && !otherFilters) {
+                  return "No records left for validation or standardization.";
+                }
+                if (hasVal && !otherFilters) {
+                  return "Validation completed. No records left to validate.";
+                }
+                if (hasStd && !otherFilters) {
+                  return "Standardization completed. No records left to standardize.";
+                }
+                return filter.length > 0
+                  ? "No records match the selected filter."
+                  : "No records found in this category.";
+              })()}
             </Typography>
           </Box>
         )}
