@@ -35,8 +35,11 @@ const getStageInfo = (record, extraParams) => {
     return { pct: 100, label: "Standardization completed", color: "#22c55e", isValid: null };
   }
 
+  if (s === "validation initiated") {
+    return { pct: 15, label: "Validation initiated…", color: "#f59e0b", isValid: null };
+  }
   if (s === "validation inprogress") {
-    return { pct: 25, label: "Validation in progress…", color: "#f59e0b", isValid: null };
+    return { pct: 40, label: "Validation in progress…", color: "#f59e0b", isValid: null };
   }
   if (s === "validation completed") {
     if (isValid === true)
