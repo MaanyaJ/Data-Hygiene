@@ -113,7 +113,26 @@ const RecordsListPage = ({ mode = "landing" }) => {
 
     // Sum counts for each active filter
     return filter.reduce((acc, f) => acc + getFilterCount(f), 0);
-  }, [filter, meta, totalRecords]);
+  }, [meta, filter, totalRecords]);
+
+  // ── Auto-refresh when local list is empty but server has records ──────────
+  // This bridges the gap during batch processing: when one batch finishes and
+  // vanishes, but the server has already pushed more records into the stage.
+  // Strict Logic: Only triggers if Standardization is the ONLY active filter.
+  useEffect(() => {
+    if (loading || !isReadyState) return;
+
+    const isOnlyStd = filter.length === 1 && filter[0] === "standardization inprogress";
+    if (!isOnlyStd) return;
+
+    const stdCount = meta?.STANDARDIZATION_IN_PROGRESS || 0;
+
+    // If the server says there are records but our local list is empty, trigger a refresh
+    if (stdCount > 0 && records.length === 0) {
+      console.log("[AutoRefresh] Server has standardization records but local list is empty. Fetching...");
+      refresh();
+    }
+  }, [meta, records.length, filter, loading, refresh, isReadyState]);
 
   useEffect(() => {
     registerRefresh(refresh);
