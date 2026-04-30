@@ -43,9 +43,11 @@ export function useBackgroundPolling({ refresh, mode, filter, loading, recordsCo
 
         if (conditionMet) {
           if (recordsCount === 0) {
+            // Auto-loader type refetch: Refresh immediately if list is empty
             setIsBackgroundLoading(true);
             refresh();
           } else {
+            // Twitter style: Show button if records already exist
             setNewRecordsAvailable(true);
           }
         }

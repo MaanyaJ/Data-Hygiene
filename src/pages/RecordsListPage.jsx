@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, Button } from "@mui/material";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ListHeader from "../components/ListHeader";
 import RecordList from "../components/RecordList";
 import ErrorPage from "../components/ErrorPage";
@@ -120,33 +121,44 @@ const RecordsListPage = ({ mode = "landing" }) => {
         <Box
           sx={{
             position: "fixed",
-            top: 160,
+            top: 100,
             left: "50%",
             transform: "translateX(-50%)",
-            zIndex: 1000,
+            zIndex: 1100,
+            animation: "slideDown 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards",
+            "@keyframes slideDown": {
+              "0%": { transform: "translateX(-50%) translateY(-30px)", opacity: 0 },
+              "100%": { transform: "translateX(-50%) translateY(0)", opacity: 1 },
+            },
           }}
         >
-          <Box
+          <Button
             onClick={handleManualRefresh}
+            variant="contained"
+            startIcon={<ArrowUpwardIcon sx={{ fontSize: 18 }} />}
             sx={{
-              backgroundColor: "#000",
+              backgroundColor: "#1d9bf0", // Twitter Blue
               color: "#fff",
+              borderRadius: "9999px",
               px: 3,
               py: 1,
-              borderRadius: "2px",
-              cursor: "pointer",
-              fontSize: 13,
+              fontSize: "14px",
               fontWeight: 700,
-              boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
-              display: "flex",
-              alignItems: "center",
-              gap: 1,
-              "&:hover": { backgroundColor: "#333" },
-              transition: "all 0.2s ease"
+              textTransform: "none",
+              boxShadow: "0 4px 15px rgba(29, 155, 240, 0.4)",
+              transition: "all 0.2s ease-in-out",
+              "&:hover": {
+                backgroundColor: "#1a8cd8",
+                boxShadow: "0 6px 20px rgba(29, 155, 240, 0.6)",
+                transform: "translateY(-1px)",
+              },
+              "&:active": {
+                transform: "translateY(0)",
+              },
             }}
           >
-            NEW RECORDS AVAILABLE
-          </Box>
+            Show new records
+          </Button>
         </Box>
       )}
 
