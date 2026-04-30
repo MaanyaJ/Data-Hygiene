@@ -142,8 +142,17 @@ export function useProgressSocket({
 
             pendingRemovals.set(idKey, timer);
           } else {
-            // Patch stage in place (or no-op if record not currently loaded)
-            patchRecords([record]);
+            // Non-removal case: if standardization completes, show a quick 100% bar flash 
+            // before switching to the default "Status + Inconsistent Fields" UI.
+            if (ns === "standardization_completed") {
+              patchRecords([{ ...record, Stage: "standardization_completing" }]);
+              setTimeout(() => {
+                patchRecords([record]);
+              }, REMOVAL_FLASH_DELAY_MS);
+            } else {
+              // Normal patch for all other intermediate stages
+              patchRecords([record]);
+            }
           }
         } catch (err) {
           console.error("[WS] ❌ Failed to parse message:", err, "Raw:", event.data);
