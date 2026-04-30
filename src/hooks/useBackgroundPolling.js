@@ -1,87 +1,106 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { API_URL } from "../config";
 
-const BACKGROUND_POLL_MS = 2000;
 const COUNTS_URL = `${API_URL}/pipeline-counts`;
+const POLL_GAP_MS = 5000; // 5 seconds gap between polls
 
 export function useBackgroundPolling({ refresh, mode, filter, loading, recordsCount }) {
   const [newRecordsAvailable, setNewRecordsAvailable] = useState(false);
   const [isBackgroundLoading, setIsBackgroundLoading] = useState(false);
   
-  const initialDelayRef = useRef(null);
-  const pollIntervalRef = useRef(null);
+  const timerRef = useRef(null);
   const lastLoadingState = useRef(loading);
 
-  const shouldTriggerRefresh = useCallback((counts) => {
-    const v = counts?.VALIDATION_IN_PROGRESS;
-    const s = counts?.STANDARDIZATION_IN_PROGRESS;
+  const checkConditions = useCallback(async () => {
+    // If a manual fetch started while we were waiting, don't do anything
+    if (loading) return;
 
-    const filterStr = filter.join(",");
-    const isValidationActive = filterStr.includes("validation") || mode === "active" || filter.includes("pending");
-    const isStandardizationOnly = (filterStr.includes("standardization") && !filterStr.includes("validation")) || 
-                                  filter.includes("accepted") || 
-                                  filter.includes("rejected") || 
-                                  filter.includes("On Hold");
+    try {
+      const res = await fetch(COUNTS_URL);
+      if (!res.ok) return;
+      const data = await res.json();
 
-    if (mode === "landing") {
-      return (v?.to > v?.from) || (s?.to > s?.from);
-    }
-    if (isStandardizationOnly) {
-      return s?.to > 0;
-    }
-    if (isValidationActive) {
-      return v?.to > v?.from;
-    }
-    return false;
-  }, [mode, filter]);
+      if (data.status === "success") {
+        const counts = data.counts;
+        const v = counts?.VALIDATION_IN_PROGRESS;
+        const s = counts?.STANDARDIZATION_IN_PROGRESS;
 
-  const startPolling = useCallback(() => {
-    if (pollIntervalRef.current) return;
+        const filterStr = filter.join(",");
+        const isValidationActive = filterStr.includes("validation") || mode === "active" || filter.includes("pending");
+        const isStandardizationOnly = (filterStr.includes("standardization") && !filterStr.includes("validation")) || 
+                                      filter.includes("accepted") || 
+                                      filter.includes("rejected") || 
+                                      filter.includes("On Hold");
 
-    pollIntervalRef.current = setInterval(async () => {
-      try {
-        const res = await fetch(COUNTS_URL);
-        if (!res.ok) return;
-        const data = await res.json();
+        let conditionMet = false;
+        if (mode === "landing") {
+          conditionMet = (v?.to > v?.from) || (s?.to > s?.from);
+        } else if (isStandardizationOnly) {
+          conditionMet = s?.to > 0;
+        } else if (isValidationActive) {
+          conditionMet = v?.to > v?.from;
+        }
 
-        if (data.status === "success" && shouldTriggerRefresh(data.counts)) {
+        if (conditionMet) {
           if (recordsCount === 0) {
-            console.log("[Background Polling] List empty, auto-refreshing...");
             setIsBackgroundLoading(true);
             refresh();
           } else {
-            console.log("[Background Polling] New records found, showing notification.");
             setNewRecordsAvailable(true);
           }
         }
-      } catch (err) {
-        console.error("Background Polling Error:", err);
       }
-    }, BACKGROUND_POLL_MS);
-  }, [refresh, recordsCount, shouldTriggerRefresh]);
+    } catch (err) {
+      console.error("Background Polling Error:", err);
+    } finally {
+      // Schedule the next poll only AFTER this one is done
+      scheduleNextPoll();
+    }
+  }, [mode, filter, recordsCount, refresh, loading]);
+
+  const scheduleNextPoll = useCallback(() => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    
+    // Don't schedule if a manual fetch is active
+    if (loading) return;
+
+    timerRef.current = setTimeout(() => {
+      checkConditions();
+    }, POLL_GAP_MS);
+  }, [checkConditions, loading]);
 
   useEffect(() => {
+    // When manual loading finishes (or on mount), start the polling sequence
     if (lastLoadingState.current === true && loading === false) {
       setIsBackgroundLoading(false);
       setNewRecordsAvailable(false);
-      
-      if (initialDelayRef.current) clearTimeout(initialDelayRef.current);
-      initialDelayRef.current = setTimeout(() => {
-        startPolling();
-      }, 5000);
+      scheduleNextPoll();
     }
-    lastLoadingState.current = loading;
-  }, [loading, startPolling]);
+    
+    // If manual loading starts, kill any active timer immediately
+    if (loading) {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    }
 
+    lastLoadingState.current = loading;
+  }, [loading, scheduleNextPoll]);
+
+  // Initial Mount
   useEffect(() => {
+    if (!loading) {
+      scheduleNextPoll();
+    }
     return () => {
-      if (initialDelayRef.current) clearTimeout(initialDelayRef.current);
-      if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
+      if (timerRef.current) clearTimeout(timerRef.current);
     };
   }, []);
 
-  return { newRecordsAvailable, isBackgroundLoading, handleManualRefresh: () => {
-    setNewRecordsAvailable(false);
-    refresh();
-  }};
+  return { 
+    newRecordsAvailable, 
+    isBackgroundLoading, 
+    handleManualRefresh: () => {
+      setNewRecordsAvailable(false);
+      refresh();
+    }
+  };
 }
