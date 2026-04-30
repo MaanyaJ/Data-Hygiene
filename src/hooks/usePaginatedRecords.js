@@ -112,13 +112,13 @@ export function usePaginatedRecords({ extraParams = {}, activeFilters = [] } = {
         }));
 
         // Always use total_records from the API as the source of truth
-        const total = data?.total_records ?? incoming.length;
+        const total = data?.total_invalid_records ?? incoming.length;
 
         setTotalPages(Math.ceil(total / PAGE_SIZE));
         setTotalRecords(total);
         setRecords((prev) => (isNew ? incoming : [...prev, ...incoming]));
 
-        const { data: _d, total_records: _t, summary, ...rest } = data;
+        const { data: _d, total_invalid_records: _t, summary, ...rest } = data;
         setMeta({ ...rest, ...(summary || {}) });
 
         setIsReadyState(true);

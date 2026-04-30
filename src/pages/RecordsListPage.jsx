@@ -61,13 +61,23 @@ const RecordsListPage = ({ mode = "landing" }) => {
     patchRecords, removeRecords, updateCounts, isReadyState,
   } = usePaginatedRecords({ extraParams, activeFilters: filter });
 
-  // Auto-refresh when std-only filter is active but local list is empty
+  // Auto-refresh when only Val/Std filters are active but local list is empty
   useEffect(() => {
     if (loading || !isReadyState) return;
-    const isOnlyStd = filter.length === 1 && filter[0] === "standardization inprogress";
-    if (!isOnlyStd) return;
-    if ((meta?.STANDARDIZATION_IN_PROGRESS || 0) > 0 && records.length === 0) {
-      refresh();
+
+    const hasVal = filter.includes("validation inprogress,validation initiated");
+    const hasStd = filter.includes("standardization inprogress");
+    const otherCount = filter.length - (hasVal ? 1 : 0) - (hasStd ? 1 : 0);
+
+    // Only proceed if at least one is selected and NO other filters are active
+    if ((hasVal || hasStd) && otherCount === 0) {
+      let serverCount = 0;
+      if (hasVal) serverCount += (meta?.VALIDATION_INITIATED || 0) + (meta?.VALIDATION_IN_PROGRESS || 0);
+      if (hasStd) serverCount += (meta?.STANDARDIZATION_IN_PROGRESS || 0);
+
+      if (serverCount > 0 && records.length === 0) {
+        refresh();
+      }
     }
   }, [meta, records.length, filter, loading, refresh, isReadyState]);
 
