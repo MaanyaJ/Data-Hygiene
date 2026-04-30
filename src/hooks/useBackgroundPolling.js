@@ -39,19 +39,33 @@ export function useBackgroundPolling({ refresh, mode, filter, loading, recordsCo
         let conditionMet = false;
         let relevantToCount = 0;
 
-        // 1. Determine conditions and the 'relevant' count based on active filters
-        if (filter.includes("pending") || mode === "active") {
-          const p = counts?.PENDING;
-          conditionMet = Number(p?.to) > Number(p?.from);
-          relevantToCount = Number(p?.to);
-        } else if (filterStr.includes("validation")) {
-          const v = counts?.VALIDATION_IN_PROGRESS;
-          conditionMet = Number(v?.to) > Number(v?.from);
-          relevantToCount = Number(v?.to);
-        } else if (filterStr.includes("standardization") || filter.includes("accepted") || filter.includes("rejected")) {
-          const s = counts?.STANDARDIZATION_IN_PROGRESS;
-          conditionMet = Number(s?.to) > Number(s?.from);
-          relevantToCount = Number(s?.to);
+        // 1. Identify which stages to monitor based on active filters
+        const isVal = filterStr.includes("validation");
+        const isStan = filterStr.includes("standardization");
+        const isPending = filter.includes("pending") || mode === "active";
+        const isAccepted = filter.includes("accepted");
+        const isRejected = filter.includes("rejected");
+        const isOnHold = filter.includes("on_hold") || filter.includes("onhold");
+
+        let activeChecks = [];
+
+        // Special rule: if both Validation and Standardization are selected, only monitor Validation
+        if (isVal) {
+          activeChecks.push(counts?.VALIDATION_IN_PROGRESS);
+        } else if (isStan) {
+          activeChecks.push(counts?.STANDARDIZATION_IN_PROGRESS);
+        }
+
+        // Add other specific status filters to the check pool
+        if (isPending) activeChecks.push(counts?.PENDING);
+        if (isAccepted) activeChecks.push(counts?.ACCEPTED);
+        if (isRejected) activeChecks.push(counts?.REJECTED);
+        if (isOnHold) activeChecks.push(counts?.ON_HOLD);
+
+        if (activeChecks.length > 0) {
+          // Monitor the combined status of all relevant stages
+          conditionMet = activeChecks.some(c => Number(c?.to || 0) > Number(c?.from || 0));
+          relevantToCount = activeChecks.reduce((sum, c) => sum + Number(c?.to || 0), 0);
         } else if (mode === "landing") {
           // 2. General landing page logic (monitors requested core stages)
           const v = counts?.VALIDATION_IN_PROGRESS;
