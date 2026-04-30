@@ -23,6 +23,7 @@ const RecordList = ({
   removeRecords,
   isReady,
   extraParams,
+  loadingLabel,
 }) => {
   const [visibleIds, setVisibleIds] = useState([]);
 
@@ -75,7 +76,7 @@ const RecordList = ({
   if (loading && records.length === 0) {
     return (
       <Box sx={{ textAlign: "center", py: 4 }}>
-        <Loader />
+        <Loader label={loadingLabel} />
       </Box>
     );
   }

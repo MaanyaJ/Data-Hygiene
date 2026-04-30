@@ -1,7 +1,7 @@
 import React from 'react'
 import { Box, Typography, CircularProgress } from '@mui/material'
 
-const Loader = () => {
+const Loader = ({ label = "Loading..." }) => {
   return (
     <Box
       sx={{
@@ -14,8 +14,8 @@ const Loader = () => {
       }}
     >
       <CircularProgress size={40} sx={{color: "#000000"}}/>
-      <Typography sx={{color: "#000000"}}>
-        Loading...
+      <Typography sx={{color: "#000000", fontWeight: 600, fontSize: 14 }}>
+        {label}
       </Typography>
     </Box>
   )

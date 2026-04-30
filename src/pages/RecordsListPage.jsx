@@ -5,6 +5,7 @@ import RecordList from "../components/RecordList";
 import ErrorPage from "../components/ErrorPage";
 import { usePaginatedRecords } from "../hooks/usePaginatedRecords";
 import { useRefresh } from "../context/RefreshContext";
+import { useBackgroundPolling } from "../hooks/useBackgroundPolling";
 
 const MODE_CONFIG = {
   landing:   { title: "Data Hygiene Dashboard",  showStatusFilters: true, showStageFilters: true },
@@ -77,6 +78,18 @@ const RecordsListPage = ({ mode = "landing" }) => {
     registerRefresh(refresh);
   }, [refresh, registerRefresh]);
 
+  const { 
+    newRecordsAvailable, 
+    isBackgroundLoading, 
+    handleManualRefresh 
+  } = useBackgroundPolling({ 
+    refresh, 
+    mode, 
+    filter, 
+    loading, 
+    recordsCount: records.length 
+  });
+
   const isSearching = loading && searchInput !== search;
 
   if (error) {
@@ -84,7 +97,7 @@ const RecordsListPage = ({ mode = "landing" }) => {
   }
 
   return (
-    <Box sx={{ backgroundColor: "#ebebebff", minHeight: "100vh" }}>
+    <Box sx={{ backgroundColor: "#ebebebff", minHeight: "100vh", position: "relative" }}>
       <ListHeader
         title={config.title}
         search={searchInput}
@@ -102,6 +115,41 @@ const RecordsListPage = ({ mode = "landing" }) => {
         onRefresh={refresh}
       />
 
+      {/* Twitter-style New Records Button */}
+      {newRecordsAvailable && (
+        <Box
+          sx={{
+            position: "fixed",
+            top: 160,
+            left: "50%",
+            transform: "translateX(-50%)",
+            zIndex: 1000,
+          }}
+        >
+          <Box
+            onClick={handleManualRefresh}
+            sx={{
+              backgroundColor: "#000",
+              color: "#fff",
+              px: 3,
+              py: 1,
+              borderRadius: "2px",
+              cursor: "pointer",
+              fontSize: 13,
+              fontWeight: 700,
+              boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              "&:hover": { backgroundColor: "#333" },
+              transition: "all 0.2s ease"
+            }}
+          >
+            NEW RECORDS AVAILABLE
+          </Box>
+        </Box>
+      )}
+
       <Box sx={{ px: 3, py: 2 }}>
         <RecordList
           records={records}
@@ -111,10 +159,11 @@ const RecordsListPage = ({ mode = "landing" }) => {
           page={page}
           loading={loading}
           onLoadMore={loadMore}
-          patchRecords={patchRecords} // ← new
+          patchRecords={patchRecords}
           removeRecords={removeRecords}
-          isReady={isReady}           // ← new
+          isReady={isReady}
           extraParams={extraParams}
+          loadingLabel={isBackgroundLoading ? "Checking for new records..." : "Loading records..."}
         />
 
         {!loading && records.length === 0 && (
