@@ -146,7 +146,7 @@ const RecordCard = ({ record, index = 0 }) => {
         width: "97%",
         mb: "6px",
         py: 2,
-        backgroundColor: isEven ? "#ffffff" : "#fafafa",
+        backgroundColor: "#ffffff",
         boxShadow: "0 2px 8px rgba(0,0,0,0.07)",
         transition: "background-color 0.1s ease, box-shadow 0.1s ease",
         gap: 2,
