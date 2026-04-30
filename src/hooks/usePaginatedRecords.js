@@ -111,14 +111,17 @@ export function usePaginatedRecords({ extraParams = {}, activeFilters = [] } = {
           ExecutionId: String(r.ExecutionId || r.execution_id || r.executionId || ""),
         }));
 
-        // Always use total_records from the API as the source of truth
-        const total = data?.total_records ?? incoming.length;
+        // Use filtered_total if filters are applied, otherwise total_records
+        const hasFilters = !!search || activeFilters.length > 0;
+        const total = (hasFilters && data?.filtered_total !== undefined)
+          ? data.filtered_total
+          : (data?.total_records ?? incoming.length);
 
         setTotalPages(Math.ceil(total / PAGE_SIZE));
         setTotalRecords(total);
         setRecords((prev) => (isNew ? incoming : [...prev, ...incoming]));
 
-        const { data: _d, total_records: _t, summary, ...rest } = data;
+        const { data: _d, total_records: _t, filtered_total: _ft, summary, ...rest } = data;
         setMeta({ ...rest, ...(summary || {}) });
 
         setIsReadyState(true);

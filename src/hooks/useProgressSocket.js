@@ -52,7 +52,7 @@ function shouldRemove(normalizedStage, activeFilters) {
 }
 
 // Delay in ms between patching the final stage and removing the card
-const REMOVAL_FLASH_DELAY_MS = 500;
+const REMOVAL_FLASH_DELAY_MS = 100;
 
 export function useProgressSocket({
   patchRecords,
@@ -119,7 +119,7 @@ export function useProgressSocket({
           };
 
           const idKey = String(record.ExecutionId);
-          console.log(`[WS] Processing update for ID: ${idKey}, New Stage: "${message.stage}" (Normalized: "${ns}")`);
+          // console.log(`[WS] Processing update for ID: ${idKey}, New Stage: "${message.stage}" (Normalized: "${ns}")`);
 
           if (shouldRemove(ns, activeFiltersRef.current)) {
             // Cancel any existing pending removal for this record (e.g. double-fire)
