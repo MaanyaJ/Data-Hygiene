@@ -99,17 +99,31 @@ export function usePaginatedRecords({ extraParams = {} } = {}) {
     [search, extraParamsKey]
   );
 
+  const dismissalIntervalRef = useRef(null);
+
   const triggerDismissal = useCallback(() => {
-    setTimeout(() => {
+    // If already processing a dismissal queue, let it continue
+    if (dismissalIntervalRef.current) return;
+
+    // Start a staggered removal loop (one record every 300ms)
+    dismissalIntervalRef.current = setInterval(() => {
       setRecords((prev) => {
-        const remaining = prev.filter(r => !r.isDismissing);
-        const removedCount = prev.length - remaining.length;
-        if (removedCount > 0) {
-          setTotalRecords(t => Math.max(0, t - removedCount));
+        const index = prev.findIndex((r) => r.isDismissing);
+        if (index === -1) {
+          if (dismissalIntervalRef.current) {
+            clearInterval(dismissalIntervalRef.current);
+            dismissalIntervalRef.current = null;
+          }
+          return prev;
         }
-        return remaining;
+
+        // Remove only the first record found with the dismissal flag
+        const next = [...prev];
+        next.splice(index, 1);
+        setTotalRecords((t) => Math.max(0, t - 1));
+        return next;
       });
-    }, 1200);
+    }, 300);
   }, []);
 
   // ── Patch specific records in-place by ExecutionId ────────────────────────
