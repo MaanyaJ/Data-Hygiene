@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Box, Typography } from "@mui/material";
+import { toast } from "react-toastify";
 import ListHeader from "../components/ListHeader";
 import RecordList from "../components/RecordList";
 import ErrorPage from "../components/ErrorPage";
@@ -84,6 +85,63 @@ const RecordsListPage = ({ mode = "landing" }) => {
   useEffect(() => {
     registerRefresh(refresh);
   }, [refresh, registerRefresh]);
+
+  // --- Real-time "New Records" Notification Logic ---
+  const lastTotalRef = useRef(totalRecords);
+  const toastIdRef = useRef(null);
+  const [canShowToast, setCanShowToast] = useState(false);
+
+  // Delay showing toasts after every refresh/load to avoid noise
+  useEffect(() => {
+    if (!loading && isReadyState) {
+      const timer = setTimeout(() => {
+        console.log("[Toast] Notification system armed. Initial total:", totalRecords);
+        lastTotalRef.current = totalRecords;
+        setCanShowToast(true);
+      }, 3000); 
+      return () => clearTimeout(timer);
+    } else {
+      setCanShowToast(false);
+      if (toastIdRef.current) {
+        toast.dismiss(toastIdRef.current);
+        toastIdRef.current = null;
+      }
+    }
+  }, [loading, isReadyState]); // Only reset on load/refresh, NOT on count updates
+
+  useEffect(() => {
+    if (!canShowToast || loading) return;
+
+    console.debug(`[Toast Check] Server Total: ${totalRecords}, Last Seen: ${lastTotalRef.current}, UI List: ${records.length}`);
+
+    // Only show if the server total has increased
+    if (totalRecords <= lastTotalRef.current) {
+      // If records were deleted/moved, just sync the ref without a toast
+      if (totalRecords < lastTotalRef.current) lastTotalRef.current = totalRecords;
+      return;
+    }
+
+    const diff = totalRecords - lastTotalRef.current;
+    if (diff > 0) {
+      const message = `✨ ${diff} new record${diff > 1 ? 's' : ''} arrived. Click to refresh.`;
+      console.log("[Toast] Showing notification:", message);
+      
+      if (toastIdRef.current && toast.isActive(toastIdRef.current)) {
+        toast.update(toastIdRef.current, { render: message });
+      } else {
+        toastIdRef.current = toast.info(message, {
+          onClick: () => {
+            refresh();
+            toast.dismiss(toastIdRef.current);
+          },
+          autoClose: false,
+          closeOnClick: false,
+          draggable: false,
+          icon: "🚀"
+        });
+      }
+    }
+  }, [totalRecords, canShowToast, loading, refresh, records.length]);
 
   const isSearching = loading && searchInput !== search;
 

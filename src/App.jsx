@@ -1,5 +1,7 @@
 import React from 'react'
 import { Routes, Route } from 'react-router-dom'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 import RecordsListPage from './pages/RecordsListPage'
 import DetailsPage from './pages/DetailsPage'
 import { RefreshProvider } from './context/RefreshContext'
@@ -16,6 +18,7 @@ const App = () => {
         <Route path="/all" element={<RecordsListPage key="all" mode="all" />} />
         <Route path="/:id" element={<DetailsPage />} />
       </Routes>
+      <ToastContainer position="bottom-right" autoClose={5000} theme="dark" />
       </RefreshProvider>
     </>
   )
