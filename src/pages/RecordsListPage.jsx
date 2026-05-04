@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import { Box, Typography } from "@mui/material";
 import { toast } from "react-toastify";
 import ListHeader from "../components/ListHeader";
@@ -177,6 +178,7 @@ const RecordsListPage = ({ mode = "landing" }) => {
         loading={isSearching}
         totalRecords={totalRecords}
         onRefresh={refresh}
+        mode={mode}
       />
 
       <Box sx={{ px: 3, py: 2 }}>
@@ -201,9 +203,49 @@ const RecordsListPage = ({ mode = "landing" }) => {
                 const hasVal = filter.includes("validation inprogress,validation initiated");
                 const hasStd = filter.includes("standardization inprogress");
                 const otherCount = filter.length - (hasVal ? 1 : 0) - (hasStd ? 1 : 0);
-                if (hasVal && hasStd && otherCount === 0) return "No records left for validation or standardization.";
-                if (hasVal && otherCount === 0) return "Validation completed. No records left to validate.";
-                if (hasStd && otherCount === 0) return "Standardization completed. No records left to standardize.";
+
+                const landingLink = (
+                  <Box component="span" sx={{ display: "block", mt: 1 }}>
+                    <Link 
+                      to="/" 
+                      onClick={(e) => {
+                        if (mode === "landing") {
+                          e.preventDefault();
+                          setFilter([]);
+                          refresh();
+                        }
+                      }}
+                      style={{ color: "#111", fontWeight: "600", textDecoration: "underline" }}
+                    >
+                      Go to Dashboard
+                    </Link>
+                  </Box>
+                );
+
+                if (hasVal && hasStd && otherCount === 0) {
+                  return (
+                    <>
+                      No records left for validation or standardization.
+                      {landingLink}
+                    </>
+                  );
+                }
+                if (hasVal && otherCount === 0) {
+                  return (
+                    <>
+                      Validation completed. No records left to validate.
+                      {landingLink}
+                    </>
+                  );
+                }
+                if (hasStd && otherCount === 0) {
+                  return (
+                    <>
+                      Standardization completed. No records left to standardize.
+                      {landingLink}
+                    </>
+                  );
+                }
                 return filter.length > 0 ? "No records match the selected filter." : "No records found in this category.";
               })()}
             </Typography>

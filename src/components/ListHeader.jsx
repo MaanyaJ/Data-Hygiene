@@ -26,7 +26,8 @@ const ListHeader = ({
   allowedFilters,
   loading,
   totalRecords,
-  countLabel,
+  onRefresh,
+  mode,
 }) => {
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -93,7 +94,7 @@ const ListHeader = ({
 
   return (
     <Box>
-      <Navbar />
+      <Navbar onRefresh={onRefresh} mode={mode} onResetFilters={() => onFilterChange("")} />
 
       {/* Page Header */}
       <Box sx={{ px: 3, pt: 10, pb: 1.5, backgroundColor: "#ebebebff" }}>

@@ -19,7 +19,7 @@ const NAV_LINKS = [
   { label: "Master List", path: "/masterlist" },
 ];
 
-const Navbar = () => {
+const Navbar = ({ onRefresh, mode, onResetFilters }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [anchorEl, setAnchorEl] = useState(null);
@@ -27,6 +27,17 @@ const Navbar = () => {
 
   const handleOpen = (e) => setAnchorEl(e.currentTarget);
   const handleClose = () => setAnchorEl(null);
+
+  const handleRefreshLogic = (e, path) => {
+    if (path === "/" && location.pathname === "/") {
+      e?.preventDefault();
+      onResetFilters?.();
+      onRefresh?.();
+      handleClose();
+      return true;
+    }
+    return false;
+  };
 
   const handleNavigate = (path) => {
     navigate(path);
@@ -48,7 +59,11 @@ const Navbar = () => {
           <Typography
             variant="h6"
             fontWeight={800}
-            onClick={() => navigate("/")}
+            onClick={(e) => {
+              if (!handleRefreshLogic(e, "/")) {
+                navigate("/");
+              }
+            }}
             sx={{
               cursor: "pointer",
               letterSpacing: -0.5,
@@ -187,7 +202,9 @@ const Navbar = () => {
                           key={subItem.path}
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleNavigate(subItem.path);
+                            if (!handleRefreshLogic(e, subItem.path)) {
+                              handleNavigate(subItem.path);
+                            }
                           }}
                           sx={{
                             fontSize: "0.78rem",
@@ -217,7 +234,11 @@ const Navbar = () => {
               return (
                 <MenuItem
                   key={item.path}
-                  onClick={() => handleNavigate(item.path)}
+                  onClick={(e) => {
+                    if (!handleRefreshLogic(e, item.path)) {
+                      handleNavigate(item.path);
+                    }
+                  }}
                   sx={{
                     fontSize: "0.78rem",
                     fontFamily: "'Inter', sans-serif",
