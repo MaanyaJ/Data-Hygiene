@@ -98,7 +98,7 @@ const RecordsListPage = ({ mode = "landing" }) => {
         console.log("[Toast] Notification system armed. Initial total:", totalRecords);
         lastTotalRef.current = totalRecords;
         setCanShowToast(true);
-      }, 3000); 
+      }, 4000); 
       return () => clearTimeout(timer);
     } else {
       setCanShowToast(false);
@@ -112,19 +112,32 @@ const RecordsListPage = ({ mode = "landing" }) => {
   useEffect(() => {
     if (!canShowToast || loading) return;
 
-    console.debug(`[Toast Check] Server Total: ${totalRecords}, Last Seen: ${lastTotalRef.current}, UI List: ${records.length}`);
-
-    // Only show if the server total has increased
+    // Only proceed if the server total has increased
     if (totalRecords <= lastTotalRef.current) {
-      // If records were deleted/moved, just sync the ref without a toast
       if (totalRecords < lastTotalRef.current) lastTotalRef.current = totalRecords;
       return;
     }
 
     const diff = totalRecords - lastTotalRef.current;
-    if (diff > 0) {
-      const message = `✨ ${diff} new record${diff > 1 ? 's' : ''} arrived. Click to refresh.`;
-      console.log("[Toast] Showing notification:", message);
+    if (diff <= 0) return;
+
+    // Determine behavior based on filters:
+    const hasVal = filter.includes("validation inprogress,validation initiated");
+    const hasStd = filter.includes("standardization inprogress");
+    const hasPending = filter.includes("pending");
+    
+    // Logic: If Standardization is active:
+    // - If Val or Pending (Action Required) are ALSO active -> Show Toast
+    // - Otherwise (Std alone, or Std + Accepted/Rejected/On-Hold) -> Auto-Refetch
+    const isActionRequiredActive = hasVal || hasPending;
+    const shouldAutoRefetch = hasStd && !isActionRequiredActive;
+
+    if (shouldAutoRefetch) {
+      console.log("[Auto-Refresh] Standardization update detected. Refetching...");
+      refresh();
+      lastTotalRef.current = totalRecords; // Sync immediately to prevent double-fire
+    } else {
+      const message = `${diff} new record${diff > 1 ? 's' : ''} arrived. Click to refresh.`;
       
       if (toastIdRef.current && toast.isActive(toastIdRef.current)) {
         toast.update(toastIdRef.current, { render: message });
@@ -137,11 +150,10 @@ const RecordsListPage = ({ mode = "landing" }) => {
           autoClose: false,
           closeOnClick: false,
           draggable: false,
-          icon: "🚀"
         });
       }
     }
-  }, [totalRecords, canShowToast, loading, refresh, records.length]);
+  }, [totalRecords, canShowToast, loading, refresh, filter]);
 
   const isSearching = loading && searchInput !== search;
 

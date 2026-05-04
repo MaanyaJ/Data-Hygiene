@@ -22,13 +22,55 @@ body {
   width: 6px;
   height: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: #f5f5f5;
 }
+
 ::-webkit-scrollbar-thumb {
   background: #bbb;
   border-radius: 3px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: #888;
+}
+
+/* Custom Toast Styling - Premium Black */
+.Toastify__toast {
+  cursor: pointer !important;
+}
+
+.Toastify__toast-body, 
+.Toastify__toast-body * {
+  cursor: pointer !important;
+  user-select: none;
+}
+
+.Toastify__toast--dark {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border: 1px solid #333;
+  border-radius: 0px !important;
+  /* Sharp corners for professional look */
+  font-size: 13px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+  padding: 8px 16px;
+  transition: background-color 0.2s ease;
+}
+
+.Toastify__toast--dark:hover {
+  background-color: #111111 !important;
+}
+
+.Toastify__toast-icon {
+  margin-right: 12px;
+  width: 18px;
+   
+}
+.Toastify__toast-icon--info svg {
+  fill: #ffffff !important; /* Change #ffffff to any color you want (e.g., #00ff00 for green) */
+}
+.Toastify__progress-bar--dark {
+  background: #fbfbfb !important;
 }
