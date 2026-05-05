@@ -9,11 +9,11 @@ import { usePaginatedRecords } from "../hooks/usePaginatedRecords";
 import { useRefresh } from "../context/RefreshContext";
 
 const MODE_CONFIG = {
-  landing:   { title: "Data Hygiene Dashboard", showStatusFilters: true,  showStageFilters: true },
-  active:    { title: "My Active List",          defaultStatus: "pending",            showAgeFilters: true },
-  completed: { title: "My Completed List",       defaultStatus: "accepted,rejected",  showStatusFilters: true, allowedFilters: ["accepted", "rejected"] },
-  onhold:    { title: "On Hold Records",         defaultStatus: "On Hold",            showAgeFilters: true },
-  all:       { title: "All Records",             showStatusFilters: true },
+  landing: { title: "Data Hygiene Dashboard", showStatusFilters: true, showStageFilters: true },
+  active: { title: "My Active List", defaultStatus: "pending", showAgeFilters: true },
+  completed: { title: "My Completed List", defaultStatus: "accepted,rejected", showStatusFilters: true, allowedFilters: ["accepted", "rejected"] },
+  onhold: { title: "On Hold Records", defaultStatus: "On Hold", showAgeFilters: true },
+  all: { title: "All Records", showStatusFilters: true },
 };
 
 const AGE_TO_SERVER = { "<3": "green", "3-6": "yellow", ">6": "red" };
@@ -43,14 +43,14 @@ const RecordsListPage = ({ mode = "landing" }) => {
     }
 
     const params = {};
-    if (config.defaultStage)  params.stage  = config.defaultStage;
+    if (config.defaultStage) params.stage = config.defaultStage;
     if (config.defaultStatus) params.status = config.defaultStatus;
 
     if (filter.length > 0) {
       const statuses = filter.filter((v) => !STAGE_FILTER_VALUES.includes(v));
-      const stages   = filter.filter((v) =>  STAGE_FILTER_VALUES.includes(v));
+      const stages = filter.filter((v) => STAGE_FILTER_VALUES.includes(v));
       if (statuses.length > 0) params.status = statuses.join(",");
-      if (stages.length   > 0) params.stage  = stages.join(",");
+      if (stages.length > 0) params.stage = stages.join(",");
     }
 
     return params;
@@ -99,7 +99,7 @@ const RecordsListPage = ({ mode = "landing" }) => {
         console.log("[Toast] Notification system armed. Initial total:", totalRecords);
         lastTotalRef.current = totalRecords;
         setCanShowToast(true);
-      }, 4000); 
+      }, 4000);
       return () => clearTimeout(timer);
     } else {
       setCanShowToast(false);
@@ -109,6 +109,22 @@ const RecordsListPage = ({ mode = "landing" }) => {
       }
     }
   }, [loading, isReadyState]); // Only reset on load/refresh, NOT on count updates
+
+  // ── Sparse Pagination / Empty View Recovery ────────────────────────────────
+  // If the server says there are records (totalRecords > 0) but they aren't on 
+  // page 1 (records.length === 0), and we are in an active pipeline filter, 
+  // trigger a silent refresh to try and pull them to the front.
+  useEffect(() => {
+    if (loading || !isReadyState) return;
+
+    const hasVal = filter.includes("validation inprogress,validation initiated");
+    const hasStd = filter.includes("standardization inprogress");
+
+    if ((hasVal || hasStd) && records.length === 0 && totalRecords > 0) {
+      console.log("[Auto-Recovery] Empty list detected with positive count. Performing silent refetch.");
+      refresh();
+    }
+  }, [records.length, totalRecords, filter, loading, isReadyState, refresh]);
 
   useEffect(() => {
     if (!canShowToast || loading) return;
@@ -126,7 +142,7 @@ const RecordsListPage = ({ mode = "landing" }) => {
     const hasVal = filter.includes("validation inprogress,validation initiated");
     const hasStd = filter.includes("standardization inprogress");
     const hasPending = filter.includes("pending");
-    
+
     // Logic: If Standardization is active:
     // - If Val or Pending (Action Required) are ALSO active -> Show Toast
     // - Otherwise (Std alone, or Std + Accepted/Rejected/On-Hold) -> Auto-Refetch
@@ -138,8 +154,15 @@ const RecordsListPage = ({ mode = "landing" }) => {
       refresh();
       lastTotalRef.current = totalRecords; // Sync immediately to prevent double-fire
     } else {
+      // Hide toast for Validation or No Filters (Landing default)
+      if (hasVal || filter.length === 0) {
+        lastTotalRef.current = totalRecords;
+        return;
+      }
+
+      const diff = totalRecords - lastTotalRef.current;
       const message = `${diff} new record${diff > 1 ? 's' : ''} arrived. Click to refresh.`;
-      
+
       if (toastIdRef.current && toast.isActive(toastIdRef.current)) {
         toast.update(toastIdRef.current, { render: message });
       } else {
@@ -153,6 +176,7 @@ const RecordsListPage = ({ mode = "landing" }) => {
           draggable: false,
         });
       }
+      lastTotalRef.current = totalRecords;
     }
   }, [totalRecords, canShowToast, loading, refresh, filter]);
 
@@ -206,8 +230,8 @@ const RecordsListPage = ({ mode = "landing" }) => {
 
                 const landingLink = (
                   <Box component="span" sx={{ display: "block", mt: 1 }}>
-                    <Link 
-                      to="/" 
+                    <Link
+                      to="/"
                       onClick={(e) => {
                         if (mode === "landing") {
                           e.preventDefault();
