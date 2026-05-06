@@ -40,7 +40,7 @@ const ExistingDataRow = ({ existingData, theme }) => (
               sx={{
                 fontSize: 13,
                 fontWeight: 700,
-                color: item.validation_status === "invalid" ?"rgb(183, 1, 1)" :"#0f172a",
+                color: item.validation_status === "invalid" ?"rgb(229, 0, 0)" :"#0f172a",
                 
               }}
             >
