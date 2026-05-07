@@ -13,22 +13,39 @@ const VALIDATION_FILTER_KEY = "validation inprogress,validation initiated";
 const STD_FILTER_KEY = "standardization inprogress";
 
 function computeTotalFromSummary(summary, filters) {
-  const get = (key) => summary[key] || 0;
+  const get = (key) => {
+    const val = summary[key] || 0;
+    if (val > 0) console.log(`[Calc]   ${key}: ${val}`);
+    return val;
+  };
 
   const getForFilter = (f) => {
-    if (f === VALIDATION_FILTER_KEY) return get("VALIDATION_INITIATED") + get("VALIDATION_IN_PROGRESS");
-    if (f === STD_FILTER_KEY)        return get("STANDARDIZATION_IN_PROGRESS");
-    if (f === "pending")             return get("PENDING");
-    if (f === "accepted")            return get("ACCEPTED");
-    if (f === "rejected")            return get("REJECTED"); // L0 data = rejected
-    if (f === "On Hold")             return get("ON HOLD");
-    if (f === "<3")                  return get("green");
-    if (f === "3-6")                 return get("yellow");
-    if (f === ">6")                  return get("red");
+    if (f === VALIDATION_FILTER_KEY) {
+      console.log(`[Calc] Summing Validation Stages:`);
+      return (
+        get("VALIDATION_INITIATED") +
+        get("VALIDATION_IN_PROGRESS") +
+        get("VALIDATION_COMPLETED")
+      );
+    }
+    if (f === STD_FILTER_KEY) {
+      console.log(`[Calc] Summing Standardization Stages:`);
+      return (
+        get("STANDARDIZATION_IN_PROGRESS")
+      );
+    }
+    if (f === "pending") return get("PENDING");
+    if (f === "accepted") return get("ACCEPTED");
+    if (f === "rejected") return get("REJECTED"); // L0 data = rejected
+    if (f === "On Hold") return get("ON HOLD");
+    if (f === "<3") return get("green");
+    if (f === "3-6") return get("yellow");
+    if (f === ">6") return get("red");
     return 0;
   };
 
   if (!filters || filters.length === 0) {
+    console.log(`[Calc] Summing Landing Page (All Active):`);
     return (
       get("PENDING") +
       get("REJECTED") +
@@ -36,6 +53,7 @@ function computeTotalFromSummary(summary, filters) {
       get("ON HOLD") +
       get("VALIDATION_INITIATED") +
       get("VALIDATION_IN_PROGRESS") +
+      get("VALIDATION_COMPLETED") +
       get("STANDARDIZATION_IN_PROGRESS")
     );
   }
@@ -111,15 +129,24 @@ export function usePaginatedRecords({ extraParams = {}, activeFilters = [] } = {
           ExecutionId: String(r.ExecutionId || r.execution_id || r.executionId || ""),
         }));
 
-        // Always use total_records from the API as the source of truth
-        const total = data?.total_invalid_records ?? incoming.length;
+        // Calculate total from summary for consistency with real-time updates
+        const summary = data?.summary || {};
+        const totalCalculated = computeTotalFromSummary(summary, activeFiltersRef.current);
+        const totalFromAPI = data?.total_invalid_records ?? incoming.length;
+
+        console.log(`[Fetch] Filter: "${activeFiltersRef.current.join(",")}"`);
+        console.log(`[Fetch] API Total: ${totalFromAPI}, Calculated Total: ${totalCalculated}`);
+        console.log(`[Fetch] Summary Object:`, summary);
+
+        // We'll use the API total as the primary source for now, but log both
+        const total = totalFromAPI;
 
         setTotalPages(Math.ceil(total / PAGE_SIZE));
         setTotalRecords(total);
         setRecords((prev) => (isNew ? incoming : [...prev, ...incoming]));
 
-        const { data: _d, total_invalid_records: _t, summary, ...rest } = data;
-        setMeta({ ...rest, ...(summary || {}) });
+        const { data: _d, total_invalid_records: _t, ...rest } = data;
+        setMeta({ ...rest, ...summary });
 
         setIsReadyState(true);
       } catch (err) {
@@ -161,9 +188,11 @@ export function usePaginatedRecords({ extraParams = {}, activeFilters = [] } = {
   // using the currently active filters.
   const updateCounts = useCallback((summary) => {
     if (!summary) return;
+    console.log(`[WS] New Summary Arrived:`, summary);
     setMeta((prev) => ({ ...prev, ...summary }));
 
     const newTotal = computeTotalFromSummary(summary, activeFiltersRef.current);
+    console.log(`[WS] Final Calculated Total for filter "${activeFiltersRef.current.join(",")}": ${newTotal}`);
     setTotalRecords(newTotal);
   }, []);
 

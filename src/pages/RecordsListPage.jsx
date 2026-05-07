@@ -154,13 +154,10 @@ const RecordsListPage = ({ mode = "landing" }) => {
       refresh();
       lastTotalRef.current = totalRecords; // Sync immediately to prevent double-fire
     } else {
-      // Hide toast for Validation or No Filters (Landing default)
-      if (hasVal || filter.length === 0) {
-        lastTotalRef.current = totalRecords;
-        return;
-      }
-
+      // Proceed to show toast
       const diff = totalRecords - lastTotalRef.current;
+      if (diff <= 0) return; 
+
       const message = `${diff} new record${diff > 1 ? 's' : ''} arrived. Click to refresh.`;
 
       if (toastIdRef.current && toast.isActive(toastIdRef.current)) {
