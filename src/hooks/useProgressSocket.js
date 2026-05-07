@@ -8,7 +8,6 @@ const normalizeStage = (s) => s?.toLowerCase().trim().replace(/[\s_]+/g, "_") ??
 
 // Determine whether a WS stage update should trigger record removal.
 //
-// activeFilters === undefined  → UploadPage mode: always remove on standardization_completed
 // activeFilters = []           → Dashboard, no filters: never remove (just patch)
 // activeFilters = [...]        → Dashboard with filters: filter-aware removal
 //
@@ -20,11 +19,6 @@ const normalizeStage = (s) => s?.toLowerCase().trim().replace(/[\s_]+/g, "_") ??
 //   • "pending" active together with stage filters
 //     → do NOT remove on standardization_completed
 function shouldRemove(normalizedStage, activeFilters) {
-  // UploadPage mode (activeFilters not passed)
-  if (activeFilters === undefined) {
-    return normalizedStage === "standardization_completed";
-  }
-
   // Terminal failure stages: always remove from dashboard pipeline view
   if (normalizedStage === "validation_failed" || normalizedStage === "standardization_failed") {
     return true;
@@ -58,7 +52,7 @@ export function useProgressSocket({
   patchRecords,
   removeRecords,
   updateCounts,   // called with WS summary object to update filter counts
-  activeFilters,  // undefined = UploadPage; [] or [...] = dashboard
+  activeFilters,  // [] or [...] = dashboard
   isReady,
 }) {
   // Keep activeFilters in a ref so the WS message handler always sees the latest
