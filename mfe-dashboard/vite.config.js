@@ -1,18 +1,18 @@
-import { defineConfig } from "vite";
+import { moduleFederation } from "@module-federation/vite";
 import react from "@vitejs/plugin-react";
-import federation from "@originjs/vite-plugin-federation";
+import { defineConfig } from "vite";
 
 export default defineConfig({
   plugins: [
     react(),
-    federation({
+    moduleFederation({
       name: "dashboard",
       filename: "remoteEntry.js",
       exposes: {
         "./RecordsListPage": "./src/pages/RecordsListPage.jsx",
       },
       remotes: {
-        shell: "http://localhost:5000/assets/remoteEntry.js",
+        shell: "shell@http://localhost:5000/remoteEntry.js",
       },
       shared: {
         react: { singleton: true },
@@ -25,9 +25,6 @@ export default defineConfig({
     }),
   ],
   build: {
-    modulePreload: false,
     target: "esnext",
-    minify: false,
-    cssCodeSplit: false,
   },
 });

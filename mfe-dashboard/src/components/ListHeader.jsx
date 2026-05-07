@@ -11,7 +11,6 @@ import {
   Divider,
 } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import Navbar from "shell/Navbar";
 
 const ListHeader = ({
   title,
@@ -93,10 +92,9 @@ const ListHeader = ({
 
   return (
     <Box>
-      <Navbar />
 
       {/* Page Header */}
-      <Box sx={{ px: 3, pt: 10, pb: 1.5, backgroundColor: "#ebebebff" }}>
+      <Box sx={{ px: 3,pt: 3.5, pb: 1.5, backgroundColor: "#ebebebff" }}>
         <Typography
           sx={{ fontSize: 20, fontWeight: 700, color: "#000", lineHeight: 1.2 }}
         >
