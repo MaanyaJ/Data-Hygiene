@@ -13,7 +13,7 @@ const App = () => {
     <>
       <Navbar />
       <Box sx={{ pt: 7 }}> {/* Padding for fixed Navbar */}
-        {/* <Suspense fallback={<Loader />}> */}
+        <Suspense fallback={<Loader />}>
           <Routes>
             <Route path="/" element={<RecordsListPage key="landing" mode="landing" />} />
             <Route path="/active" element={<RecordsListPage key="active" mode="active" />} />
@@ -22,7 +22,7 @@ const App = () => {
             <Route path="/all" element={<RecordsListPage key="all" mode="all" />} />
             <Route path="/:id" element={<DetailsPage />} />
           </Routes>
-        {/* </Suspense> */}
+        </Suspense>
       </Box>
     </>
   )

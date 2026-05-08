@@ -1,6 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import federation from "@originjs/vite-plugin-federation";
+import { federation } from "@module-federation/vite";
 
 export default defineConfig({
   plugins: [
@@ -8,19 +8,34 @@ export default defineConfig({
     federation({
       name: "details",
       filename: "remoteEntry.js",
+      dts: false,
       exposes: {
         "./DetailsPage": "./src/pages/DetailsPage.jsx",
       },
       remotes: {
-        shell: "http://localhost:5000/assets/remoteEntry.js",
+        shell: {
+          type: "module",
+          name: "shell",
+          entry: "http://localhost:5003/remoteEntry.js",
+        },
       },
-      shared: ["react", "react-dom", "react-router-dom", "@mui/material", "@emotion/react", "@emotion/styled"],
+      shared: {
+        react: { singleton: true },
+        "react-dom": { singleton: true },
+        "react-router-dom": { singleton: true },
+        "@mui/material": { singleton: true },
+        "@emotion/react": { singleton: true },
+        "@emotion/styled": { singleton: true },
+      },
     }),
   ],
   build: {
-    modulePreload: false,
     target: "esnext",
     minify: false,
     cssCodeSplit: false,
   },
+  server: {
+    port: 5002,
+    strictPort: true,
+  }
 });
