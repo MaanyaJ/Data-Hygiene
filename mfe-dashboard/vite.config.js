@@ -18,6 +18,11 @@ export default defineConfig({
           name: "shell",
           entry: "http://localhost:5003/remoteEntry.js",
         },
+        details: {
+          type: "module",
+          name: "details",
+          entry: "http://localhost:5002/remoteEntry.js",
+        },
       },
       shared: {
         react: { singleton: true },
