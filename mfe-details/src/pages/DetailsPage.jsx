@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Box, Snackbar, Alert } from "@mui/material";
 import ErrorPage from "shell/ErrorPage";
-import Loader from "shell/Loader";
+import DetailsSkeleton from "../components/DetailsSkeleton";
 import ExecutionInfoBox from "../components/ExecutionInfoBox";
 import CorrectionsTable from "../components/CorrectionsTable";
 import { API_URL } from "../config";
@@ -108,7 +108,7 @@ const DetailsPage = () => {
     fetchData();
   }, [id]);
 
-  if (loading) return <Loader />;
+  if (loading) return <DetailsSkeleton />;
   if (error) return <ErrorPage message={error?.message} onRetry={fetchData} />;
   if (!executionData) return "No execution data to show";
   // if (!data || data.length === 0) return "No invalid data in the response to show";
