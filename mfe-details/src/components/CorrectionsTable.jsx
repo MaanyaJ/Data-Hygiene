@@ -306,7 +306,7 @@ const DraftRecordDialog = ({
 };
 
 /* ─── Main Component ────────────────────────────────────────────── */
-const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotification }) => {
+const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotification, isEditable }) => {
   const {
     selectedSuggestions,
     editedSuggestions,
@@ -358,11 +358,28 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
       <Stack gap={0.5}>
         {/* Section header */}
         <Stack direction="row" alignItems="center" justifyContent="space-between">
-          <Box>
+          <Stack direction="row" alignItems="center" gap={1.5}>
             <Typography variant="h6" sx={{ fontWeight: 700, color: "#0f172a", mb: 0.25 }}>
               Inconsistent Fields
             </Typography>
-          </Box>
+            {!isEditable && (
+              <Box sx={{ 
+                px: 1.25, 
+                py: 0.25, 
+                bgcolor: "#fee2e2", 
+                color: "#991b1b", 
+                borderRadius: "4px",
+                border: "1px solid #fecaca",
+                display: "flex",
+                alignItems: "center",
+                gap: 0.5
+              }}>
+                <Typography sx={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase" }}>
+                  Read Only
+                </Typography>
+              </Box>
+            )}
+          </Stack>
         </Stack>
 
         {data.map((group, groupIdx) => {
@@ -371,6 +388,7 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
           const canAccept = selectedIdx !== undefined;
           const fieldStatus = group.currentStatus?.toLowerCase();
           const isPending = !fieldStatus || fieldStatus.toLowerCase() === STATUS.INVALID || fieldStatus.toLowerCase() === STATUS.PENDING;
+          const isActuallyEditable = isEditable && isPending;
           const isAccepted =
             group.currentStatus === STATUS.ACCEPTED ||
             group.currentStatus === STATUS.APPROVED;
@@ -443,13 +461,13 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
 
                   {isPending && (
                     <Chip
-                      label="Action Required"
+                      label={isEditable ? "Action Required" : "View Only"}
                       size="small"
                       sx={{
                         height: 18,
                         fontSize: 10,
                         fontWeight: 700,
-                        backgroundColor: "#000000",
+                        backgroundColor: isEditable ? "#000000" : "#64748b",
                         color: "#ffffff",
                         borderRadius: "4px",
                         "& .MuiChip-label": { px: 1 },
@@ -556,7 +574,7 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                           onSelect={() => handleSelect(groupIdx, si)}
                           onEditField={(key, newVal) => handleEditField(groupIdx, key, newVal)}
                           sutType={sutType}
-                          isPending={isPending}
+                          isPending={isActuallyEditable}
                         />
                       );
                     })
@@ -634,7 +652,7 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                   onSelectCustom={(idx) => handleSelectCustom(groupIdx, idx)}
                   onClearCustom={() => handleClearCustom(groupIdx)}
                   onCustomMetadataFetch={(meta) => handleCustomMetadataFetch(groupIdx, meta)}
-                  isPending={isPending}
+                  isPending={isActuallyEditable}
                   theme={activeTheme}
                 />
 
@@ -671,14 +689,14 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                           onSelect={() => handleSelectCustom(groupIdx, ri)}
                           onEditField={(key, newVal) => handleEditField(groupIdx, key, newVal)}
                           sutType={sutType}
-                          isPending={isPending}
+                          isPending={isActuallyEditable}
                         />
                       </Box>
                     );
                   })}
 
                 {/* ── Action Buttons (Accept / Submit Draft / Send to L0) ── */}
-                {isPending && (
+                {isActuallyEditable && (
                   <Stack
                     direction="row"
                     alignItems="center"

@@ -126,6 +126,7 @@ const RecordsListPage = ({ mode = "landing" }) => {
             updateCounts={updateCounts}
             activeFilters={filter}
             isReadyState={isReadyState}
+            mode={mode}
           />
         )}
 

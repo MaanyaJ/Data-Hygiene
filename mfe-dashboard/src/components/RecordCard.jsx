@@ -117,7 +117,7 @@ const PipelineProgress = ({ pct, label }) => {
   );
 };
 
-const RecordCard = ({ record, index = 0 }) => {
+const RecordCard = ({ record, index = 0, mode }) => {
   const [isClicked, setIsClicked] = useState(false);
   const invalidFields = record["InvalidFields"];
   const navigate = useNavigate();
@@ -133,7 +133,7 @@ const RecordCard = ({ record, index = 0 }) => {
   const stopAndNavigate = (e) => {
     e.stopPropagation();
     setIsClicked(true);
-    navigate(`/${record.ExecutionId}`);
+    navigate(`/${record.ExecutionId}`, { state: { from: mode } });
   };
 
   return (

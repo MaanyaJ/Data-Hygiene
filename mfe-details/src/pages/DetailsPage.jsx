@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import { Box, Snackbar, Alert } from "@mui/material";
 import { ErrorPage } from "@data-hygiene/ui";
 import DetailsSkeleton from "../components/DetailsSkeleton";
@@ -56,6 +56,8 @@ const transformOldApiData = (rawData) => {
 
 const DetailsPage = () => {
   const { id } = useParams();
+  const location = useLocation();
+  const isEditable = location.state?.from === "active";
 
   const [error, setError] = useState(null);
   const [executionData, setExecutionData] = useState(null);
@@ -126,6 +128,7 @@ const DetailsPage = () => {
             sutType={executionData.sutType}
             fetchData={fetchData}
             showNotification={showNotification}
+            isEditable={isEditable}
           />
         </Box>
       </Box>

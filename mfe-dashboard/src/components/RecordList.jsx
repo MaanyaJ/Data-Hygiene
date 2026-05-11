@@ -23,6 +23,7 @@ const RecordList = ({
   updateCounts,   // live count updates from WS summary
   activeFilters,  // undefined = UploadPage (always remove on std_completed); [] or [...] = dashboard
   isReadyState,
+  mode,
 }) => {
   useProgressSocket({
     patchRecords,
@@ -52,7 +53,7 @@ const RecordList = ({
     }
     return (
       <div key={key} style={style}>
-        <RecordCard record={record} index={index} />
+        <RecordCard record={record} index={index} mode={mode} />
       </div>
     );
   };
