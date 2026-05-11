@@ -1,8 +1,15 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { federation } from "@module-federation/vite";
+import path from "path";
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      "@data-hygiene/ui": path.resolve(__dirname, "../packages/ui/src"),
+      "@data-hygiene/core": path.resolve(__dirname, "../packages/core/src"),
+    },
+  },
   plugins: [
     react(),
     federation({
