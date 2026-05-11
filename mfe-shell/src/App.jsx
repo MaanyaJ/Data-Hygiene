@@ -1,8 +1,8 @@
 import React, { Suspense, lazy } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { Box } from "@mui/material"
-import Navbar from './components/Navbar'
-import Loader from './components/Loader'
+import Navbar from './components/Navbar';
+import { Loader } from "@data-hygiene/ui";
 
 // Remote MFEs
 const RecordsListPage = lazy(() => import('dashboard/RecordsListPage'));

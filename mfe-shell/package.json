@@ -18,7 +18,9 @@
     "react-dom": "^19.2.4",
     "react-router-dom": "^7.13.2",
     "react-toastify": "^11.0.5",
-    "react-virtualized": "^9.22.6"
+    "react-virtualized": "^9.22.6",
+    "@data-hygiene/ui": "*",
+    "@data-hygiene/core": "*"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Box, Typography } from "@mui/material";
 import ListHeader from "../components/ListHeader";
 import RecordList from "../components/RecordList";
-import ErrorPage from "shell/ErrorPage";
+import { ErrorPage } from "@data-hygiene/ui";
 import { usePaginatedRecords } from "../hooks/usePaginatedRecords";
 
 const MODE_CONFIG = {

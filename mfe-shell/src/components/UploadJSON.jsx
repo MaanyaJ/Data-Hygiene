@@ -84,7 +84,6 @@ const UploadJSON = () => {
       showNotification("File uploaded successfully!", "success");
       setDialogOpen(false);
       setSelectedFile(null);
-      // Trigger refresh via global browser event (MFE friendly)
       window.dispatchEvent(new CustomEvent("app:refresh-data"));
     } catch (err) {
       showNotification(err.message || "Upload failed. Please try again.", "error");

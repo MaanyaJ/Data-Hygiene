@@ -22,9 +22,6 @@ export default defineConfig({
         },
       },
       exposes: {
-        "./Navbar": "./src/components/Navbar.jsx",
-        "./Loader": "./src/components/Loader.jsx",
-        "./ErrorPage": "./src/components/ErrorPage.jsx",
       },
       shared: {
         react: { singleton: true },

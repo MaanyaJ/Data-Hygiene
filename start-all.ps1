@@ -3,9 +3,10 @@
 
 Write-Host "Starting Data Hygiene MFEs..." -ForegroundColor Cyan
 
-Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd mfe-dashboard; npm run dev"
-Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd mfe-details; npm run dev"
-Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd mfe-shell; npm run dev"
+$refreshPath = '$env:Path = [System.Environment]::GetEnvironmentVariable(\"Path\",\"Machine\") + \";\" + [System.Environment]::GetEnvironmentVariable(\"Path\",\"User\");'
+Start-Process powershell -ArgumentList "-NoExit", "-Command", "$refreshPath cd mfe-dashboard; npm run dev"
+Start-Process powershell -ArgumentList "-NoExit", "-Command", "$refreshPath cd mfe-details; npm run dev"
+Start-Process powershell -ArgumentList "-NoExit", "-Command", "$refreshPath cd mfe-shell; npm run dev"
 
 Write-Host "Apps are launching!" -ForegroundColor Green
 Write-Host "Dashboard: http://localhost:5001"

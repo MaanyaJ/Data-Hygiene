@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Box, Snackbar, Alert } from "@mui/material";
-import ErrorPage from "shell/ErrorPage";
-import Loader from "shell/Loader";
+import { ErrorPage, Loader } from "@data-hygiene/ui";
 import ExecutionInfoBox from "../components/ExecutionInfoBox";
 import CorrectionsTable from "../components/CorrectionsTable";
 import { API_URL } from "../config";

@@ -1,7 +1,7 @@
 import React from "react";
 import { Box } from "@mui/material";
 import RecordCard from "./RecordCard";
-import Loader from "shell/Loader";
+import { Loader } from "@data-hygiene/ui";
 import {
   List,
   InfiniteLoader,

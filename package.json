@@ -1,0 +1,12 @@
+{
+  "name": "data-hygiene-monorepo",
+  "private": true,
+  "workspaces": [
+    "mfe-*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present"
+  }
+}

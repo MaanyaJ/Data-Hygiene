@@ -123,7 +123,7 @@ const Navbar = () => {
                 "& .MuiList-root": { py: 0 },
                 boxShadow: "0 8px 24px rgba(0,0,0,0.6)",
                 transformOrigin: "top left",
-                overflow: "visible", // Allow sub-menu to show outside
+                overflow: "visible",
                 animation: "rollDown 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards",
                 "@keyframes rollDown": {
                   from: { transform: "scaleY(0)", opacity: 0 },
@@ -153,7 +153,7 @@ const Navbar = () => {
                       alignItems: "center",
                       justifyContent: "space-between",
                       position: "relative",
-                      overflow: "visible", // Allow sub-menu to show outside
+                      overflow: "visible",
                       borderBottom: idx < dropdownLinks.length - 1 ? "1px solid #1e1e1e" : "none",
                       transition: "all 0.12s ease",
                       "& .sub-menu": { display: "none" },
@@ -179,7 +179,7 @@ const Navbar = () => {
                         minWidth: 160,
                         zIndex: 1000,
                         boxShadow: "0 8px 24px rgba(0,0,0,0.6)",
-                        pointerEvents: "auto", // Ensure clicks work
+                        pointerEvents: "auto",
                       }}
                     >
                       {item.items.map((subItem, sIdx) => (
