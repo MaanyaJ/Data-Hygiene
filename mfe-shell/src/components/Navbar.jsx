@@ -243,8 +243,40 @@ const Navbar = () => {
           </Menu>
         </Box>
 
-        {/* Right: Upload dialog trigger */}
-        <UploadJSON />
+        {/* Right: Actions */}
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <UploadJSON />
+          <Typography
+            onClick={() => {
+              localStorage.removeItem("auth_token");
+              localStorage.removeItem("username");
+              localStorage.setItem("logout_success", "true");
+              window.location.href = "/login";
+            }}
+            sx={{
+            fontFamily: "'Inter', sans-serif",
+            fontWeight: 600,
+            fontSize: "0.75rem",
+            textTransform: "none",
+            letterSpacing: 0.3,
+            color: "#1a1a1a",
+            backgroundColor: "#f0f0f0",
+            border: "1px solid #d8d8d8",
+            px: 1.8,
+            py: 0.5,
+            minHeight: "30px",
+            borderRadius: "2px",
+            boxShadow: "none",
+            cursor: "pointer",
+            "&:hover": {
+              backgroundColor: "#e4e4e4",
+              boxShadow: "none",
+            },
+          }}
+          >
+            Logout
+          </Typography>
+        </Box>
       </Toolbar>
     </AppBar>
   );

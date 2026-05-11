@@ -14,9 +14,6 @@ const Loader = () => {
       }}
     >
       <CircularProgress size={40} sx={{color: "#000000"}}/>
-      <Typography sx={{color: "#000000"}}>
-        Loading...
-      </Typography>
     </Box>
   )
 }

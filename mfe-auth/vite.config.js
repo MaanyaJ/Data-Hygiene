@@ -17,11 +17,11 @@ export default defineConfig({
   plugins: [
     react(),
     federation({
-      name: "details",
+      name: "auth",
       filename: "remoteEntry.js",
       dts: false,
       exposes: {
-        "./DetailsPage": "./src/pages/DetailsPage.jsx",
+        "./LoginPage": "./src/pages/LoginPage.jsx",
       },
       remotes: {
         shell: {
@@ -46,7 +46,7 @@ export default defineConfig({
     cssCodeSplit: false,
   },
   server: {
-    port: 5002,
+    port: 5004,
     strictPort: true,
-  }
+  },
 });
