@@ -4,6 +4,7 @@ import ListHeader from "../components/ListHeader";
 import RecordList from "../components/RecordList";
 import { ErrorPage } from "@data-hygiene/ui";
 import { usePaginatedRecords } from "../hooks/usePaginatedRecords";
+import DashboardSkeleton from "../components/DashboardSkeleton";
 
 const MODE_CONFIG = {
   landing:   { title: "Data Hygiene Dashboard", showStatusFilters: true,  showStageFilters: true },
@@ -110,19 +111,23 @@ const RecordsListPage = ({ mode = "landing" }) => {
       />
 
       <Box sx={{ px: 3, py: 2 }}>
-        <RecordList
-          records={records}
-          totalRecords={totalRecords}
-          totalPages={totalPages}
-          page={page}
-          loading={loading}
-          onLoadMore={loadMore}
-          patchRecords={patchRecords}
-          removeRecords={removeRecords}
-          updateCounts={updateCounts}
-          activeFilters={filter}
-          isReadyState={isReadyState}
-        />
+        {loading && records.length === 0 ? (
+          <DashboardSkeleton />
+        ) : (
+          <RecordList
+            records={records}
+            totalRecords={totalRecords}
+            totalPages={totalPages}
+            page={page}
+            loading={loading}
+            onLoadMore={loadMore}
+            patchRecords={patchRecords}
+            removeRecords={removeRecords}
+            updateCounts={updateCounts}
+            activeFilters={filter}
+            isReadyState={isReadyState}
+          />
+        )}
 
         {!loading && records.length === 0 && (
           <Box sx={{ textAlign: "center", py: 8, backgroundColor: "#ebebebff", border: "1px solid #e0e0e0", borderTop: "none" }}>
