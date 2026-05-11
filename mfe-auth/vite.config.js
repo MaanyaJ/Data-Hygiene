@@ -17,27 +17,18 @@ export default defineConfig({
   plugins: [
     react(),
     federation({
-      name: "shell",
+      name: "auth",
       filename: "remoteEntry.js",
       dts: false,
-      remotes: {
-        dashboard: {
-          type: "module",
-          name: "dashboard",
-          entry: "http://localhost:5001/remoteEntry.js",
-        },
-        details: {
-          type: "module",
-          name: "details",
-          entry: "http://localhost:5002/remoteEntry.js",
-        },
-        auth: {
-          type: "module",
-          name: "auth",
-          entry: "http://localhost:5004/remoteEntry.js",
-        },
-      },
       exposes: {
+        "./LoginPage": "./src/pages/LoginPage.jsx",
+      },
+      remotes: {
+        shell: {
+          type: "module",
+          name: "shell",
+          entry: "http://localhost:5003/remoteEntry.js",
+        },
       },
       shared: {
         react: { singleton: true },
@@ -53,5 +44,9 @@ export default defineConfig({
     target: "esnext",
     minify: false,
     cssCodeSplit: false,
+  },
+  server: {
+    port: 5004,
+    strictPort: true,
   },
 });

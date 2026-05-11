@@ -238,7 +238,7 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
       });
       const data = await res.json();
       if (!res.ok || data.status === "error") {
-        showNotification(data?.message, "error");
+        showNotification(data?.message || data?.detail, "error");
         setAcceptConfirm(null);
         return;
       }
@@ -267,11 +267,17 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
   const handleL0Confirm = useCallback(async () => {
     setSubmittingL0(true);
     try {
-      await fetch(`${API_URL}/reject-record`, {
+      const res = await fetch(`${API_URL}/reject-record`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ execution_id: execID, currentStatus: "L0 Data" }),
       });
+      const data = await res.json();
+      if (!res.ok || data.status === "error") {
+        showNotification(data?.message || data?.detail, "error");
+        setL0ConfirmDialog(null);
+        return;
+      }
       setL0ConfirmDialog(null);
       fetchData();
       showNotification("Rejected due to L0 data", "success");
@@ -372,7 +378,7 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
       );
       const data = await res.json();
       if (!res.ok || data.status === "error") {
-        showNotification(data?.message, "error");
+        showNotification(data?.message || data?.detail, "error");
         return;
       }
       showNotification("Draft record submitted successfully", "success");
