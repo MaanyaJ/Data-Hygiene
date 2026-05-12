@@ -133,7 +133,7 @@ const RecordCard = ({ record, index = 0 }) => {
   const stopAndNavigate = (e) => {
     e.stopPropagation();
     setIsClicked(true);
-    navigate(`/${record.ExecutionId}`);
+    navigate(`/details/${record.ExecutionId}`);
   };
 
   return (

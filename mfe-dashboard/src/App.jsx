@@ -14,7 +14,7 @@ const App = () => {
         <Route path="/completed" element={<RecordsListPage key="completed" mode="completed" />} />
         <Route path="/on-hold" element={<RecordsListPage key="onhold" mode="onhold" />} />
         <Route path="/all" element={<RecordsListPage key="all" mode="all" />} />
-        <Route path="/:id" element={<DetailsPage />} />
+        <Route path="/details/:id" element={<DetailsPage />} />
       </Routes>
     </Suspense>
   )
