@@ -461,13 +461,13 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
 
                   {isPending && (
                     <Chip
-                      label={isEditable ? "Action Required" : "Pending"}
+                      label = "Action Required"
                       size="small"
                       sx={{
                         height: 18,
                         fontSize: 10,
                         fontWeight: 700,
-                        backgroundColor: isEditable ? "#000000" : "#64748b",
+                        backgroundColor: "#000000",
                         color: "#ffffff",
                         borderRadius: "4px",
                         "& .MuiChip-label": { px: 1 },

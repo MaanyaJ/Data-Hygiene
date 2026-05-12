@@ -1,5 +1,5 @@
 import React from "react";
-import { Stack, Typography, Box } from "@mui/material";
+import { Stack, Typography, Box, Tooltip } from "@mui/material";
 
 const InconsistentFieldsList = ({ invalidFields = [], SuggestionsCount, status }) => {
   const errors = invalidFields;
@@ -31,9 +31,12 @@ const InconsistentFieldsList = ({ invalidFields = [], SuggestionsCount, status }
       ))}
 
       {remaining > 0 && (
-        <Typography sx={{ fontSize: "0.68rem", color: "#888", alignSelf: "center" }}>
-          +{remaining} more
-        </Typography>
+        <Tooltip describeChild arrow title={errors.map(err => <Typography display="block" variant="caption" key={err}>{err}</Typography>)}>
+          <Typography sx={{ fontSize: "0.68rem", color: "#888", alignSelf: "center" }}>
+            +{remaining} more
+          </Typography>
+        </Tooltip>
+
       )}
 
       {status?.toLowerCase() === "pending" && SuggestionsCount === true && (
