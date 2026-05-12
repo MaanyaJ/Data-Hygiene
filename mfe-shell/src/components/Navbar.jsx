@@ -1,8 +1,11 @@
 import React, { useState } from "react";
-import { AppBar, Toolbar, Typography, Box, Menu, MenuItem } from "@mui/material";
+import { AppBar, Toolbar, Typography, Box, Menu, MenuItem, Tooltip, Stack, Divider, Chip } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import LogoutIcon from "@mui/icons-material/Logout";
+import { getSession, logout } from "@data-hygiene/core";
 import UploadJSON from "./UploadJSON";
 
 const NAV_LINKS = [
@@ -24,6 +27,8 @@ const Navbar = () => {
   const location = useLocation();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
+  
+  const user = getSession();
 
   const handleOpen = (e) => setAnchorEl(e.currentTarget);
   const handleClose = () => setAnchorEl(null);
@@ -244,36 +249,109 @@ const Navbar = () => {
         </Box>
 
         {/* Right: Actions */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 3 }}>
+          {user.username && (
+            <Tooltip
+              title={
+                <Box sx={{ p: 1.5, minWidth: 220 }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 800, color: "#fff", mb: 0.5 }}>
+                    User Profile
+                  </Typography>
+                  <Divider sx={{ bgcolor: "rgba(255,255,255,0.15)", my: 1 }} />
+                  <Stack gap={1.5}>
+                    <Box>
+                      <Typography sx={{ fontSize: "0.65rem", fontWeight: 700, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", mb: 0.25 }}>
+                        Email Address
+                      </Typography>
+                      <Typography sx={{ fontSize: "0.85rem", color: "#fff" }}>{user.emailid}</Typography>
+                    </Box>
+                    <Box>
+                      <Typography sx={{ fontSize: "0.65rem", fontWeight: 700, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", mb: 0.25 }}>
+                        Designation
+                      </Typography>
+                      <Typography sx={{ fontSize: "0.85rem", color: "#fff" }}>{user.role}</Typography>
+                    </Box>
+                    <Box>
+                      <Typography sx={{ fontSize: "0.65rem", fontWeight: 700, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", mb: 0.5 }}>
+                        Expertise
+                      </Typography>
+                      <Stack direction="row" flexWrap="wrap" gap={0.75}>
+                        {user.expertise?.map((exp) => (
+                          <Chip
+                            key={exp}
+                            label={exp}
+                            size="small"
+                            sx={{
+                              height: 20,
+                              fontSize: "0.7rem",
+                              fontWeight: 600,
+                              bgcolor: "rgba(255,255,255,0.1)",
+                              color: "#fff",
+                              borderRadius: "4px",
+                              border: "1px solid rgba(255,255,255,0.1)",
+                              "& .MuiChip-label": { px: 1 },
+                            }}
+                          />
+                        ))}
+                      </Stack>
+                    </Box>
+                  </Stack>
+                </Box>
+              }
+              slotProps={{
+                tooltip: {
+                  sx: {
+                    bgcolor: "#0a0a0a",
+                    color: "#fff",
+                    border: "1px solid #333",
+                    boxShadow: "0 12px 40px rgba(0,0,0,0.9)",
+                    borderRadius: 2,
+                    p: 0,
+                  }
+                },
+                arrow: {
+                  sx: { color: "#0a0a0a" }
+                }
+              }}
+              arrow
+            >
+              <Box sx={{ cursor: "pointer", display: "flex", alignItems: "center", gap: 1, px: 1, py: 0.5, borderRadius: 1, transition: "background-color 0.2s", "&:hover": { bgcolor: "rgba(255,255,255,0.05)" } }}>
+                <AccountCircleIcon sx={{ fontSize: 22, color: "rgba(255,255,255,0.8)" }} />
+                <Typography sx={{ fontSize: "0.85rem", fontWeight: 700, color: "#fff", fontFamily: "'Inter', sans-serif" }}>
+                  {user.username}
+                </Typography>
+              </Box>
+            </Tooltip>
+          )}
+
           <UploadJSON />
+
           <Typography
-            onClick={() => {
-              localStorage.removeItem("auth_token");
-              localStorage.removeItem("username");
-              localStorage.setItem("logout_success", "true");
-              window.location.href = "/login";
-            }}
+            onClick={logout}
             sx={{
-            fontFamily: "'Inter', sans-serif",
-            fontWeight: 600,
-            fontSize: "0.75rem",
-            textTransform: "none",
-            letterSpacing: 0.3,
-            color: "#1a1a1a",
-            backgroundColor: "#f0f0f0",
-            border: "1px solid #d8d8d8",
-            px: 1.8,
-            py: 0.5,
-            minHeight: "30px",
-            borderRadius: "2px",
-            boxShadow: "none",
-            cursor: "pointer",
-            "&:hover": {
-              backgroundColor: "#e4e4e4",
-              boxShadow: "none",
-            },
-          }}
+              fontFamily: "'Inter', sans-serif",
+              fontWeight: 700,
+              fontSize: "0.75rem",
+              textTransform: "uppercase",
+              letterSpacing: 0.5,
+              color: "#fff",
+              backgroundColor: "rgba(255,255,255,0.1)",
+              border: "1px solid rgba(255,255,255,0.2)",
+              px: 2,
+              py: 0.6,
+              borderRadius: "4px",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              transition: "all 0.2s",
+              "&:hover": {
+                backgroundColor: "rgba(255,255,255,0.15)",
+                borderColor: "rgba(255,255,255,0.3)",
+              },
+            }}
           >
+            <LogoutIcon sx={{ fontSize: 16 }} />
             Logout
           </Typography>
         </Box>

@@ -461,7 +461,7 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
 
                   {isPending && (
                     <Chip
-                      label={isEditable ? "Action Required" : "View Only"}
+                      label={isEditable ? "Action Required" : "Pending"}
                       size="small"
                       sx={{
                         height: 18,

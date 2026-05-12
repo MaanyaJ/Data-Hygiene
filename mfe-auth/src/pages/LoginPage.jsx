@@ -51,6 +51,9 @@ const LoginPage = () => {
       if (response.ok) {
         localStorage.setItem("auth_token", data.token);
         localStorage.setItem("username", data.username);
+        localStorage.setItem("role", data.role);
+        localStorage.setItem("emailid", data.emailid);
+        localStorage.setItem("expertise", JSON.stringify(data.expertise));
         
         // Set success flag for the dashboard to pick up
         localStorage.setItem("login_success", "true");
