@@ -2,7 +2,7 @@ import React, { Suspense, lazy, useState, useEffect } from 'react'
 import { Routes, Route, useLocation, Navigate, Outlet } from 'react-router-dom'
 import { Box, Snackbar, Alert} from "@mui/material"
 import Navbar from './components/Navbar';
-import { Loader, PageNotFound, ProtectedRoute } from "@data-hygiene/ui";
+import { Loader, PageNotFound, ProtectedRoute, GuestRoute } from "@data-hygiene/ui";
 
 // Remote MFEs
 const RecordsListPage = lazy(() => import('dashboard/RecordsListPage'));
@@ -36,7 +36,9 @@ const App = () => {
       <Suspense fallback={<Loader />}>
         <Routes>
           {/* Public Routes (No Navbar) */}
-          <Route path="/login" element={<LoginPage />} />
+          <Route element={<GuestRoute />}>
+            <Route path="/login" element={<LoginPage />} />
+          </Route>
 
           {/* Private Protected Routes (With Navbar) */}
           <Route element={<ProtectedRoute />}>

@@ -1,6 +1,6 @@
 import React, { Suspense,lazy } from 'react'
 import { Routes, Route } from 'react-router-dom'
-import { Loader, ProtectedRoute, PageNotFound } from '@data-hygiene/ui'
+import { Loader, ProtectedRoute, PageNotFound, GuestRoute } from '@data-hygiene/ui'
 const DetailsPage = lazy(() => import('./pages/DetailsPage'));
 const LoginPage = lazy(() => import('auth/LoginPage'));
 
@@ -9,7 +9,9 @@ const App = () => {
     <Suspense fallback={<Loader />}>
       <Routes>
         {/* Standalone Login */}
-        <Route path="/login" element={<LoginPage />} />
+        <Route element={<GuestRoute />}>
+          <Route path="/login" element={<LoginPage />} />
+        </Route>
         
         <Route element={<ProtectedRoute />}>
           <Route path="/details/:id" element={<DetailsPage />} />
