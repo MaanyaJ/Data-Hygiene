@@ -14,6 +14,9 @@ export default defineConfig({
       "@data-hygiene/core": path.resolve(__dirname, "../packages/core/src"),
     },
   },
+  optimizeDeps: {
+    include: ["react", "react-dom", "react-router-dom", "@mui/material", "@emotion/react", "@emotion/styled"],
+  },
   plugins: [
     react(),
     federation({
@@ -23,16 +26,10 @@ export default defineConfig({
       exposes: {
         "./DetailsPage": "./src/pages/DetailsPage.jsx",
       },
-      remotes: {
-        shell: {
-          type: "module",
-          name: "shell",
-          entry: "http://localhost:5003/remoteEntry.js",
-        },
-      },
       shared: {
         react: { singleton: true },
         "react-dom": { singleton: true },
+        "react/jsx-runtime": { singleton: true },
         "react-router-dom": { singleton: true },
         "@mui/material": { singleton: true },
         "@emotion/react": { singleton: true },
