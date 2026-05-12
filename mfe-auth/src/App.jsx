@@ -1,15 +1,16 @@
 import React from 'react'
-import { Routes, Route, BrowserRouter } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import LoginPage from './pages/LoginPage'
+import { PageNotFound } from '@data-hygiene/ui'
 
 const App = () => {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="*" element={<LoginPage />} />
-      </Routes>
-    </BrowserRouter>
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      {/* For Auth MFE, any other path also shows login or a 404 */}
+      <Route path="/" element={<LoginPage />} />
+      <Route path="*" element={<PageNotFound />} />
+    </Routes>
   )
 }
 

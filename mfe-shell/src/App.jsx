@@ -2,25 +2,12 @@ import React, { Suspense, lazy, useState, useEffect } from 'react'
 import { Routes, Route, useLocation, Navigate, Outlet } from 'react-router-dom'
 import { Box, Snackbar, Alert} from "@mui/material"
 import Navbar from './components/Navbar';
-import { Loader } from "@data-hygiene/ui";
-import PageNotFound from './components/PageNotFound';
+import { Loader, PageNotFound, ProtectedRoute } from "@data-hygiene/ui";
 
 // Remote MFEs
 const RecordsListPage = lazy(() => import('dashboard/RecordsListPage'));
 const DetailsPage = lazy(() => import('details/DetailsPage'));
 const LoginPage = lazy(() => import('auth/LoginPage'));
-
-// Protected Route Component
-const ProtectedRoute = () => {
-  const isAuthenticated = !!localStorage.getItem("auth_token");
-  const location = useLocation();
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace state={{ from: location }} />;
-  }
-
-  return <Outlet />;
-};
 
 // Layout for pages that should have a Navbar
 const MainLayout = () => {

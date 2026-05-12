@@ -26,6 +26,13 @@ export default defineConfig({
       exposes: {
         "./DetailsPage": "./src/pages/DetailsPage.jsx",
       },
+      remotes: {
+        auth: {
+          type: "module",
+          name: "auth",
+          entry: "http://localhost:5004/remoteEntry.js",
+        },
+      },
       shared: {
         react: { singleton: true },
         "react-dom": { singleton: true },
