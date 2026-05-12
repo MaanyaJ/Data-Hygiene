@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from 'react'
+import React, { Suspense, lazy, useState, useEffect } from 'react'
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom'
 import { Box, Snackbar, Alert } from "@mui/material"
 import Navbar from './components/Navbar';
@@ -11,9 +11,9 @@ const LoginPage = lazy(() => import('auth/LoginPage'));
 
 const App = () => {
   const location = useLocation();
-  const [loginSuccess, setLoginSuccess] = React.useState(false);
+  const [loginSuccess, setLoginSuccess] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (localStorage.getItem("login_success")) {
       setLoginSuccess(true);
       localStorage.removeItem("login_success");

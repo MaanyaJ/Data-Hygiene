@@ -1,7 +1,7 @@
 import React, { Suspense, lazy } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import RecordsListPage from './pages/RecordsListPage'
-import Loader from 'shell/Loader'
+import { Loader } from '@data-hygiene/ui'
 
 const DetailsPage = lazy(() => import('details/DetailsPage'));
 

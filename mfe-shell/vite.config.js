@@ -14,6 +14,9 @@ export default defineConfig({
       "@data-hygiene/core": path.resolve(__dirname, "../packages/core/src"),
     },
   },
+  optimizeDeps: {
+    include: ["react", "react-dom", "react-router-dom", "@mui/material", "@emotion/react", "@emotion/styled"],
+  },
   plugins: [
     react(),
     federation({
@@ -42,6 +45,7 @@ export default defineConfig({
       shared: {
         react: { singleton: true },
         "react-dom": { singleton: true },
+        "react/jsx-runtime": { singleton: true },
         "react-router-dom": { singleton: true },
         "@mui/material": { singleton: true },
         "@emotion/react": { singleton: true },
