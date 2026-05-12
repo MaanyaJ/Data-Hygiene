@@ -117,7 +117,7 @@ const PipelineProgress = ({ pct, label }) => {
   );
 };
 
-const RecordCard = ({ record, index = 0 }) => {
+const RecordCard = ({ record, index = 0, mode }) => {
   const [isClicked, setIsClicked] = useState(false);
   const invalidFields = record["InvalidFields"];
   const navigate = useNavigate();
