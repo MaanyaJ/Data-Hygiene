@@ -133,7 +133,7 @@ const RecordCard = ({ record, index = 0, mode }) => {
   const stopAndNavigate = (e) => {
     e.stopPropagation();
     setIsClicked(true);
-    navigate(`/${record.ExecutionId}`, { state: { from: mode } });
+    navigate(`/details/${record.ExecutionId}`);
   };
 
   return (

@@ -1,15 +1,18 @@
 import React from 'react'
-import { Routes, Route, BrowserRouter } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import LoginPage from './pages/LoginPage'
+import { PageNotFound, GuestRoute } from '@data-hygiene/ui'
 
 const App = () => {
   return (
-    <BrowserRouter>
-      <Routes>
+    <Routes>
+      <Route element={<GuestRoute />}>
         <Route path="/login" element={<LoginPage />} />
-        <Route path="*" element={<LoginPage />} />
-      </Routes>
-    </BrowserRouter>
+        {/* For Auth MFE, the root also shows login, but it should be protected */}
+        <Route path="/" element={<LoginPage />} />
+      </Route>
+      <Route path="*" element={<PageNotFound />} />
+    </Routes>
   )
 }
 
