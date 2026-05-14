@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Typography, Button } from "@mui/material";
 
-const ErrorPage = ({ message, onRetry }) => {
+const ErrorPage = ({ message }) => {
   return (
     <Box
       sx={{
@@ -21,12 +21,7 @@ const ErrorPage = ({ message, onRetry }) => {
       <Typography variant="body2" color="text.secondary">
         {message}
       </Typography>
-
-      {/* {onRetry && (
-        <Button variant="contained" onClick={onRetry}>
-          Retry
-        </Button>
-      )} */}
+      
     </Box>
   );
 };

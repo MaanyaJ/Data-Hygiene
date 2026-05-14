@@ -7,7 +7,8 @@ import { usePaginatedRecords } from "../hooks/usePaginatedRecords";
 import DashboardSkeleton from "../components/DashboardSkeleton";
 import { API_URL } from "../config";
 import { getSession, authFetch } from "@data-hygiene/core";
-import { Menu, MenuItem, Snackbar, Alert } from "@mui/material";
+import { Menu, MenuItem } from "@mui/material";
+import { useSnackbar } from "@data-hygiene/ui";
 
 const MODE_CONFIG = {
   landing: { title: "Data Hygiene Dashboard", showStatusFilters: true, showStageFilters: true },
@@ -34,7 +35,7 @@ const RecordsListPage = ({ mode = "landing" }) => {
   const [isReassigning, setIsReassigning] = useState(false);
   const isFetchingRef = useRef(false);
   
-  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+  const { showSnackbar, SnackbarComponent } = useSnackbar();
 
   const handleFilterChange = (value) => {
     if (value === "") {
@@ -119,14 +120,14 @@ const RecordsListPage = ({ mode = "landing" }) => {
 
       if (!res.ok) throw new Error(`Reassignment failed: ${res.status}`);
       
-      setSnackbar({ open: true, message: `Successfully reassigned ${assignments.length} records to ${targetUser}`, severity: "success" });
+      showSnackbar(`Successfully reassigned ${assignments.length} records to ${targetUser}`, "success");
       setReassignAnchorEl(null);
       setIsReassignMode(false);
       setSelectedRecordIds(new Set());
       refresh();
     } catch (err) {
       console.error("Reassign submission error:", err);
-      setSnackbar({ open: true, message: "Failed to reassign records. Please try again.", severity: "error" });
+      showSnackbar("Failed to reassign records. Please try again.", "error");
     }
   };
 
@@ -211,7 +212,7 @@ const RecordsListPage = ({ mode = "landing" }) => {
   const isSearching = loading && searchInput !== search;
 
   if (error) {
-    return <ErrorPage message={error?.message || "Something went wrong"} onRetry={retry} />;
+    return <ErrorPage message={error?.message || "Something went wrong"} />;
   }
 
   return (
@@ -312,16 +313,7 @@ const RecordsListPage = ({ mode = "landing" }) => {
         )}
       </Menu>
 
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={4000}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      >
-        <Alert severity={snackbar.severity} sx={{ width: "100%" }}>
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
+      {SnackbarComponent}
     </Box>
   );
 };

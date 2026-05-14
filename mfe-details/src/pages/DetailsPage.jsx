@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useLocation } from "react-router-dom";
-import { Box, Snackbar, Alert } from "@mui/material";
-import { ErrorPage } from "@data-hygiene/ui";
+import { Box } from "@mui/material";
+import { Loader, ErrorPage, useSnackbar } from "@data-hygiene/ui";
 import DetailsSkeleton from "../components/DetailsSkeleton";
 import ExecutionInfoBox from "../components/ExecutionInfoBox";
 import CorrectionsTable from "../components/CorrectionsTable";
@@ -65,13 +65,7 @@ const DetailsPage = () => {
   const [data, setData] = useState(null);
   const [history, setHistory] = useState(null);
   const [loading, setLoading] = useState(true); // ← true so Loader shows on first paint
-  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
-
-  const showNotification = (message, severity = "success") => {
-    setSnackbar({ open: true, message, severity });
-  };
-
-  const handleSnackbarClose = () => setSnackbar(prev => ({ ...prev, open: false }));
+  const { showSnackbar, SnackbarComponent } = useSnackbar();
 
   const fetchData = async () => {
     setLoading(true);
@@ -112,7 +106,7 @@ const DetailsPage = () => {
   }, [id]);
 
   if (loading) return <DetailsSkeleton />;
-  if (error) return <ErrorPage message={error?.message} onRetry={fetchData} />;
+  if (error) return <ErrorPage message={error?.message} />;
   if (!executionData) return "No execution data to show";
   // if (!data || data.length === 0) return "No invalid data in the response to show";
 
@@ -128,22 +122,13 @@ const DetailsPage = () => {
             execID={executionData.execution_id}
             sutType={executionData.sutType}
             fetchData={fetchData}
-            showNotification={showNotification}
+            showNotification={showSnackbar}
             isEditable={isEditable}
           />
         </Box>
       </Box>
 
-      <Snackbar 
-        open={snackbar.open} 
-        autoHideDuration={5000} 
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert onClose={handleSnackbarClose} severity={snackbar.severity} variant="filled" sx={{ width: "100%" }}>
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
+      {SnackbarComponent}
     </Box>
   );
 };
