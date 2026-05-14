@@ -33,8 +33,15 @@ const ListHeader = ({
   onConfirmReassign,
   selectedCount = 0,
   showReassignButton = false,
+  eligibleUsers = [],
+  selectedUsers = [],
+  onUserFilterChange,
+  onAssignedToClick,
+  isAllSelected = false,
+  onSelectAll,
 }) => {
   const [anchorEl, setAnchorEl] = useState(null);
+  const [userAnchorEl, setUserAnchorEl] = useState(null);
 
   const AGE_FILTERS = [
     { label: "< 3 DAYS", value: "<3" },
@@ -275,8 +282,10 @@ const ListHeader = ({
           </Popover>
         </Box>
 
+
         {/* Actions Section */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 2, ml: "auto" }}>
+
           {isReassignMode ? (
             <>
               <Button
@@ -291,6 +300,97 @@ const ListHeader = ({
               >
                 CANCEL
               </Button>
+
+              {/* Assigned To Filter Dropdown - In Reassign Mode */}
+              <Box>
+                <Box
+                  onClick={(e) => {
+                    setUserAnchorEl(e.currentTarget);
+                    if (onAssignedToClick) onAssignedToClick();
+                  }}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 1,
+                    px: 1.5,
+                    height: 36,
+                    minWidth: 140,
+                    border: "1px solid #bbb",
+                    borderRadius: "2px",
+                    backgroundColor: "#fff",
+                    cursor: "pointer",
+                    "&:hover": { borderColor: "#555" },
+                  }}
+                >
+                  <Typography sx={{ fontSize: 11, fontWeight: 700, color: "#111", letterSpacing: 0.5 }}>
+                    ASSIGNED TO
+                    {selectedUsers.length > 0 && (
+                      <Box component="span" sx={{ color: "#777", ml: 0.5, fontWeight: 400 }}>
+                        ({selectedUsers.length})
+                      </Box>
+                    )}
+                  </Typography>
+                  <KeyboardArrowDownIcon sx={{ fontSize: 16, color: "#777" }} />
+                </Box>
+
+                <Popover
+                  open={Boolean(userAnchorEl)}
+                  anchorEl={userAnchorEl}
+                  onClose={() => setUserAnchorEl(null)}
+                  anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+                  transformOrigin={{ vertical: "top", horizontal: "left" }}
+                  slotProps={{
+                    paper: {
+                      sx: {
+                        mt: 0.5,
+                        borderRadius: "2px",
+                        boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+                        border: "1px solid #ddd",
+                        minWidth: 200,
+                        maxHeight: 400,
+                      },
+                    },
+                  }}
+                >
+                  <Stack sx={{ p: 1 }} gap={0.5}>
+                    {eligibleUsers.length === 0 ? (
+                      <Typography sx={{ fontSize: 11, p: 1, color: "#888" }}>Loading...</Typography>
+                    ) : (
+                      eligibleUsers.map((user) => {
+                        const name = typeof user === "string" ? user : user.username;
+                        const isActive = selectedUsers.includes(name);
+                        return (
+                          <Box
+                            key={name}
+                            onClick={() => onUserFilterChange(name)}
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 1,
+                              px: 1,
+                              py: 0.8,
+                              cursor: "pointer",
+                              borderRadius: "2px",
+                              "&:hover": { backgroundColor: "#f5f5f5" },
+                            }}
+                          >
+                            <Checkbox
+                              checked={isActive}
+                              size="small"
+                              sx={{ p: 0, color: "#999", "&.Mui-checked": { color: "#000" } }}
+                            />
+                            <Typography sx={{ fontSize: 11, fontWeight: 600, color: "#111" }}>
+                              {name}
+                            </Typography>
+                          </Box>
+                        );
+                      })
+                    )}
+                  </Stack>
+                </Popover>
+              </Box>
+
               <Button
                 variant="contained"
                 disabled={selectedCount === 0}
@@ -346,6 +446,31 @@ const ListHeader = ({
             </>
           )}
         </Box>
+        {/* Select All - Only in Reassign Mode */}
+        {isReassignMode && totalRecords>0 && (
+          <Box
+            sx={{
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              gap: 0.5,
+              mt: 1,
+              mb: -0.5,
+              ml: 0.5,
+              cursor: "pointer",
+            }}
+            onClick={onSelectAll}
+          >
+            <Checkbox
+              checked={isAllSelected}
+              size="small"
+              sx={{ p: 0, color: "#999", "&.Mui-checked": { color: "#000" } }}
+            />
+            <Typography sx={{ fontSize: 11, fontWeight: 700, color: "#111", textTransform: "uppercase", letterSpacing: 0.5 }}>
+              Select All
+            </Typography>
+          </Box>
+        )}
       </Box>
     </Box>
   );
