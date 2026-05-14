@@ -315,7 +315,7 @@ const ListHeader = ({
                   }),
                 }}
               >
-                ASSIGNED TO ({selectedCount})
+                ASSIGN TO ({selectedCount})
               </Button>
             </>
           ) : (
