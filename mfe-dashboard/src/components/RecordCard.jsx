@@ -129,8 +129,8 @@ const RecordCard = ({ record, index = 0, mode, isReassignMode, isSelected, onTog
 
   const stageInfo = getStageInfo(record.Stage, record.isValid);
   
-  const { username } = getSession();
-  const isAssignedToMe = record.tester === username;
+  const { emailid } = getSession();
+  const isAssignedToMe = record.tester === emailid;
   const isEditable = mode === "active" || isAssignedToMe;
 
   // Show the stage panel only when there is actionable stage info
