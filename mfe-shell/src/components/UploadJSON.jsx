@@ -16,6 +16,7 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutlined";
+import { useSnackbar } from "@data-hygiene/ui";
 import { API_URL } from "../config";
 
 const UploadJSON = () => {
@@ -24,14 +25,8 @@ const UploadJSON = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
-  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
-
+  const { showSnackbar, SnackbarComponent } = useSnackbar();
   const fileInputRef = useRef(null);
-
-  const handleSnackbarClose = () => setSnackbar((s) => ({ ...s, open: false }));
-
-  const showNotification = (message, type) =>
-    setSnackbar({ open: true, message, severity: type });
 
   const handleOpenDialog = () => {
     setSelectedFile(null);
@@ -50,7 +45,7 @@ const UploadJSON = () => {
     if (file.type === "application/json" || file.name.endsWith(".json")) {
       setSelectedFile(file);
     } else {
-      showNotification("Only JSON files are accepted.", "error");
+      showSnackbar("Only JSON files are accepted.", "error");
     }
   };
 
@@ -63,7 +58,7 @@ const UploadJSON = () => {
     if (file.type === "application/json" || file.name.endsWith(".json")) {
       setSelectedFile(file);
     } else {
-      showNotification("Only JSON files are accepted.", "error");
+      showSnackbar("Only JSON files are accepted.", "error");
     }
   };
 
@@ -81,12 +76,12 @@ const UploadJSON = () => {
         const err = await response.json().catch(() => null);
         throw new Error(err?.detail || `Server error: ${response.status}`);
       }
-      showNotification("File uploaded successfully!", "success");
+      showSnackbar("File uploaded successfully!", "success");
       setDialogOpen(false);
       setSelectedFile(null);
       window.dispatchEvent(new CustomEvent("app:refresh-data"));
     } catch (err) {
-      showNotification(err.message || "Upload failed. Please try again.", "error");
+      showSnackbar(err.message || "Upload failed. Please try again.", "error");
     } finally {
       setLoading(false);
     }
@@ -273,22 +268,7 @@ const UploadJSON = () => {
         </DialogActions>
       </Dialog>
 
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={5000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        sx={{ zIndex: 9999 }}
-      >
-        <Alert
-          onClose={handleSnackbarClose}
-          severity={snackbar.severity}
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
+      {SnackbarComponent}
     </>
   );
 };

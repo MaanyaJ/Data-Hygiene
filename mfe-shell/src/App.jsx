@@ -2,7 +2,7 @@ import React, { Suspense, lazy, useState, useEffect } from 'react'
 import { Routes, Route, useLocation, Navigate, Outlet } from 'react-router-dom'
 import { Box, Snackbar, Alert} from "@mui/material"
 import Navbar from './components/Navbar';
-import { Loader, PageNotFound, ProtectedRoute, GuestRoute } from "@data-hygiene/ui";
+import { Loader, PageNotFound, ProtectedRoute, GuestRoute, useSnackbar } from "@data-hygiene/ui";
 
 // Remote MFEs
 const RecordsListPage = lazy(() => import('dashboard/RecordsListPage'));
@@ -22,14 +22,15 @@ const MainLayout = () => {
 };
 
 const App = () => {
+  const { showSnackbar, SnackbarComponent } = useSnackbar();
   const [loginSuccess, setLoginSuccess] = useState(false);
 
   useEffect(() => {
     if (localStorage.getItem("login_success")) {
-      setLoginSuccess(true);
+      showSnackbar("Login successful", "success");
       localStorage.removeItem("login_success");
     }
-  }, []);
+  }, [showSnackbar]);
 
   return (
     <>
@@ -57,16 +58,7 @@ const App = () => {
         </Routes>
       </Suspense>
 
-      <Snackbar
-        open={loginSuccess}
-        autoHideDuration={4000}
-        onClose={() => setLoginSuccess(false)}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert onClose={() => setLoginSuccess(false)} severity="success" variant="filled" sx={{ width: "100%" }}>
-          Login successful
-        </Alert>
-      </Snackbar>
+      {SnackbarComponent}
     </>
   )
 }

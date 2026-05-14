@@ -14,24 +14,24 @@ import {
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { API_URL } from "@data-hygiene/core";
+import { useSnackbar } from "@data-hygiene/ui";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "error" });
+  const { showSnackbar, SnackbarComponent } = useSnackbar();
 
   useEffect(() => {
     // Check if we just logged out
     const logoutFlag = localStorage.getItem("logout_success");
     if (logoutFlag) {
-      setSnackbar({ open: true, message: "Logged out successfully", severity: "success" });
+      showSnackbar("Logged out successfully", "success");
       localStorage.removeItem("logout_success");
     }
-  }, []);
+  }, [showSnackbar]);
 
-  const handleCloseSnackbar = () => setSnackbar({ ...snackbar, open: false });
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -63,10 +63,11 @@ const LoginPage = () => {
         const errorMsg = Array.isArray(data.detail) 
           ? data.detail[0]?.msg || "Invalid input" 
           : data.detail || "Invalid email or password";
-        setSnackbar({ open: true, message: errorMsg, severity: "error" });
+        showSnackbar(errorMsg, "error");
       }
     } catch (err) {
-      setSnackbar({ open: true, message: "Something went wrong. Please try again.", severity: "error" });
+      showSnackbar(err.message || "Something went wrong. Please try again.", "error");
+      console.log(err.message)
     } finally {
       setLoading(false);
     }
@@ -176,21 +177,7 @@ const LoginPage = () => {
         </Paper>
       </Container>
 
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={5000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity={snackbar.severity}
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
+      {SnackbarComponent}
     </Box>
   );
 };
