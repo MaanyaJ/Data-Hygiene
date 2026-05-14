@@ -3,7 +3,7 @@ import { Stack, Typography, Box, Tooltip } from "@mui/material";
 
 const InconsistentFieldsList = ({ invalidFields = [], SuggestionsCount, status }) => {
   const errors = invalidFields;
-  const MAX_VISIBLE = 2;
+  const MAX_VISIBLE = 3;
 
   const visibleErrors = errors.slice(0, MAX_VISIBLE);
   const remaining = errors.length - MAX_VISIBLE;

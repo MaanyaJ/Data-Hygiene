@@ -363,21 +363,24 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
               Inconsistent Fields
             </Typography>
             {!isEditable && (
+              <>
               <Box sx={{ 
                 px: 1.25, 
                 py: 0.25, 
-                bgcolor: "#fee2e2", 
-                color: "#991b1b", 
+                bgcolor: "#fff5e1ff", 
+                color: "#e09200ff", 
                 borderRadius: "4px",
-                border: "1px solid #fecaca",
+                border: "1px solid #ffd280ff",
                 display: "flex",
                 alignItems: "center",
                 gap: 0.5
               }}>
                 <Typography sx={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase" }}>
-                  Read Only (This record is not assigned to you)
+                  Read Only 
                 </Typography>
               </Box>
+              <Typography variant="caption">(This record is not assigned to you)</Typography>
+              </>
             )}
           </Stack>
         </Stack>

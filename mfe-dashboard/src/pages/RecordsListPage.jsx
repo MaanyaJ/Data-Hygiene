@@ -31,9 +31,11 @@ const RecordsListPage = ({ mode = "landing" }) => {
   const [selectedRecordIds, setSelectedRecordIds] = useState(new Set());
 
   const [eligibleUsers, setEligibleUsers] = useState([]);
+  const [selectedUsers, setSelectedUsers] = useState([]);
   const [reassignAnchorEl, setReassignAnchorEl] = useState(null);
   const [isReassigning, setIsReassigning] = useState(false);
   const isFetchingRef = useRef(false);
+  const userAbortRef = useRef(null);
   
   const { showSnackbar, SnackbarComponent } = useSnackbar();
 
@@ -47,92 +49,19 @@ const RecordsListPage = ({ mode = "landing" }) => {
     }
   };
 
+  const handleUserFilterChange = (username) => {
+    setSelectedUsers((prev) =>
+      prev.includes(username) ? prev.filter((u) => u !== username) : [...prev, username]
+    );
+  };
+
   const toggleReassignMode = () => {
-    setIsReassignMode(!isReassignMode);
+    const nextMode = !isReassignMode;
+    setIsReassignMode(nextMode);
     setSelectedRecordIds(new Set());
-  };
-
-  const handleToggleSelection = (id) => {
-    setSelectedRecordIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
-
-  const handleConfirmReassign = (event) => {
-    console.log("handleConfirmReassign clicked");
-    setReassignAnchorEl(prev => prev ? null : event.currentTarget);
-  };
-
-  useEffect(() => {
-    if (!reassignAnchorEl || isFetchingRef.current) return;
-
-    const fetchUsers = async () => {
-      isFetchingRef.current = true;
-      setIsReassigning(true);
-      try {
-        const url = `${API_URL}/eligible-users/`; // Back to slash, but with lock
-        console.log("Fetching eligible users (locked) from:", url);
-        const res = await authFetch(url);
-
-        if (!res.ok) throw new Error(`Status ${res.status}`);
-
-        const data = await res.json();
-        console.log("Users fetched successfully:", data);
-        
-        // Use the correct key from backend response
-        const users = data.eligible_users || (Array.isArray(data) ? data : []);
-        setEligibleUsers(users);
-      } catch (err) {
-        console.error("Failed to fetch users:", err);
-        setEligibleUsers([]);
-      } finally {
-        setIsReassigning(false);
-        isFetchingRef.current = false;
-      }
-    };
-
-    fetchUsers();
-  }, [reassignAnchorEl]);
-
-  const handleUserSelect = async (user) => {
-    const targetUser = typeof user === "string" ? user : user.username;
-    console.log(`Reassigning records ${Array.from(selectedRecordIds)} to ${targetUser}`);
-    
-    // Construct the assignments array for the bulk API call
-    const assignments = Array.from(selectedRecordIds).map(id => {
-      const record = records.find(r => r.ExecutionId === id);
-      return {
-        e_id: id,
-        assign_from: record?.assigned_to || "",
-        assign_to: targetUser
-      };
-    });
-
-    try {
-      const res = await authFetch(`${API_URL}/reassign-records`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ assignments })
-      });
-
-      if (!res.ok) throw new Error(`Reassignment failed: ${res.status}`);
-      
-      showSnackbar(`Successfully reassigned ${assignments.length} records to ${targetUser}`, "success");
-      setReassignAnchorEl(null);
-      setIsReassignMode(false);
-      setSelectedRecordIds(new Set());
-      refresh();
-    } catch (err) {
-      console.error("Reassign submission error:", err);
-      showSnackbar("Failed to reassign records. Please try again.", "error");
+    if (!nextMode) {
+      setSelectedUsers([]);
     }
-  };
-
-  const handleMenuClose = () => {
-    setReassignAnchorEl(null);
   };
 
   const extraParams = React.useMemo(() => {
@@ -173,8 +102,12 @@ const RecordsListPage = ({ mode = "landing" }) => {
       params.username = username;
     }
 
+    if (selectedUsers.length > 0) {
+      params.users = selectedUsers.join(",");
+    }
+
     return params;
-  }, [mode, filter, config.showStatusFilters, config.defaultStage, config.defaultStatus, isReassignMode]);
+  }, [mode, filter, config.showStatusFilters, config.defaultStage, config.defaultStatus, isReassignMode, selectedUsers]);
 
   const {
     records, totalRecords, totalPages, page, loading, error,
@@ -182,6 +115,111 @@ const RecordsListPage = ({ mode = "landing" }) => {
     loadMore, retry, refresh, meta,
     patchRecords, removeRecords, updateCounts, isReadyState,
   } = usePaginatedRecords({ extraParams, activeFilters: filter });
+
+  const handleToggleSelection = (id) => {
+    setSelectedRecordIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const handleSelectAll = () => {
+    if (records.length === 0) return;
+    
+    const allVisibleSelected = records.every(r => selectedRecordIds.has(r.ExecutionId));
+    
+    setSelectedRecordIds((prev) => {
+      const next = new Set(prev);
+      if (allVisibleSelected) {
+        // Deselect all visible
+        records.forEach(r => next.delete(r.ExecutionId));
+      } else {
+        // Select all visible
+        records.forEach(r => next.add(r.ExecutionId));
+      }
+      return next;
+    });
+  };
+
+  const isAllSelected = records.length > 0 && records.every(r => selectedRecordIds.has(r.ExecutionId));
+
+  const handleConfirmReassign = (event) => {
+    console.log("handleConfirmReassign clicked");
+    setReassignAnchorEl(event.currentTarget);
+    handleFetchUsers();
+  };
+
+  const handleFetchUsers = async () => {
+    // Cancel any pending request
+    if (userAbortRef.current) {
+      userAbortRef.current.abort();
+    }
+    const controller = new AbortController();
+    userAbortRef.current = controller;
+
+    isFetchingRef.current = true;
+    setEligibleUsers([]); // Clear existing to show loading state
+    setIsReassigning(true);
+    try {
+      const url = `${API_URL}/eligible-users/`;
+      console.log("Fetching eligible users on demand from:", url);
+      const res = await authFetch(url, { signal: controller.signal });
+      if (!res.ok) throw new Error(`Status ${res.status}`);
+      const data = await res.json();
+      const users = data.eligible_users || (Array.isArray(data) ? data : []);
+      setEligibleUsers(users);
+    } catch (err) {
+      if (err.name !== "AbortError") {
+        console.error("Failed to fetch users:", err);
+      }
+    } finally {
+      if (userAbortRef.current === controller) {
+        setIsReassigning(false);
+        isFetchingRef.current = false;
+      }
+    }
+  };
+
+  const handleUserSelect = async (user) => {
+    const targetUser = typeof user === "string" ? user : user.username;
+    console.log(`Reassigning records ${Array.from(selectedRecordIds)} to ${targetUser}`);
+    
+    // Construct the assignments array for the bulk API call
+    const assignments = Array.from(selectedRecordIds).map(id => {
+      const record = records.find(r => r.ExecutionId === id);
+      return {
+        e_id: id,
+        assign_from: record?.assigned_to || "",
+        assign_to: targetUser
+      };
+    });
+
+    try {
+      const res = await authFetch(`${API_URL}/reassign-records`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ assignments })
+      });
+
+      if (!res.ok) throw new Error(`Reassignment failed: ${res.status}`);
+      
+      showSnackbar(`Successfully reassigned ${assignments.length} records to ${targetUser}`, "success");
+      setReassignAnchorEl(null);
+      setIsReassignMode(false);
+      setSelectedRecordIds(new Set());
+      refresh();
+    } catch (err) {
+      console.error("Reassign submission error:", err);
+      showSnackbar("Failed to reassign records. Please try again.", "error");
+    }
+  };
+
+  const handleMenuClose = () => {
+    setReassignAnchorEl(null);
+  };
+
 
   // Auto-refresh when only Val/Std filters are active but local list is empty
   useEffect(() => {
@@ -237,10 +275,11 @@ const RecordsListPage = ({ mode = "landing" }) => {
         selectedCount={selectedRecordIds.size}
         showReassignButton={isAdmin && mode === "landing"}
         eligibleUsers={eligibleUsers}
-        isLoadingUsers={isReassigning}
-        onUserSelect={handleUserSelect}
-        isAssignDropdownOpen={Boolean(reassignAnchorEl)}
-        onAssignDropdownClose={handleMenuClose}
+        selectedUsers={selectedUsers}
+        onUserFilterChange={handleUserFilterChange}
+        onAssignedToClick={handleFetchUsers}
+        isAllSelected={isAllSelected}
+        onSelectAll={handleSelectAll}
       />
 
       <Box sx={{ px: 3, py: 2 }}>
@@ -283,6 +322,40 @@ const RecordsListPage = ({ mode = "landing" }) => {
         )}
       </Box>
 
+      {/* User Selection Menu for Reassignment */}
+      <Menu
+        anchorEl={reassignAnchorEl}
+        open={Boolean(reassignAnchorEl)}
+        onClose={handleMenuClose}
+        PaperProps={{
+          sx: {
+            mt: 0.5,
+            borderRadius: "2px",
+            boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+            border: "1px solid #ddd",
+            minWidth: 180,
+          },
+        }}
+      >
+        {isReassigning ? (
+          <MenuItem disabled sx={{ fontSize: 13 }}>Loading...</MenuItem>
+        ) : eligibleUsers.length === 0 ? (
+          <MenuItem disabled sx={{ fontSize: 13 }}>No eligible users found</MenuItem>
+        ) : (
+          eligibleUsers.map((u) => {
+            const name = typeof u === "string" ? u : u.username;
+            return (
+              <MenuItem
+                key={name}
+                onClick={() => handleUserSelect(u)}
+                sx={{ fontSize: 13, fontWeight: 500, py: 1 }}
+              >
+                {name}
+              </MenuItem>
+            );
+          })
+        )}
+      </Menu>
 
       {SnackbarComponent}
     </Box>

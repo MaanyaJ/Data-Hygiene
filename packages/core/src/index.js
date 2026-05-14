@@ -1,4 +1,4 @@
-export const API_URL = "http://192.168.0.151:8000";
+export const API_URL = "http://192.168.0.96:8000";
 
 export const getSession = () => {
   try {
