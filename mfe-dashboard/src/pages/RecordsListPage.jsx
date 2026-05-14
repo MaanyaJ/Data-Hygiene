@@ -7,7 +7,7 @@ import { usePaginatedRecords } from "../hooks/usePaginatedRecords";
 import DashboardSkeleton from "../components/DashboardSkeleton";
 import { API_URL } from "../config";
 import { getSession, authFetch } from "@data-hygiene/core";
-import { Menu, MenuItem } from "@mui/material";
+
 import { useSnackbar } from "@data-hygiene/ui";
 
 const MODE_CONFIG = {
@@ -63,7 +63,7 @@ const RecordsListPage = ({ mode = "landing" }) => {
 
   const handleConfirmReassign = (event) => {
     console.log("handleConfirmReassign clicked");
-    setReassignAnchorEl(event.currentTarget);
+    setReassignAnchorEl(prev => prev ? null : event.currentTarget);
   };
 
   useEffect(() => {
@@ -236,6 +236,11 @@ const RecordsListPage = ({ mode = "landing" }) => {
         onConfirmReassign={handleConfirmReassign}
         selectedCount={selectedRecordIds.size}
         showReassignButton={isAdmin && mode === "landing"}
+        eligibleUsers={eligibleUsers}
+        isLoadingUsers={isReassigning}
+        onUserSelect={handleUserSelect}
+        isAssignDropdownOpen={Boolean(reassignAnchorEl)}
+        onAssignDropdownClose={handleMenuClose}
       />
 
       <Box sx={{ px: 3, py: 2 }}>
@@ -278,40 +283,6 @@ const RecordsListPage = ({ mode = "landing" }) => {
         )}
       </Box>
 
-      {/* User Selection Menu for Reassignment */}
-      <Menu
-        anchorEl={reassignAnchorEl}
-        open={Boolean(reassignAnchorEl)}
-        onClose={handleMenuClose}
-        PaperProps={{
-          sx: {
-            mt: 0.5,
-            borderRadius: "2px",
-            boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
-            border: "1px solid #ddd",
-            minWidth: 180,
-          },
-        }}
-      >
-        {isReassigning ? (
-          <MenuItem disabled sx={{ fontSize: 13 }}>Loading users...</MenuItem>
-        ) : eligibleUsers.length === 0 ? (
-          <MenuItem disabled sx={{ fontSize: 13 }}>No eligible users found</MenuItem>
-        ) : (
-          eligibleUsers.map((u) => {
-            const name = typeof u === "string" ? u : u.username;
-            return (
-              <MenuItem
-                key={name}
-                onClick={() => handleUserSelect(u)}
-                sx={{ fontSize: 13, fontWeight: 500, py: 1 }}
-              >
-                {name}
-              </MenuItem>
-            );
-          })
-        )}
-      </Menu>
 
       {SnackbarComponent}
     </Box>

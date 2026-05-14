@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -11,7 +11,9 @@ import {
   Divider,
 } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import AddIcon from '@mui/icons-material/Add';
+import PersonIcon from '@mui/icons-material/Person';
 import { Button } from "@mui/material";
 
 const ListHeader = ({
@@ -33,8 +35,40 @@ const ListHeader = ({
   onConfirmReassign,
   selectedCount = 0,
   showReassignButton = false,
+  // User assignment dropdown props
+  eligibleUsers = [],
+  isLoadingUsers = false,
+  onUserSelect,
+  isAssignDropdownOpen = false,
+  onAssignDropdownClose,
 }) => {
-  const [anchorEl, setAnchorEl] = useState(null);
+  const assignDropdownRef = useRef(null);
+  const filterDropdownRef = useRef(null);
+  const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
+
+  // Close Assign dropdown when clicking outside
+  useEffect(() => {
+    if (!isAssignDropdownOpen) return;
+    const handleClickOutside = (e) => {
+      if (assignDropdownRef.current && !assignDropdownRef.current.contains(e.target)) {
+        onAssignDropdownClose?.();
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isAssignDropdownOpen, onAssignDropdownClose]);
+
+  // Close Filter dropdown when clicking outside
+  useEffect(() => {
+    if (!isFilterDropdownOpen) return;
+    const handleClickOutside = (e) => {
+      if (filterDropdownRef.current && !filterDropdownRef.current.contains(e.target)) {
+        setIsFilterDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isFilterDropdownOpen]);
 
   const AGE_FILTERS = [
     { label: "< 3 DAYS", value: "<3" },
@@ -106,6 +140,13 @@ const ListHeader = ({
           sx={{ fontSize: 20, fontWeight: 700, color: "#000", lineHeight: 1.2 }}
         >
           {title}
+          {/* A/B Option 'UP': Show count next to title
+          {totalRecords !== undefined && (
+            <Box component="span" sx={{ fontSize: 14, fontWeight: 500, color: "#666", ml: 2 }}>
+              ({totalRecords} Records)
+            </Box>
+          )}
+          */}
         </Typography>
       </Box>
 
@@ -154,9 +195,9 @@ const ListHeader = ({
         />
 
         {/* Unified Filter Dropdown */}
-        <Box>
+        <Box ref={filterDropdownRef} sx={{ position: "relative" }}>
           <Box
-            onClick={(e) => setAnchorEl(e.currentTarget)}
+            onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
             sx={{
               display: "flex",
               alignItems: "center",
@@ -180,25 +221,29 @@ const ListHeader = ({
                 </Box>
               )}
             </Typography>
-            <KeyboardArrowDownIcon sx={{ fontSize: 18, color: "#777" }} />
+            {isFilterDropdownOpen ? (
+              <KeyboardArrowUpIcon sx={{ fontSize: 18, color: "#777" }} />
+            ) : (
+              <KeyboardArrowDownIcon sx={{ fontSize: 18, color: "#777" }} />
+            )}
           </Box>
 
-          <Popover
-            open={Boolean(anchorEl)}
-            anchorEl={anchorEl}
-            onClose={() => setAnchorEl(null)}
-            anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-            transformOrigin={{ vertical: "top", horizontal: "left" }}
-            slotProps={{
-              paper: {
-                sx: {
-                  mt: 0.5,
-                  borderRadius: "2px",
-                  boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
-                  border: "1px solid #ddd",
-                  minWidth: 200,
-                },
-              },
+          {/* Smooth Filter Dropdown */}
+          <Box
+            sx={{
+              position: "absolute",
+              top: "calc(100% + 4px)",
+              left: 0,
+              zIndex: 1300,
+              minWidth: 180,
+              backgroundColor: "#fff",
+              border: "1px solid #ddd",
+              borderRadius: "4px",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+              overflow: "hidden",
+              maxHeight: isFilterDropdownOpen ? "500px" : "0px",
+              opacity: isFilterDropdownOpen ? 1 : 0,
+              transition: "max-height 0.3s ease, opacity 0.2s ease",
             }}
           >
             <Stack sx={{ p: 1 }} gap={0.5}>
@@ -272,7 +317,7 @@ const ListHeader = ({
                 </>
               )}
             </Stack>
-          </Popover>
+          </Box>
         </Box>
 
         {/* Actions Section */}
@@ -291,31 +336,114 @@ const ListHeader = ({
               >
                 CANCEL
               </Button>
-              <Button
-                variant="contained"
-                disabled={selectedCount === 0}
-                onClick={onConfirmReassign}
-                startIcon={<AddIcon />}
-                sx={{
-                  fontSize: 12,
-                  fontWeight: 700,
-                  backgroundColor: "#ccc",
-                  color: "#666",
-                  boxShadow: "none",
-                  borderRadius: "2px",
-                  px: 2,
-                  height: 36,
-                  "&.Mui-disabled": { backgroundColor: "#eee", color: "#aaa" },
-                  "&:hover": { backgroundColor: "#bbb", boxShadow: "none" },
-                  ...(selectedCount > 0 && {
-                    backgroundColor: "#1b1b1b",
-                    color: "#fff",
-                    "&:hover": { backgroundColor: "#000" },
-                  }),
-                }}
-              >
-                ASSIGN TO
-              </Button>
+              {/* ASSIGN TO button with smooth inline dropdown */}
+              <Box ref={assignDropdownRef} sx={{ position: "relative" }}>
+                <Button
+                  variant="contained"
+                  disabled={selectedCount === 0}
+                  onClick={onConfirmReassign}
+                  endIcon={isAssignDropdownOpen ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                  sx={{
+                    fontSize: 12,
+                    fontWeight: 700,
+                    backgroundColor: "#ccc",
+                    color: "#666",
+                    boxShadow: "none",
+                    borderRadius: "2px",
+                    px: 2,
+                    height: 36,
+                    "&.Mui-disabled": { backgroundColor: "#eee", color: "#aaa" },
+                    "&:hover": { backgroundColor: "#bbb", boxShadow: "none" },
+                    ...(selectedCount > 0 && {
+                      backgroundColor: "#1b1b1b",
+                      color: "#fff",
+                      "&:hover": { backgroundColor: "#111" },
+                    }),
+                  }}
+                >
+                  ASSIGN TO
+                </Button>
+
+                {/* Smooth slide-down dropdown */}
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: "calc(100% + 8px)",
+                    right: 0,
+                    zIndex: 1300,
+                    minWidth: 180,
+                    backgroundColor: "#fff",
+                    border: "1px solid #e0e0e0",
+                    borderRadius: "4px",
+                    boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+                    overflow: "hidden",
+                    // Smooth slide + fade animation
+                    maxHeight: isAssignDropdownOpen ? "320px" : "0px",
+                    opacity: isAssignDropdownOpen ? 1 : 0,
+                    transition: "max-height 0.25s ease, opacity 0.2s ease",
+                  }}
+                >
+                  {/* Header row */}
+                  <Box sx={{ px: 2, py: 1.25, borderBottom: "1px solid #f0f0f0", backgroundColor: "#fafafa" }}>
+                    <Typography sx={{ fontSize: 11, fontWeight: 700, color: "#888", letterSpacing: 0.8, textTransform: "uppercase" }}>
+                      Assign to
+                    </Typography>
+                  </Box>
+
+                  {/* User list */}
+                  <Box sx={{ overflowY: "auto", maxHeight: "240px" }}>
+                    {isLoadingUsers ? (
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, px: 2, py: 2 }}>
+                        <CircularProgress size={14} sx={{ color: "#888" }} />
+                        <Typography sx={{ fontSize: 12, color: "#888" }}>Loading users…</Typography>
+                      </Box>
+                    ) : eligibleUsers.length === 0 ? (
+                      <Box sx={{ px: 2, py: 2 }}>
+                        <Typography sx={{ fontSize: 12, color: "#aaa" }}>No eligible users found</Typography>
+                      </Box>
+                    ) : (
+                      eligibleUsers.map((u) => {
+                        const name = typeof u === "string" ? u : u.username;
+                        return (
+                          <Box
+                            key={name}
+                            onClick={() => onUserSelect?.(u)}
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 1.5,
+                              px: 2,
+                              py: 1.25,
+                              cursor: "pointer",
+                              transition: "background-color 0.15s ease",
+                              "&:hover": { backgroundColor: "#f5f5f5" },
+                              "&:active": { backgroundColor: "#efefef" },
+                            }}
+                          >
+                            <Box
+                              sx={{
+                                width: 28,
+                                height: 28,
+                                borderRadius: "50%",
+                                backgroundColor: "#1b1b1b",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                flexShrink: 0,
+                              }}
+                            >
+                              <PersonIcon sx={{ fontSize: 15, color: "#fff" }} />
+                            </Box>
+                            <Typography sx={{ fontSize: 13, fontWeight: 500, color: "#111", lineHeight: 1.3 }}>
+                              {name}
+                            </Typography>
+                          </Box>
+                        );
+                      })
+                    )}
+                  </Box>
+                </Box>
+              </Box>
             </>
           ) : (
             <>
@@ -338,12 +466,14 @@ const ListHeader = ({
                   REASSIGN
                 </Button>
               )}
-              {totalRecords !== undefined && (
-                <Typography sx={{ fontSize: 12, fontWeight: 600, color: "#000", pr: 1 }}>
-                  No.of Records: {totalRecords}
-                </Typography>
-              )}
             </>
+          )}
+
+          {/* Record Count - Moved beside buttons */}
+          {totalRecords !== undefined && (
+            <Typography sx={{ fontSize: 12, fontWeight: 600, color: "#000", pr: 1 }}>
+              No.of Records: {totalRecords}
+            </Typography>
           )}
         </Box>
       </Box>
