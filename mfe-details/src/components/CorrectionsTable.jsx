@@ -375,7 +375,7 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                 gap: 0.5
               }}>
                 <Typography sx={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase" }}>
-                  Read Only
+                  Read Only (This record is not assigned to you)
                 </Typography>
               </Box>
             )}

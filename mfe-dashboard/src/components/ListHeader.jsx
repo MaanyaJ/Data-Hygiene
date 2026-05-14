@@ -11,8 +11,7 @@ import {
   Divider,
 } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import CloseIcon from "@mui/icons-material/Close";
+import AddIcon from '@mui/icons-material/Add';
 import { Button } from "@mui/material";
 
 const ListHeader = ({
@@ -296,7 +295,7 @@ const ListHeader = ({
                 variant="contained"
                 disabled={selectedCount === 0}
                 onClick={onConfirmReassign}
-                startIcon={<EditOutlinedIcon />}
+                startIcon={<AddIcon />}
                 sx={{
                   fontSize: 12,
                   fontWeight: 700,
@@ -315,7 +314,7 @@ const ListHeader = ({
                   }),
                 }}
               >
-                ASSIGN TO ({selectedCount})
+                ASSIGN TO
               </Button>
             </>
           ) : (
@@ -324,7 +323,7 @@ const ListHeader = ({
                 <Button
                   variant="outlined"
                   onClick={onToggleReassignMode}
-                  startIcon={<EditOutlinedIcon />}
+                  startIcon={<AddIcon />}
                   sx={{
                     fontSize: 12,
                     fontWeight: 700,

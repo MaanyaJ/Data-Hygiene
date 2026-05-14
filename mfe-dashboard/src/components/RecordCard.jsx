@@ -129,8 +129,8 @@ const RecordCard = ({ record, index = 0, mode, isReassignMode, isSelected, onTog
 
   const stageInfo = getStageInfo(record.Stage, record.isValid);
   
-  const { username } = getSession();
-  const isAssignedToMe = record.tester === username;
+  const { emailid } = getSession();
+  const isAssignedToMe = record.tester === emailid;
   const isEditable = mode === "active" || isAssignedToMe;
 
   // Show the stage panel only when there is actionable stage info
@@ -169,7 +169,7 @@ const RecordCard = ({ record, index = 0, mode, isReassignMode, isSelected, onTog
         </Box>
       )}
       {/* Execution ID */}
-      <Box sx={{ width: "18%", pr: 2, flexShrink: 0 }}>
+      <Box sx={{ width: "16%", pr: 2, flexShrink: 0 }}>
         <Typography sx={{ fontSize: 11, color: "#777", fontWeight: 700, mb: 0.3, textTransform: "uppercase", letterSpacing: 0.5 }}>
           Execution ID
         </Typography>
@@ -179,17 +179,17 @@ const RecordCard = ({ record, index = 0, mode, isReassignMode, isSelected, onTog
       </Box>
 
       {/* assigned to */}
-      <Box sx={{ width: "8%", pr: 2, flexShrink: 0 }}>
+      <Box sx={{ width: "12%", pr: 2, flexShrink: 0 }}>
         <Typography sx={{ fontSize: 11, color: "#777", fontWeight: 700, mb: 0.3, textTransform: "uppercase", letterSpacing: 0.5 }}>
           assigned to
         </Typography>
-        <Typography sx={{ fontSize: 12, fontWeight: 600, color: "#111", lineHeight: 1.2 }}>
+        <Typography sx={{ fontSize: 12, fontWeight: 600, color: "#111", lineHeight: 1.2, wordBreak: "break-all" }}>
           {record.tester}
         </Typography>
       </Box>
 
       {/* Updated On */}
-      <Box sx={{ width: "7%", pr: 2, flexShrink: 0 }}>
+      <Box sx={{ width: "8%", pr: 2, flexShrink: 0 }}>
         <Typography sx={{ fontSize: 11, color: "#777", fontWeight: 700, mb: 0.3, textTransform: "uppercase", letterSpacing: 0.5 }}>
           Updated On
         </Typography>
@@ -199,7 +199,7 @@ const RecordCard = ({ record, index = 0, mode, isReassignMode, isSelected, onTog
       </Box>
 
       {/* Benchmark Category */}
-      <Box sx={{ width: "8%", pr: 2, flexShrink: 0 }}>
+      <Box sx={{ width: "9%", pr: 2, flexShrink: 0 }}>
         <Typography sx={{ fontSize: 11, color: "#777", fontWeight: 700, mb: 0.3, textTransform: "uppercase", letterSpacing: 0.5 }}>
           Benchmark Category
         </Typography>
@@ -209,7 +209,7 @@ const RecordCard = ({ record, index = 0, mode, isReassignMode, isSelected, onTog
       </Box>
 
       {/* Benchmark Type */}
-      <Box sx={{ width: "8%", pr: 2, flexShrink: 0 }}>
+      <Box sx={{ width: "9%", pr: 2, flexShrink: 0 }}>
         <Typography sx={{ fontSize: 11, color: "#777", fontWeight: 700, mb: 0.3, textTransform: "uppercase", letterSpacing: 0.5 }}>
           Benchmark Type
         </Typography>
@@ -252,7 +252,7 @@ const RecordCard = ({ record, index = 0, mode, isReassignMode, isSelected, onTog
         /* ── Normal: Status + Inconsistent Fields ── */
         <>
           {/* Status */}
-          <Box sx={{ width: "6%", pr: 2, flexShrink: 0 }}>
+          <Box sx={{ width: "9%", pr: 2, flexShrink: 0 }}>
             <Typography sx={{ fontSize: 11, color: "#777", fontWeight: 700, mb: 0.3, textTransform: "uppercase", letterSpacing: 0.5 }}>
               Status
             </Typography>
@@ -266,7 +266,7 @@ const RecordCard = ({ record, index = 0, mode, isReassignMode, isSelected, onTog
           </Box>
 
           {/* Inconsistent Fields */}
-          <Box sx={{ width: "39%", pr: 2, flexShrink: 0 }}>
+          <Box sx={{ flex: 1, pr: 2, overflow: "hidden" }}>
             <Typography
               sx={{
                 fontSize: 11, color: "#777", fontWeight: 700, mb: 0.3,
