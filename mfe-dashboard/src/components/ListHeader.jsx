@@ -44,6 +44,20 @@ const ListHeader = ({
 }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [userAnchorEl, setUserAnchorEl] = useState(null);
+  const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
+  const filterDropdownRef = useRef(null);
+
+  // Close Filter dropdown when clicking outside
+  useEffect(() => {
+    if (!isFilterDropdownOpen) return;
+    const handleClickOutside = (e) => {
+      if (filterDropdownRef.current && !filterDropdownRef.current.contains(e.target)) {
+        setIsFilterDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isFilterDropdownOpen]);
 
   const AGE_FILTERS = [
     { label: "< 3 DAYS", value: "<3" },
