@@ -7,7 +7,15 @@ import { usePaginatedRecords } from "../hooks/usePaginatedRecords";
 import DashboardSkeleton from "../components/DashboardSkeleton";
 import { API_URL } from "../config";
 import { getSession, authFetch } from "@data-hygiene/core";
-import { Menu, MenuItem } from "@mui/material";
+import { 
+  Menu, 
+  MenuItem, 
+  Dialog, 
+  DialogTitle, 
+  DialogContent, 
+  DialogActions, 
+  Button 
+} from "@mui/material";
 import { useSnackbar } from "@data-hygiene/ui";
 
 const MODE_CONFIG = {
@@ -38,6 +46,10 @@ const RecordsListPage = ({ mode = "landing" }) => {
   const userAbortRef = useRef(null);
   
   const { showSnackbar, SnackbarComponent } = useSnackbar();
+
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [pendingAssignUser, setPendingAssignUser] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleFilterChange = (value) => {
     if (value === "") {
@@ -94,6 +106,7 @@ const RecordsListPage = ({ mode = "landing" }) => {
       if (expertise && expertise.length > 0) {
         params.expertise = expertise.join(",");
       }
+      params.status = "pending";
       params.reassign_mode = "true";
     }
 
@@ -182,8 +195,16 @@ const RecordsListPage = ({ mode = "landing" }) => {
     }
   };
 
-  const handleUserSelect = async (user) => {
-    const targetUser = typeof user === "string" ? user : user.username;
+  const handleUserSelect = (user) => {
+    setPendingAssignUser(user);
+    setConfirmDialogOpen(true);
+    setReassignAnchorEl(null);
+  };
+
+  const executeReassignment = async () => {
+    if (!pendingAssignUser) return;
+    
+    const targetUser = typeof pendingAssignUser === "string" ? pendingAssignUser : pendingAssignUser.username;
     console.log(`Reassigning records ${Array.from(selectedRecordIds)} to ${targetUser}`);
     
     // Construct the assignments array for the bulk API call
@@ -196,6 +217,7 @@ const RecordsListPage = ({ mode = "landing" }) => {
       };
     });
 
+    setIsSubmitting(true);
     try {
       const res = await authFetch(`${API_URL}/reassign-records`, {
         method: "POST",
@@ -206,13 +228,17 @@ const RecordsListPage = ({ mode = "landing" }) => {
       if (!res.ok) throw new Error(`Reassignment failed: ${res.status}`);
       
       showSnackbar(`Successfully reassigned ${assignments.length} records to ${targetUser}`, "success");
-      setReassignAnchorEl(null);
+      setConfirmDialogOpen(false);
+      setPendingAssignUser(null);
       setIsReassignMode(false);
       setSelectedRecordIds(new Set());
+      setSelectedUsers([]);
       refresh();
     } catch (err) {
       console.error("Reassign submission error:", err);
       showSnackbar("Failed to reassign records. Please try again.", "error");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -358,6 +384,54 @@ const RecordsListPage = ({ mode = "landing" }) => {
       </Menu>
 
       {SnackbarComponent}
+
+      {/* Reassignment Confirmation Dialog */}
+      <Dialog
+        open={confirmDialogOpen}
+        onClose={() => !isSubmitting && setConfirmDialogOpen(false)}
+        PaperProps={{
+          sx: {
+            borderRadius: "2px",
+            padding: 1,
+            minWidth: 400,
+          }
+        }}
+      >
+        <DialogTitle sx={{ fontSize: 16, fontWeight: 700, pb: 1 }}>
+          Confirm Reassignment
+        </DialogTitle>
+        <DialogContent>
+          <Typography sx={{ fontSize: 14, color: "#333" }}>
+            Are you sure you want to assign <strong>{selectedRecordIds.size}</strong> records to <strong>{pendingAssignUser ? (typeof pendingAssignUser === "string" ? pendingAssignUser : pendingAssignUser.username) : ""}</strong>?
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button 
+            onClick={() => setConfirmDialogOpen(false)} 
+            disabled={isSubmitting}
+            sx={{ fontSize: 12, fontWeight: 600, color: "#555" }}
+          >
+            CANCEL
+          </Button>
+          <Button 
+            onClick={executeReassignment} 
+            variant="contained"
+            disabled={isSubmitting}
+            sx={{ 
+              fontSize: 12, 
+              fontWeight: 700, 
+              backgroundColor: "#1b1b1b",
+              color: "#fff",
+              borderRadius: "2px",
+              boxShadow: "none",
+              "&:hover": { backgroundColor: "#000", boxShadow: "none" },
+              "&.Mui-disabled": { backgroundColor: "#eee", color: "#aaa" }
+            }}
+          >
+            {isSubmitting ? "ASSIGNING..." : "CONFIRM"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
