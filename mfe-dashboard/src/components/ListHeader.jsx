@@ -224,7 +224,7 @@ const ListHeader = ({
               top: "calc(100% + 4px)",
               left: 0,
               zIndex: 1300,
-              minWidth: 180,
+              minWidth: 300,
               backgroundColor: "#fff",
               border: "1px solid #ddd",
               borderRadius: "4px",
@@ -258,9 +258,9 @@ const ListHeader = ({
                       size="small"
                       sx={{ p: 0, color: "#999", "&.Mui-checked": { color: "#000" } }}
                     />
-                    <Typography sx={{ fontSize: 12, fontWeight: 550, color: "#111", display: "flex", alignItems: "center", gap: 0.5 }}>
+                    <Typography sx={{ fontSize: 12, fontWeight: 550, color: "#111", gap: 0.5 }}>
                       {f.label}
-                      <Box component="span" sx={{ fontSize: 11, fontWeight: 400, color: "#888" }}>
+                      <Box component="span" sx={{ fontSize: 11, fontWeight: 400, color: "#888", ml: 0.8 }}>
                         ({loading ? "0" : getCount(f.value)?.toLocaleString() || "0"})
                       </Box>
                     </Typography>

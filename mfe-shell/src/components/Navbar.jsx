@@ -120,7 +120,7 @@ const Navbar = () => {
               elevation: 0,
               sx: {
                 mt: 0,
-                width: anchorEl?.offsetWidth ?? 180,
+                width: 155,
                 borderRadius: 0,
                 backgroundColor: "#111",
                 border: "none",

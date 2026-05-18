@@ -377,7 +377,7 @@ const RecordsListPage = ({ mode = "landing" }) => {
         )}
  
         {!loading && records.length === 0 && (
-<Box sx={{ textAlign: "center", py: 8, backgroundColor: "#ebebebff", border: "1px solid #e0e0e0", borderTop: "none" }}>
+<Box sx={{ textAlign: "center", py: 8, backgroundColor: "#ebebebff" }}>
 <Typography variant="h6" color="text.secondary" sx={{ fontSize: 14 }}>
               {(() => {
                 const hasVal = filter.includes("validation inprogress,validation initiated");
