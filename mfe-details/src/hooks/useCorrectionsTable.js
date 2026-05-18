@@ -73,8 +73,8 @@ export const useCorrectionsTable = (data, history, execID, sutType, fetchData, s
     const initialCustom = {};
 
     data.forEach((group, groupIdx) => {
-      const gStatus = group.currentStatus;
-      if (gStatus !== STATUS.ACCEPTED && gStatus !== STATUS.APPROVED) return;
+      const gStatus = group.currentStatus?.toLowerCase();
+      if (gStatus !== STATUS.ACCEPTED.toLowerCase() && gStatus !== STATUS.APPROVED.toLowerCase()) return;
 
       const primaryField = group.invalid_field;
 

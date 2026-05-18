@@ -493,23 +493,25 @@ const CorrectionsTable = ({ data, history, execID, sutType, fetchData, showNotif
                           "& .MuiChip-label": { px: 1 },
                         }}
                       />
-                      <Chip
-                        label={
-                          typeof selectedIdx === "number"
-                            ? "Suggestion Selected"
-                            : "Custom Masterlist Dropdown Value Selected"
-                        }
-                        size="small"
-                        sx={{
-                          height: 20,
-                          fontSize: 11,
-                          fontWeight: 700,
-                          backgroundColor: "#000000",
-                          color: "#ffffff",
-                          borderRadius: "4px",
-                          "& .MuiChip-label": { px: 1 },
-                        }}
-                      />
+                      {selectedIdx !== undefined && (
+                        <Chip
+                          label={
+                            typeof selectedIdx === "number"
+                              ? "Suggestion Selected"
+                              : "Custom Masterlist Dropdown Value Selected"
+                          }
+                          size="small"
+                          sx={{
+                            height: 20,
+                            fontSize: 11,
+                            fontWeight: 700,
+                            backgroundColor: "#000000",
+                            color: "#ffffff",
+                            borderRadius: "4px",
+                            "& .MuiChip-label": { px: 1 },
+                          }}
+                        />
+                      )}
                     </>
                   )}
                 </Stack>
